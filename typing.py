@@ -1,5 +1,8 @@
 from typing import List
+import numpy as np
+
 from bpy.props import FloatProperty, IntProperty, StringProperty, FloatVectorProperty
+
 
 class SvBaseType:
     pass
@@ -7,6 +10,8 @@ class SvBaseType:
 # Everytype must have a corresponding socket
 # Types aren't actually concrete types yet, they are just for
 # auto generating nodes based on introspection
+
+Required = object()
 
 
 class Number(SvBaseType):
@@ -49,7 +54,21 @@ class Object(SvBaseType):
     bl_idname = "SvRxObjectSocket"
 
 
+class Matrix(SvBaseType):
+    bl_idname = "SvRxMatrixSocket"
+    identity = np.identity(4)
+
+
+class Color(SvBaseType):
+    bl_idname = "SvRxColorSocket"
+
+
+class Anytype(SvBaseType):
+    bl_idname = "SvRxAnySocket"
+
+
 # Property types
+
 class SvBaseTypeP:
     def __init__(self, **kwargs):
         self.kwargs = kwargs

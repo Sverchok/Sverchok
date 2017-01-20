@@ -25,6 +25,7 @@ from bpy.props import (FloatProperty,
                        BoolProperty,
                        StringProperty)
 
+
 class SocketBase:
     default_value = None
     color = (1, 0, 0, 1)  # red to show unset colors
@@ -38,6 +39,7 @@ class SocketBase:
     def draw_color(self, context, node):
         return self.color
 
+
 class SocketNumber(SocketBase):
     color = (0.0, 0.8, 0.0, 1.0)
 
@@ -48,18 +50,28 @@ class IntSocket(bpy.types.NodeSocket, SocketNumber):
 
     default_value = IntProperty()
 
+
 class FloatSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxFloatSocket"
     bl_label = "Float Socket"
 
     default_value = FloatProperty()
 
+
 class SocketVector(SocketBase):
     color = (0.9, 0.6, 0.2, 1.0)
+
 
 class VertexSocket(bpy.types.NodeSocket, SocketVector):
     bl_idname = "SvRxVertexSocket"
     bl_label = "Vertex Socket"
+
+
+class MatrixSocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = "SvRxMatrixSocket"
+    bl_label = "Matrix Socket"
+
+    color = (.2, .8, .8, 1.0)
 
 
 class VectorSocket(bpy.types.NodeSocket, SocketVector):
