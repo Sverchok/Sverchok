@@ -60,6 +60,7 @@ def import_submodules(package, recursive=True):
     results = {}
     for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
         full_name = package.__name__ + '.' + name
+        print(name)
         results[full_name] = importlib.import_module(full_name)
         if recursive and is_pkg:
             results.update(import_submodules(full_name))
@@ -74,7 +75,6 @@ if reload_event:
     print("SvRx reloading")
     for im in imported_modules.values():
         importlib.reload(im)
-    ui.menu.reload_menu()
 
 # this is used as a marker for reload
 import bpy
