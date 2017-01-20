@@ -59,6 +59,8 @@ class NodeDynSignature(NodeBase):
     def function(self):
         return self.func_dict[self.mode]
 
+_func_lookup = {}
+
 
 def node_func(*args, **values):
     def real_node_func(func):
