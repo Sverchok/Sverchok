@@ -31,13 +31,63 @@ class SocketBase:
     color = (1, 0, 0, 1)  # red to show unset colors
 
     def draw(self, context, layout, node, text):
-        if self.default_value and not self.is_linked:
+
+        if self.is_output or self.is_linked:
+            layout.label(text)
+        elif self.is_linked:
+            layout.label(text)
+        elif self.default_value is not None:
             layout.prop(self, "default_value", text=text)
         else:
             layout.label(text)
 
     def draw_color(self, context, node):
         return self.color
+
+    def replace_socket(self, bl_idname=None, name=None, default=None):
+        replace_socket(self, new_type=bl_idname, new_name=name, default=default)
+
+    @property
+    def socket_id(self):
+        return hash(self)
+
+
+def replace_socket(socket, new_type=None, new_name=None, default=None):
+    '''
+    Replace a socket with a socket of new_type and keep links
+    '''
+
+    socket_type = new_type or socket.bl_idname
+    socket_name = new_name or socket.name
+
+    ng = socket.id_data
+    if socket.bl_idname == socket_type:
+        socket.name = new_name
+        if default is not None:
+            socket.default_value = default
+        return
+
+    if socket.is_output:
+        outputs = socket.node.outputs
+        to_sockets = [l.to_socket for l in socket.links]
+
+        outputs.remove(socket)
+        new_socket = outputs.new(socket_type, socket_name)
+
+        for to_socket in to_sockets:
+            ng.links.new(new_socket, to_socket)
+
+    else:
+        inputs = socket.node.inputs
+        from_socket = socket.links[0].from_socket if socket.is_linked else None
+
+        inputs.remove(socket)
+        new_socket = inputs.new(socket_type, socket_name)
+
+        if from_socket:
+            ng.links.new(from_socket, new_socket)
+
+    return new_socket
 
 
 class SocketNumber(SocketBase):
@@ -78,7 +128,7 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
     bl_idname = "SvRxVectorSocket"
     bl_label = "Vector Socket"
 
-    default_value = FloatVectorProperty(size=4)
+    default_value = FloatVectorProperty(size=3)
 
     def draw(self, context, layout, node, text):
         if not self.is_linked:
@@ -87,8 +137,40 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
             super().draw(context, layout, node, text)
 
 
+class TopoSocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = "SvRxTopoSocket"
+    bl_label = "Topo Socket"
+
+    color = (.1, .1, .1, 1)
+
+
+
+class AnySocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = "SvRxAnySocket"
+    bl_label = "Any Socket"
+
+    color = (.9, .9, .9, 1.0)
+
+
+
 class ValueIntSocket(bpy.types.NodeSocket, SocketNumber):
+    bl_idname = "SvRxValueIntSocket"
+    bl_label = "Value Int Socket"
+
     default_value = IntProperty()
+
+    def draw(self, context, layout, node, text):
+        if self.is_output:
+            layout.prop(self, "default_value", text=text)
+        else:
+            pass
+
+
+class ValueFloatSocket(bpy.types.NodeSocket, SocketNumber):
+    bl_idname = "SvRxValueFloatSocket"
+    bl_label = "Value Float Socket"
+
+    default_value = FloatProperty()
 
     def draw(self, context, layout, node, text):
         if self.is_output:

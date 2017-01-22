@@ -1,13 +1,16 @@
-from svrx.typing import Int, Float, Vertices, Edges, Faces
 
-import svrx.util.geom
+from svrx.nodes.node_base import node_func
+from svrx.typing import Int, Float, Vertices, Edges, Faces, List
 
-@node_func
-def circle(
-          count: Int, radius: Float = 1.0
-          ) -> (
-          Vertices,
-          Edges,
-          Faces
-          ):
-    return geom.circle(count, radius)
+from svrx.util.geom import circle
+
+
+@node_func(bl_idname="SvRxNodeCircle", label="Circle")
+def circle(count: Int = 24,
+           radius: Float = 1.0
+           ) -> (
+           List[Vertices],
+           List[Edges],
+           List[Faces]
+                ):
+    return list(circles(count, radius))

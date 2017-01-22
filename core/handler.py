@@ -17,28 +17,29 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-
-class Node:
-
-    def __init__(self, node):
-        self.name = node.name
+import bpy
+from bpy.app.handlers import persistent
 
 
-class NodeTree:
+def svrx_trees():
+    for ng in bpy.data.node_groups:
+        if ng.bl_idname == 'SvRxTree':
+            yield ng
 
-    def __init__(self, ng):
-        self.name = ng.name
 
-    def __iter__(self):
-        end_nodes = magic_func()
-        visited = set()
-        node_stack = list(end_nodes)
-        while node_stack:
-            node = node_stack.pop()
-            if all(n in seed for n in get_deps(node)):
-                yield node
-            else:
-                node_stack.push(node)
-                for n in get_deps:
-                    if n not in visited:
-                        node_stack.push(n)
+@persistent
+def sv_main_handler(scene):
+    """
+    Main Sverchok handler for updating node tree upon editor changes
+    """
+    for ng in svrx_trees():
+        if ng.has_changed:
+            ng.execute()
+
+
+def register():
+    bpy.app.handlers.scene_update_pre.append(sv_main_handler)
+
+
+def unregister():
+    bpy.app.handlers.scene_update_pre.remove(sv_main_handler)

@@ -20,6 +20,8 @@
 import bpy
 from bpy.props import BoolProperty
 
+from svrx.core.execution import exec_node_group
+
 
 class SverchokReduxTree(bpy.types.NodeTree):
     bl_idname = 'SvRxTree'
@@ -32,4 +34,6 @@ class SverchokReduxTree(bpy.types.NodeTree):
         self.has_changed = True
 
     def execute(self):
-        pass
+        self.has_changed = False
+        exec_node_group(self)
+        self.has_changed = False

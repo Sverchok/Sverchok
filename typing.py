@@ -4,8 +4,10 @@ import numpy as np
 from bpy.props import FloatProperty, IntProperty, StringProperty, FloatVectorProperty
 
 
-class SvBaseType:
-    pass
+class SvRxBaseType:
+    def __init__(self, name=None):
+        self.name = name
+
 
 # Everytype must have a corresponding socket
 # Types aren't actually concrete types yet, they are just for
@@ -14,7 +16,7 @@ class SvBaseType:
 Required = object()
 
 
-class Number(SvBaseType):
+class Number(SvRxBaseType):
     bl_idname = "SvRxFloatSocket"
 
 
@@ -31,14 +33,14 @@ class Vertices(Number):
 
 
 class Vector(Number):
-    bl_idname = "SvRxVertexSocket"
+    bl_idname = "SvRxVectorSocket"
 
 
-class Edges(SvBaseType):
+class Edges(SvRxBaseType):
     bl_idname = "SvRxTopoSocket"
 
 
-class Faces(SvBaseType):
+class Faces(SvRxBaseType):
     bl_idname = "SvRxTopoSocket"
 
 
@@ -46,30 +48,30 @@ class TopoData(Edges, Faces):
     bl_idname = "SvRxTopoSocket"
 
 
-class String(SvBaseType):
+class String(SvRxBaseType):
     bl_idname = "SvRxStringSocket"
 
 
-class Object(SvBaseType):
+class Object(SvRxBaseType):
     bl_idname = "SvRxObjectSocket"
 
 
-class Matrix(SvBaseType):
+class Matrix(SvRxBaseType):
     bl_idname = "SvRxMatrixSocket"
     identity = np.identity(4)
 
 
-class Color(SvBaseType):
+class Color(SvRxBaseType):
     bl_idname = "SvRxColorSocket"
 
 
-class Anytype(SvBaseType):
+class Anytype(SvRxBaseType):
     bl_idname = "SvRxAnySocket"
 
 
 # Property types
 
-class SvBaseTypeP:
+class SvRxBaseTypeP:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
 
@@ -80,31 +82,31 @@ class SvBaseTypeP:
         return self.prop_func(**self.kwargs)
 
 
-class FloatP(SvBaseTypeP):
+class FloatP(SvRxBaseTypeP):
     prop_func = FloatProperty
 
 
-class IntP(SvBaseTypeP):
+class IntP(SvRxBaseTypeP):
     prop_func = IntProperty
 
 
-class VectorP(SvBaseTypeP):
+class VectorP(SvRxBaseTypeP):
     prop_func = FloatVectorProperty
 
 
-class StringP(SvBaseTypeP):
+class StringP(SvRxBaseTypeP):
     prop_func = StringProperty
 
 
 # Value Types, used for outputs
 
 class ValueBase:
-    pass
+    bl_idname = "SvRxValueIntSocket"
 
 
 class IntValue:
-    pass
+    bl_idname = "SvRxValueIntSocket"
 
 
 class FloatValue:
-    pass
+    bl_idname = "SvRxValueFloatSocket"

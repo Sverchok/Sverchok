@@ -1,10 +1,22 @@
+
+
 import numpy as np
+
+from svrx.typing import Vertices, Float
+
 
 def add(u: Vertices = (0.0, 0.0, 0.0),
         v: Vertices = (0.0, 0.0, 0.0)
         ) -> Vertices:
     u, v = make_compatible(u, v)
     return u + v
+
+
+def sub(u: Vertices = (0.0, 0.0, 0.0),
+        v: Vertices = (0.0, 0.0, 0.0)
+        ) -> Vertices:
+    u, v = make_compatible(u, v)
+    return u - v
 
 
 def cross(u: Vertices = (0.0, 0.0, 0.0),
@@ -39,11 +51,12 @@ func_list = {
     "Dot":    (5, dot),
 }
 
+"""
+class SvrxVectorMathNode:
 
-class SvrVectorMathNode:
-
-    mode = EnumProperty(items=list)
+    mode = EnumProperty(items=func_list)
 
     @property
     def function(self):
         return func_dict[self.mode]
+"""
