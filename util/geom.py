@@ -34,6 +34,37 @@ import bmesh
 import mathutils
 
 
+def repeat_last(lst):
+    """
+    creates an infinite iterator the first each element in lst
+    and then keep repeating the last element,
+    use with terminating input
+    """
+    i = -1
+    while lst:
+        i += 1
+        if len(lst) > i:
+            yield lst[i]
+        else:
+            yield lst[-1]
+
+
+def match_long_repeat(lsts):
+    """return matched list, using the last value to fill lists as needed
+    longest list matching [[1,2,3,4,5], [10,11]] -> [[1,2,3,4,5], [10,11,11,11,11]]
+    """
+    max_l = 0
+    tmp = []
+    for l in lsts:
+        max_l = max(max_l, len(l))
+    for l in lsts:
+        if len(l) == max_l:
+            tmp.append(l)
+        else:
+            tmp.append(repeat_last(l))
+    return list(map(list, zip(*zip(*tmp))))
+
+
 def vectorize(func):
     '''
     Will create a yeilding vectorized generator of the

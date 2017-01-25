@@ -85,14 +85,79 @@ def DAG(ng):
     start = {l.to_node for l in ng.links if l.to_node not in from_nodes}
 
     def recurse(node, links):
-        if links[node]:
+        print(node.name)
+        if node in links:
             for n in links[node]:
                 yield from recurse(n, links)
+                yield node
         else:
             yield node
 
     for node in start:
         yield from recurse(node, links)
+
+
+def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
+    def assign_tree(tree, level, data):
+        print("Assign", tree, level, data)
+        if tree is None:
+            return
+        if level == 0:
+            tree.data = data
+            tree.level = 0
+        elif level == 1:
+            for d in data:
+                tree.add_child(data=d).level = 0
+            tree.level = 1
+        print("Assign", tree, level, data)
+
+    print(f.label, in_levels, out_levels, in_trees)
+    if all(t.level == l for t, l in zip(in_trees, in_levels)):
+        args = []
+        for tree in in_trees:
+            args.append(tree.data)
+        results = f(*args)
+        if len(out_trees) > 1:
+            for out_tree, l, result in zip(out_trees, out_levels, results):
+                assign_tree(out_tree, l, result)
+        elif len(out_trees) == 1:  # results is a single socket
+            print(results)
+            assign_tree(out_trees[0], out_levels[0], results)
+        else:  # no output
+            pass
+    else:
+        inner_trees = []
+        max_length = 1
+        for tree, l in zip(in_trees, in_levels):
+            if tree.level != l:
+                inner_trees.append(tree.children)
+                max_length = max(len(tree.children), max_length)
+            else:
+                inner_trees.append(None)
+
+        for i in range(max_length):
+            args = []
+            for tree, inner_tree in zip(in_trees, inner_trees):
+                print(tree, inner_tree)
+                if inner_tree is None:
+                    args.append(tree)
+                else:
+                    if i < len(inner_tree):
+                        args.append(inner_tree[i])
+                    else:
+                        args.append(inner_tree[-1])
+            outs = []
+            for ot in out_trees:
+                if ot:
+                    outs.append(ot.add_child())
+                else:
+                    outs.append(None)
+
+            recurse_levels(f, in_levels, out_levels, args, outs)
+#            for t0, t1 in zip(outs, out_trees):
+#                if t0:
+#                    t1.level = t0.level + 1
+
 
 
 def recurse_exec(f, trees, out_trees, level=0):
@@ -117,6 +182,7 @@ def recurse_exec(f, trees, out_trees, level=0):
             args = [inner_trees[j][idx] for j, idx in enumerate(index)]
             for out_tree in out_trees:
                 out_tree.children.append(SvDataTree())
+
             recurse_exec(f, args, [out_tree.children[-1] for out_tree in out_trees], level=(level + 1))
 
 
@@ -136,11 +202,15 @@ def exec_node_group(node_group):
         func = compile_node(node)
         out_trees = []
         in_trees = []
+        in_levels = []
 
-        for param in func.parameters:
+        for param, level in func.parameters:
+            in_levels.append(level)
             if isinstance(param, int):
                 socket = node.inputs[param]
                 if socket.is_linked:
+                    #  here a more intelligent loookup is needed
+                    #  to support reroutes and wifi replacement
                     tree = data_trees.get(socket.links[0].from_socket)
                 else:
                     tree = SvDataTree(socket)
@@ -154,8 +224,9 @@ def exec_node_group(node_group):
             else:
                 out_trees.append(None)
 
-        recurse_exec(func, in_trees, out_trees)
-
+        recurse_levels(func, in_levels, func.returns, in_trees, out_trees)
+        print("finished with node", node.name)
         for ot in out_trees:
-            ot.set_level()
-            print(ot.name, ot.get_level())
+            if ot:
+                ot.set_level()
+                ot.print()

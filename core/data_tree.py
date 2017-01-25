@@ -28,16 +28,24 @@ class SvDataTree:
     def __init__(self, socket=None, node=None, prop=None):
         self.data = None
         self.children = []
+        self.name = ""
+        self.level = None
         if socket:
             self.name = socket.node.name + ": " + socket.name
-        elif node and prop:
+            self.level = 0
+            if not socket.is_linked:
+                self.data = np.array([socket.default_value])
+        elif node and prop is not None:
             self.name = node.name + "." + prop
             self.data = getattr(node, prop)
+            self.level = 0
         else:
             pass
 
-        if not socket.is_linked:
-            self.data = np.array([socket.default_value])
+    def add_child(self, data=None):
+        self.children.append(type(self)())
+        self.children[-1].data = data
+        return self.children[-1]
 
     @property
     def is_leaf(self):
@@ -45,13 +53,15 @@ class SvDataTree:
 
     def __repr__(self):
         if self.is_leaf:
-            return "SvDataTree<{}>".format(self.data)
+            return "SvDataTree<data={}, level={}>".format(self.data, self.level)
         else:
-            return "SvDataTree<children={}>".format(len(self.children))
+            return "SvDataTree<children={}, level={},d={}>".format(len(self.children), self.level, self.data)
 
     def print(self, level=0):
         if self.name:
-            print(self.name)
+            print(self.name, self.level)
+        else:
+            print(self.level)
         if self.is_leaf:
             print(level * "    ", self.data)
         else:
@@ -65,16 +75,16 @@ class SvDataTree:
             for v in chain(map(iter, self.children)):
                 yield from v
 
-    def set_level(self, level=0):
-        self.level = level
+    def set_level(self):
         if self.is_leaf:
-            return level
+            self.level = 0
         else:
+            level = 0
             for child in self.children:
-                child.set_level(level + 1)
+                level = max(child.set_level() + 1, level)
+            self.level = level
+        return self.level
+
 
     def get_level(self):
-        if self.is_leaf:
-            return 1
-        else:
-            return 1 + self.children[0].get_level()
+        return self.level

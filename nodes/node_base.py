@@ -142,6 +142,7 @@ def get_signature(func):
         annotation = parameter.annotation
         print(name, parameter, annotation)
         if isinstance(annotation, type):
+            print(parse_type(annotation))
             annotation, level = parse_type(annotation)
             annotation = annotation()
         else:
@@ -161,7 +162,7 @@ def get_signature(func):
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
 
-            func.parameters.append((len(func.inputs_template) - 1), level)
+            func.parameters.append((len(func.inputs_template) - 1, level))
 
         elif isinstance(annotation, SvRxBaseTypeP):
             if not (parameter.default == inspect.Signature.empty or parameter.default is None):
@@ -196,7 +197,7 @@ def parse_type(s_type):
     if isinstance(s_type, type) and issubclass(s_type, list):
         return s_type.__parameters__[0], 1
     else:
-        s_type, 0
+        return s_type, 0
 
 _node_funcs = {}
 

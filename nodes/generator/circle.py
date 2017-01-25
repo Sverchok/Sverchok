@@ -2,7 +2,7 @@
 from svrx.nodes.node_base import node_func
 from svrx.typing import Int, Float, Vertices, Edges, Faces, List
 
-from svrx.util.geom import circle
+from svrx.util.geom import circles
 
 
 @node_func(bl_idname="SvRxNodeCircle", label="Circle")
