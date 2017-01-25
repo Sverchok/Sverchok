@@ -99,7 +99,6 @@ def DAG(ng):
 
 def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
     def assign_tree(tree, level, data):
-        print("Assign", tree, level, data)
         if tree is None:
             return
         if level == 0:
@@ -109,19 +108,18 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             for d in data:
                 tree.add_child(data=d).level = 0
             tree.level = 1
-        print("Assign", tree, level, data)
 
-    print(f.label, in_levels, out_levels, in_trees)
+    # print(f.label, in_levels, out_levels, in_trees)
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
         args = []
         for tree in in_trees:
             args.append(tree.data)
         results = f(*args)
+
         if len(out_trees) > 1:
             for out_tree, l, result in zip(out_trees, out_levels, results):
                 assign_tree(out_tree, l, result)
         elif len(out_trees) == 1:  # results is a single socket
-            print(results)
             assign_tree(out_trees[0], out_levels[0], results)
         else:  # no output
             pass
@@ -149,41 +147,12 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             outs = []
             for ot in out_trees:
                 if ot:
+                    print(i, max_length, len(ot.children))
                     outs.append(ot.add_child())
                 else:
                     outs.append(None)
 
             recurse_levels(f, in_levels, out_levels, args, outs)
-#            for t0, t1 in zip(outs, out_trees):
-#                if t0:
-#                    t1.level = t0.level + 1
-
-
-
-def recurse_exec(f, trees, out_trees, level=0):
-    if all(tree.is_leaf for tree in trees):
-        args = [tree.data for tree in trees]
-        res = f(*args)
-        if len(out_trees) > 1:
-            for out_tree, r in zip(out_trees, res):
-                if out_tree is not None:
-                    out_tree.data = r
-        elif len(out_trees) == 1:
-            for r in res[0]:
-                sdt = SvDataTree()
-                sdt.data = r
-                out_trees[0].children.append(sdt)
-        else:  # no output
-            pass
-    else:
-        inner_trees = [[tree] if tree.is_leaf else tree.children for tree in trees]
-        for i in range(max(map(len, inner_trees))):
-            index = [i if i < len(tree) else len(tree) - 1 for tree in inner_trees]
-            args = [inner_trees[j][idx] for j, idx in enumerate(index)]
-            for out_tree in out_trees:
-                out_tree.children.append(SvDataTree())
-
-            recurse_exec(f, args, [out_tree.children[-1] for out_tree in out_trees], level=(level + 1))
 
 
 def compile_node(node):

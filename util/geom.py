@@ -34,36 +34,21 @@ import bmesh
 import mathutils
 
 
-def repeat_last(lst):
-    """
-    creates an infinite iterator the first each element in lst
-    and then keep repeating the last element,
-    use with terminating input
-    """
-    i = -1
-    while lst:
-        i += 1
-        if len(lst) > i:
-            yield lst[i]
-        else:
-            yield lst[-1]
-
-
 def match_long_repeat(lsts):
     """return matched list, using the last value to fill lists as needed
     longest list matching [[1,2,3,4,5], [10,11]] -> [[1,2,3,4,5], [10,11,11,11,11]]
     """
-    max_l = 0
-    tmp = []
-    for l in lsts:
-        max_l = max(max_l, len(l))
-    for l in lsts:
-        if len(l) == max_l:
-            tmp.append(l)
+    out = []
+    lengths = list(map(len, lsts))
+    for length, lst in zip(lengths, lsts):
+        if length == max(lengths):
+            out.append(lst)
         else:
-            tmp.append(repeat_last(l))
-    return list(map(list, zip(*zip(*tmp))))
-
+            x = np.empty((max(lengths), 1))
+            x[length:] = lst
+            x[:length] = lst[-1]
+            out.append(x)
+    return out
 
 def vectorize(func):
     '''
@@ -73,12 +58,17 @@ def vectorize(func):
     '''
     @wraps(func)
     def inner(*args, **kwargs):
+        print("vectorize inner", func.__name__)
         split = len(args)
         keys = kwargs.keys()
         parameters = [p for p in args + tuple(kwargs.values())]
+        print(parameters)
+        print(match_long_repeat(parameters))
         for param in zip(*match_long_repeat(parameters)):
+            print(func.__name__, *param)
             kw_args = {k: v for k, v in zip(keys, param[split:])}
             yield func(*param[:split], **kw_args)
+        print("vectorize done", func.__name__)
     return inner
 
 

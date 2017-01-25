@@ -43,7 +43,7 @@ class SvDataTree:
             pass
 
     def add_child(self, data=None):
-        self.children.append(type(self)())
+        self.children.append(SvDataTree())
         self.children[-1].data = data
         return self.children[-1]
 
