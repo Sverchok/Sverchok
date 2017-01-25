@@ -1,5 +1,5 @@
-# Sverchok
+# Sverchok Reudx
 
-Ghost implemenation/Sverchok Redux.
+A refactoring of Sverchok
 
-Move Along
+In very early development, put add-on a directoy calle svrx inside of blenders add-on directory.
