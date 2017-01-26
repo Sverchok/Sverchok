@@ -37,14 +37,6 @@ class MeshOut(Stateful):
 
 
 
-def default_mesh(name):
-    verts, faces = [(1, 1, -1), (1, -1, -1), (-1, -1, -1)], [(0, 1, 2)]
-    mesh_data = bpy.data.meshes.new(name)
-    mesh_data.from_pydata(verts, [], faces)
-    mesh_data.update()
-    return mesh_data
-
-
 def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
 
     scene = bpy.context.scene
@@ -95,14 +87,14 @@ def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
     bm.verts.index_update()
     bm.verts.ensure_lookup_table()
 
-    if faces:
+    if not faces is None:
         add_face = bm.faces.new
         for face in faces:
             add_face(tuple(bm.verts[i] for i in face))
 
         bm.faces.index_update()
 
-    if edges:
+    if not edges is None:
         add_edge = bm.edges.new
         for edge in edges:
             edge_seq = tuple(bm.verts[i] for i in edge)
