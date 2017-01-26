@@ -48,7 +48,7 @@ class SvTreeDB:
 data_trees = SvTreeDB()
 
 
-def topo_sort(links, start):
+def topo_sort(links, starts):
     """
     links = {node: [node0, node1, ..., nodeN]}
     start, node to start from
@@ -59,7 +59,9 @@ def topo_sort(links, start):
         weights[node] = max(weight, weights[node])
         for from_node in links[node]:
             visit(from_node, weight + 1)
-    visit(start, 0)
+
+    for start in starts:
+        visit(start, 0)
     return sorted(weights.keys(), key=lambda n: -weights[n])
 
 
@@ -80,10 +82,7 @@ def DAG(ng):
     starts = {l.to_node for l in ng.links if l.to_node not in from_nodes}
 
     nodes = starts.union(from_nodes)
-    node_list = []
-
-    for node in starts:
-        node_list.extend(topo_sort(links, node))
+    node_list = topo_sort(links, starts)
 
     return node_list
 
@@ -97,19 +96,17 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             tree.level = 0
         elif level == 1:
             for d in data:
-                print(d)
                 tree.add_child(data=d).level = 0
             tree.level = 1
 
-    # print(f.label, in_levels, out_levels, in_trees)
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
         args = []
         for tree in in_trees:
             args.append(tree.data)
         results = f(*args)
-
+        print("results:", f.label, '\n', results)
         if len(out_trees) > 1:
-            for out_tree, l, result in zip(out_trees, out_levels, results):
+            for out_tree, l, result in zip(out_trees, out_levels, zip(*results)):
                 assign_tree(out_tree, l, result)
         elif len(out_trees) == 1:  # results is a single socket
             assign_tree(out_trees[0], out_levels[0], results)
@@ -128,7 +125,7 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
         for i in range(max_length):
             args = []
             for tree, inner_tree in zip(in_trees, inner_trees):
-                print(tree, inner_tree)
+                #print(tree, inner_tree)
                 if inner_tree is None:
                     args.append(tree)
                 else:
@@ -139,7 +136,6 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             outs = []
             for ot in out_trees:
                 if ot:
-                    print(i, max_length, len(ot.children))
                     outs.append(ot.add_child())
                 else:
                     outs.append(None)
@@ -182,4 +178,4 @@ def exec_node_group(node_group):
         for ot in out_trees:
             if ot:
                 ot.set_level()
-                ot.print()
+                #ot.print()

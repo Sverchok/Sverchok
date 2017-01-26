@@ -85,6 +85,5 @@ class SvDataTree:
             self.level = level
         return self.level
 
-
     def get_level(self):
         return self.level
