@@ -43,20 +43,20 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
     meshes = bpy.data.meshes
     objects = bpy.data.objects
 
-    name = name + "." + str(idx).zfill(4)
+    rx_name = name + "." + str(idx).zfill(4)
 
     def assign_empty_mesh(idx):
-        if name in meshes:
-            meshes.remove(meshes[name])
-        return meshes.new(name)
+        if rx_name in meshes:
+            meshes.remove(meshes[rx_name])
+        return meshes.new(rx_name)
     
     if name in objects:
-        obj = objects[name]
+        obj = objects[rx_name]
         obj.data = assign_empty_mesh(idx)
     else:
         # this is only executed once, upon the first run.
-        mesh = meshes.new(name)
-        obj = objects.new(name, mesh)
+        mesh = meshes.new(rx_name)
+        obj = objects.new(rx_name, mesh)
         scene.objects.link(obj)
 
         obj['idx'] = idx
@@ -87,14 +87,14 @@ def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
     bm.verts.index_update()
     bm.verts.ensure_lookup_table()
 
-    if not faces is None:
+    if not faces is None and len(faces):
         add_face = bm.faces.new
         for face in faces:
             add_face(tuple(bm.verts[i] for i in face))
 
         bm.faces.index_update()
 
-    if not edges is None:
+    if not edges is None and len(edges):
         add_edge = bm.edges.new
         for edge in edges:
             edge_seq = tuple(bm.verts[i] for i in edge)
