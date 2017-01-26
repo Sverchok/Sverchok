@@ -29,8 +29,11 @@
 #
 # -*- coding: utf-8 -*-
 
+
+import sys
 import importlib
 import pkgutil
+
 
 bl_info = {
     "name": "SverchokRedux",
@@ -45,6 +48,9 @@ bl_info = {
     "tracker_url": "",
     "category": "Node"}
 
+
+if __name__ != "svrx":
+    sys.modules["svrx"] = sys.modules[__name__]
 
 # Recursive auto import,
 # http://stackoverflow.com/a/25562415
