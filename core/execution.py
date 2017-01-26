@@ -21,6 +21,7 @@ import collections
 
 import svrx
 from svrx.core.data_tree import SvDataTree
+from svrx.nodes.node_base import Stateful
 
 
 class SvTreeDB:
@@ -125,7 +126,6 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
         for i in range(max_length):
             args = []
             for tree, inner_tree in zip(in_trees, inner_trees):
-                #print(tree, inner_tree)
                 if inner_tree is None:
                     args.append(tree)
                 else:
@@ -149,6 +149,9 @@ def exec_node_group(node_group):
     for node in DAG(node_group):
         print("exec node", node.name)
         func = node.compile()
+        if isinstance(func, Stateful):
+            func.start()
+
         out_trees = []
         in_trees = []
         in_levels = []
@@ -174,6 +177,8 @@ def exec_node_group(node_group):
                 out_trees.append(None)
 
         recurse_levels(func, in_levels, func.returns, in_trees, out_trees)
+        if isinstance(func, Stateful):
+            func.stop()
         print("finished with node", node.name)
         for ot in out_trees:
             if ot:

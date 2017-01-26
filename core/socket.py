@@ -25,6 +25,9 @@ from bpy.props import (FloatProperty,
                        BoolProperty,
                        StringProperty)
 
+def exec_socket(self, context):
+    self.id_data.update()
+
 
 class SocketBase:
     default_value = None
@@ -98,14 +101,14 @@ class IntSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxIntSocket"
     bl_label = "Int Socket"
 
-    default_value = IntProperty()
+    default_value = IntProperty(update=exec_socket)
 
 
 class FloatSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxFloatSocket"
     bl_label = "Float Socket"
 
-    default_value = FloatProperty()
+    default_value = FloatProperty(update=exec_socket)
 
 
 class SocketVector(SocketBase):
@@ -128,7 +131,7 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
     bl_idname = "SvRxVectorSocket"
     bl_label = "Vector Socket"
 
-    default_value = FloatVectorProperty(size=3)
+    default_value = FloatVectorProperty(size=3, update=exec_socket)
 
     def draw(self, context, layout, node, text):
         if not self.is_linked:
@@ -157,7 +160,7 @@ class ValueIntSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxValueIntSocket"
     bl_label = "Value Int Socket"
 
-    default_value = IntProperty()
+    default_value = IntProperty(update=exec_socket)
 
     def draw(self, context, layout, node, text):
         if self.is_output:
@@ -170,7 +173,7 @@ class ValueFloatSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxValueFloatSocket"
     bl_label = "Value Float Socket"
 
-    default_value = FloatProperty()
+    default_value = FloatProperty(update=exec_socket)
 
     def draw(self, context, layout, node, text):
         if self.is_output:

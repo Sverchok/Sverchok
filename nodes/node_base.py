@@ -104,7 +104,7 @@ def make_valid_identifier(name):
 
 def class_factory(func):
     if hasattr(func, "cls_bases"):
-        bases = tuple(func.cls_bases + [NodeBase, bpy.types.Node])
+        bases = tuple(func.cls_base + [bpy.types.Node])
     else:
         bases = (NodeBase, bpy.types.Node)
 
@@ -116,7 +116,7 @@ def class_factory(func):
     for name, prop in func.properties:
         cls_dict[name] = prop
 
-    for name in {"draw_buttons", "update", "draw_label"}:
+    for name in {"draw_buttons", "draw_buttons_ext", "update", "draw_label"}:
         attr = getattr(func, name, None)
         if callable(attr):
             cls_dict[name] = attr
@@ -203,6 +203,23 @@ def parse_type(s_type):
 
 _node_funcs = {}
 
+class NodeStateful(NodeBase):
+
+    @classmethod
+    def compile(cls):
+        return cls()
+
+class Stateful:
+    cls_base = (NodeStateful,)
+
+
+def register_stateful():
+    for cls in Stateful.__subclasses__():
+        f = cls()
+        class_factory(f)
+        f.category = cls.__module__.split(".")[-2]
+        _node_funcs[cls.bl_idname] = f
+
 
 def node_func(*args, **values):
     def real_node_func(func):
@@ -210,13 +227,10 @@ def node_func(*args, **values):
             for key, value in values.items():
                 setattr(func, key, value)
         annotate(func)
-        print("annotating")
         get_signature(func)
         class_factory(func)
         _node_funcs[func.bl_idname] = func
-        print("got sig")
         module_name = func.__module__.split(".")[-2]
-        print("module:", module_name)
         func.category = module_name
         return func
     if args and callable(args[0]):
@@ -227,8 +241,11 @@ def node_func(*args, **values):
 
 
 def register():
+    register_stateful()
+
     for func in _node_funcs.values():
         bpy.utils.register_class(func.cls)
+
 
 def unregister():
     for func in _node_funcs.values():

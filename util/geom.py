@@ -51,16 +51,12 @@ def vectorize(func):
     '''
     @wraps(func)
     def inner(*args, **kwargs):
-        print("vectorize inner", func.__name__)
         split = len(args)
         keys = kwargs.keys()
         parameters = [p for p in args + tuple(kwargs.values())]
-        print(parameters)
         for param in match_long_repeat(parameters):
-            print(func.__name__, *param)
             kw_args = {k: v for k, v in zip(keys, param[split:])}
             yield func(*param[:split], **kw_args)
-        print("vectorize done", func.__name__)
     return inner
 
 
