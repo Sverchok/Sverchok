@@ -47,31 +47,20 @@ def default_mesh(name):
 
 def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
 
-
     scene = bpy.context.scene
     meshes = bpy.data.meshes
     objects = bpy.data.objects
+
     name = name + "." + str(idx).zfill(4)
 
     def assign_empty_mesh(idx):
-        meshes = bpy.data.meshes
-        mt_name = name
-        if mt_name in meshes:
-            return meshes[mt_name]
-        else:
-            return meshes.new(mt_name)
+        if name in meshes:
+            meshes.remove(meshes[name])
+        return meshes.new(name)
     
     if name in objects:
         obj = objects[name]
-        # assign the object an empty mesh, this allows the current mesh
-        # to be uncoupled and removed from bpy.data.meshes
         obj.data = assign_empty_mesh(idx)
-
-        # remove uncoupled mesh, and add it straight back.
-        if name in meshes:
-            meshes.remove(meshes[name])
-        mesh = meshes.new(name)
-        obj.data = mesh
     else:
         # this is only executed once, upon the first run.
         mesh = meshes.new(name)
@@ -88,6 +77,7 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
     bm.to_mesh(mesh)
     bm.free()
 
+    obj.update_tag(refresh={'OBJECT', 'DATA'})
     obj.hide_select = False
 
 
