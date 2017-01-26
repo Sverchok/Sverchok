@@ -59,14 +59,14 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
         obj = objects.new(name, mesh)
         scene.objects.link(obj)
 
-    # at this point the mesh is always fresh and empty
-    obj['idx'] = idx
-    obj['basename'] = name
+        obj['idx'] = idx
+        obj['basename'] = name
 
+    # at this point the mesh is always fresh and empty
 
     ''' get bmesh, write bmesh to obj, free bmesh'''
     bm = bmesh_from_pydata(verts, edges, faces, normal_update=True)
-    bm.to_mesh(mesh)
+    bm.to_mesh(obj.data)
     bm.free()
 
     obj.update_tag(refresh={'OBJECT', 'DATA'})
