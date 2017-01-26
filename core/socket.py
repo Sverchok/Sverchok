@@ -25,6 +25,7 @@ from bpy.props import (FloatProperty,
                        BoolProperty,
                        StringProperty)
 
+
 def exec_socket(self, context):
     self.id_data.update()
 
@@ -147,13 +148,11 @@ class TopoSocket(bpy.types.NodeSocket, SocketBase):
     color = (.1, .1, .1, 1)
 
 
-
 class AnySocket(bpy.types.NodeSocket, SocketBase):
     bl_idname = "SvRxAnySocket"
     bl_label = "Any Socket"
 
     color = (.9, .9, .9, 1.0)
-
 
 
 class ValueIntSocket(bpy.types.NodeSocket, SocketNumber):
