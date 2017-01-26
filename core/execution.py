@@ -48,24 +48,19 @@ class SvTreeDB:
 data_trees = SvTreeDB()
 
 
-# from itertools, should be somewhere else...
+def topo_sort(links, start):
+    """
+    links = {node: [node0, node1, ..., nodeN]}
+    start, node to start from
+    """
+    weights = collections.defaultdict(lambda: -1)
 
-def unique_everseen(iterable, key=None):
-    "List unique elements, preserving order. Remember all elements ever seen."
-    # unique_everseen('AAAABBBCCDAABBB') --> A B C D
-    # unique_everseen('ABBCcAD', str.lower) --> A B C D
-    seen = set()
-    seen_add = seen.add
-    if key is None:
-        for element in filterfalse(seen.__contains__, iterable):
-            seen_add(element)
-            yield element
-    else:
-        for element in iterable:
-            k = key(element)
-            if k not in seen:
-                seen_add(k)
-                yield element
+    def visit(node, weight):
+        weights[node] = max(weight, weights[node])
+        for from_node in links[node]:
+            visit(from_node, weight + 1)
+    visit(start, 0)
+    return sorted(weights.keys(), key=lambda n: -weights[n])
 
 
 def DAG(ng):
@@ -73,7 +68,7 @@ def DAG(ng):
 
     # needs to preprocess certain things
     # 1. reroutes
-    # 2. wife node replacement
+    # 2. wifi node replacement
 
     for l in ng.links:
         if not l.is_valid:
@@ -82,19 +77,15 @@ def DAG(ng):
         links[l.to_node].append(l.from_node)
 
     from_nodes = {l.from_node for l in ng.links}
-    start = {l.to_node for l in ng.links if l.to_node not in from_nodes}
+    starts = {l.to_node for l in ng.links if l.to_node not in from_nodes}
 
-    def recurse(node, links):
-        print(node.name)
-        if node in links:
-            for n in links[node]:
-                yield from recurse(n, links)
-                yield node
-        else:
-            yield node
+    nodes = starts.union(from_nodes)
+    node_list = []
 
-    for node in start:
-        yield from recurse(node, links)
+    for node in starts:
+        node_list.extend(topo_sort(links, node))
+
+    return node_list
 
 
 def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
@@ -106,6 +97,7 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             tree.level = 0
         elif level == 1:
             for d in data:
+                print(d)
                 tree.add_child(data=d).level = 0
             tree.level = 1
 
@@ -155,20 +147,12 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             recurse_levels(f, in_levels, out_levels, args, outs)
 
 
-def compile_node(node):
-    node_funcs = svrx.nodes.node_base._node_funcs
-    func = node_funcs.get(node.bl_idname)
-    if func is None:
-        raise LookupError
-    return func
-
-
 def exec_node_group(node_group):
     print("exec tree")
     data_trees.clean(node_group)
-    for node in unique_everseen(DAG(node_group), key=lambda n: n.name):
+    for node in DAG(node_group):
         print("exec node", node.name)
-        func = compile_node(node)
+        func = node.compile()
         out_trees = []
         in_trees = []
         in_levels = []

@@ -34,21 +34,14 @@ import bmesh
 import mathutils
 
 
-def match_long_repeat(lsts):
-    """return matched list, using the last value to fill lists as needed
-    longest list matching [[1,2,3,4,5], [10,11]] -> [[1,2,3,4,5], [10,11,11,11,11]]
-    """
-    out = []
-    lengths = list(map(len, lsts))
-    for length, lst in zip(lengths, lsts):
-        if length == max(lengths):
-            out.append(lst)
-        else:
-            x = np.empty((max(lengths), 1))
-            x[length:] = lst
-            x[:length] = lst[-1]
-            out.append(x)
-    return out
+def match_long_repeat(parameters):
+    counts = [len(p) for p in parameters]
+    for i in range(max(counts)):
+        args = []
+        for c, parameter in zip(counts, parameters):
+            args.append(parameter[min(c - 1, i)])
+        yield args
+
 
 def vectorize(func):
     '''
@@ -63,8 +56,7 @@ def vectorize(func):
         keys = kwargs.keys()
         parameters = [p for p in args + tuple(kwargs.values())]
         print(parameters)
-        print(match_long_repeat(parameters))
-        for param in zip(*match_long_repeat(parameters)):
+        for param in match_long_repeat(parameters):
             print(func.__name__, *param)
             kw_args = {k: v for k, v in zip(keys, param[split:])}
             yield func(*param[:split], **kw_args)

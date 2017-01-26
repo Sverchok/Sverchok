@@ -20,7 +20,7 @@
 import bpy
 from bpy.props import BoolProperty
 
-from svrx.core.execution import exec_node_group
+from svrx.core.execution import exec_node_group, DAG
 
 
 class SverchokReduxTree(bpy.types.NodeTree):
@@ -37,3 +37,6 @@ class SverchokReduxTree(bpy.types.NodeTree):
         self.has_changed = False
         exec_node_group(self)
         self.has_changed = False
+
+    def update_list(self):
+        return DAG(self)

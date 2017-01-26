@@ -52,6 +52,9 @@ class NodeBase:
     def init(self, context):
         self.adjust_sockets()
 
+    def compile(self):
+        return _node_funcs[self.bl_idname]
+
     def adjust_sockets(self):
         inputs_template = _node_funcs[self.bl_idname].inputs_template
         for socket, socket_data in zip(self.inputs, inputs_template):
@@ -88,8 +91,7 @@ class NodeBase:
 
 class NodeDynSignature(NodeBase):
 
-    @property
-    def function(self):
+    def compile(self):
         return self.func_dict[self.mode]
 
 
