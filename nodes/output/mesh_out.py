@@ -84,7 +84,7 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
 
 
     ''' get bmesh, write bmesh to obj, free bmesh'''
-    bm = bmesh_from_pydata(verts, edges, faces, normals_update=True)
+    bm = bmesh_from_pydata(verts, edges, faces, normal_update=True)
     bm.to_mesh(mesh)
     bm.free()
 
