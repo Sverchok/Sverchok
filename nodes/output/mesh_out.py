@@ -92,7 +92,7 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
     obj.hide_select = False
 
 
-def bmesh_from_pydata(verts=None, edges=None, faces=None, normal_update=False):
+def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
     ''' verts is necessary, edges/faces are optional
         normal_update, will update verts/edges/faces normals at the end
     '''
