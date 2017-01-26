@@ -9,8 +9,8 @@ from svrx.util.geom import circles
 def circle(nr_verts: Int = 24,
            radius: Float = 1.0
            ) -> (
-           List[Vertices],
-           List[Edges],
-           List[Faces]
+           [Vertices],
+           [Edges],
+           [Faces]
                 ):
     return list(circles(radius, [0], nr_verts))

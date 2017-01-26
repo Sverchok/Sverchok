@@ -12,7 +12,7 @@ np_arange = vectorize(np.arange)
 def linspace(start: Float = 0.0,
              stop: Float = 1.0,
              count: Int = 10
-             ) -> List[Float]:
+             ) -> [Float]:
     print("np_l enter", start, stop, count)
     return list(np_linspace(start, stop, count))
 
@@ -20,7 +20,7 @@ def linspace(start: Float = 0.0,
 @node_func(bl_idname="SvRxNumberArange")
 def arange(start: Int = 0,
            stop: Int = 10,
-           step: Int = 1) -> List[Int]:
+           step: Int = 1) -> [Int]:
     return list(np_arange(start, stop, step))
 
 

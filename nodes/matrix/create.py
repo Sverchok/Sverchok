@@ -14,6 +14,6 @@ def create_matrix(location: Vector = (0.0, 0.0, 0.0),
                   scale: Vector = (1.0, 1.0, 1.0),
                   rotation: Vector = (0.0, 0.0, 1.0),
                   angle: Float = 0.0
-                  ) -> List[Matrix]:
+                  ) -> [Matrix]:
 
     return list(trans_mat(location))

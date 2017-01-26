@@ -61,7 +61,7 @@ class NodeBase:
             socket.replace_socket(*socket_data)
 
         diff = len(self.inputs) - len(inputs_template)
-        print(diff)
+
         if diff > 0:
             for i in range(diff):
                 self.inputs.remove(self.inputs[-1])
@@ -79,7 +79,7 @@ class NodeBase:
             socket.replace_socket(*socket_data)
 
         diff = len(self.outputs) - len(outputs_template)
-        print(diff)
+
         if diff > 0:
             for i in range(diff):
                 self.outputs.remove(self.outputs[-1])
@@ -142,13 +142,13 @@ def get_signature(func):
 
     for name, parameter in sig.parameters.items():
         annotation = parameter.annotation
-        print(name, parameter, annotation)
+
+        level = 0
         if isinstance(annotation, type):
-            print(parse_type(annotation))
-            annotation, level = parse_type(annotation)
             annotation = annotation()
-        else:
-            level = 0
+
+        if isinstance(annotation, list):
+            annotation, level = parse_type(annotation)
 
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
 
@@ -196,8 +196,8 @@ def get_signature(func):
 def parse_type(s_type):
     """parse type into level, right now only supports one level
     """
-    if isinstance(s_type, type) and issubclass(s_type, list):
-        return s_type.__parameters__[0], 1
+    if isinstance(s_type, list):
+        return s_type[0], 1
     else:
         return s_type, 0
 
