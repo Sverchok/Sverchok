@@ -6,11 +6,11 @@ from svrx.util.geom import circles
 
 
 @node_func(bl_idname="SvRxNodeCircle", label="Circle")
-def circle(count: Int = 24,
+def circle(nr_verts: Int = 24,
            radius: Float = 1.0
            ) -> (
            List[Vertices],
            List[Edges],
            List[Faces]
                 ):
-    return list(circles(count, radius))
+    return list(circles(radius, [0], nr_verts))
