@@ -49,7 +49,7 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
     scene = bpy.context.scene
     meshes = bpy.data.meshes
     objects = bpy.data.objects
-    name = name + "_" + str(idx).zfill(4)
+    name = name + "." + str(idx).zfill(4)
     vert_count = len(verts)
 
     if name in objects:

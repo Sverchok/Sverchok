@@ -155,6 +155,13 @@ class AnySocket(bpy.types.NodeSocket, SocketBase):
     color = (.9, .9, .9, 1.0)
 
 
+class MeshSocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = "SvRxMeshSocket"
+    bl_label = "Any Socket"
+
+    color = (.1, .1, .1, 1.0)
+
+
 class ValueIntSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxValueIntSocket"
     bl_label = "Value Int Socket"
