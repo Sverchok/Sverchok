@@ -62,7 +62,7 @@ def vectorize(func):
 
 def circle(radius=1.0, phase=0, nverts=20):
     t = np.linspace(0, np.pi * 2 * (nverts - 1 / nverts), nverts)
-    circ = np.array([np.cos(t + phase) * radius, np.sin(t + phase) * radius, np.zeros(nverts), np.zeros(nverts)])
+    circ = np.array([np.cos(t + phase) * radius, np.sin(t + phase) * radius, np.zeros(nverts), np.ones(nverts)])
     verts = np.transpose(circ)
     edges = np.array([(i, i + 1) for i in range(nverts - 1)] + [(nverts - 1, 0)])
     faces = np.array([tuple(range(nverts))])
