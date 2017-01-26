@@ -61,7 +61,6 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
         else:
             return meshes.new(mt_name)
     
-    # remove object
     if name in objects:
         obj = objects[name]
         # assign the object an empty mesh, this allows the current mesh

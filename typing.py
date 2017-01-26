@@ -69,6 +69,9 @@ class Anytype(SvRxBaseType):
     bl_idname = "SvRxAnySocket"
 
 
+class Mesh(SvRxBaseType):
+    bl_idname = "SvRxMeshSocket"
+
 # Property types
 
 class SvRxBaseTypeP:
