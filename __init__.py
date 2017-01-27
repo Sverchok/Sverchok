@@ -73,11 +73,11 @@ def import_submodules(package, recursive=True):
     return results
 
 
-imported_modules = import_submodules(__name__)
+imported_modules = import_submodules('svrx')
 
 reload_event = bool("bpy" in locals())
 
-if reload_event:
+if reload_event and False:
     print("SvRx reloading")
     for im in imported_modules.values():
         importlib.reload(im)
