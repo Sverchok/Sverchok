@@ -103,9 +103,12 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
         args = []
         for tree in in_trees:
-            args.append(tree.data)
+            if tree.level == 0:
+                args.append(tree.data)
+            else:
+                args.append(list(tree))
         results = f(*args)
-        print("results:", f.label, '\n', results)
+        #print("results:", f.label, '\n', results)
         if len(out_trees) > 1:
             for out_tree, l, result in zip(out_trees, out_levels, zip(*results)):
                 assign_tree(out_tree, l, result)
