@@ -8,9 +8,7 @@ from svrx.util.geom import circles
 @node_func(bl_idname="SvRxNodeCircle", label="Circle")
 def circle(nr_verts: Int = 24,
            radius: Float = 1.0
-           ) -> (
-           [Vertices],
-           [Edges],
-           [Faces]
-                ):
+           ) -> ([Vertices],
+                 [Edges],
+                 [Faces]):
     return list(circles(radius, [0], nr_verts))
