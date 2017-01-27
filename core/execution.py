@@ -25,6 +25,9 @@ from svrx.nodes.node_base import Stateful
 
 
 class SvTreeDB:
+    """
+    Data storage loookup for sockets
+    """
     def __init__(self):
         self.data_trees = {}
 
@@ -32,7 +35,7 @@ class SvTreeDB:
         for link in ng.links:
             self.get(link.from_socket).print()
 
-    def get(self, socket=None):
+    def get(self, socket):
         ng_id = socket.id_data.name
         s_id = socket.socket_id
         if ng_id not in self.data_trees:
@@ -52,7 +55,8 @@ data_trees = SvTreeDB()
 def topo_sort(links, starts):
     """
     links = {node: [node0, node1, ..., nodeN]}
-    start, node to start from
+    starts, nodes to start from
+    return a topologiclly sorted list
     """
     weights = collections.defaultdict(lambda: -1)
 
@@ -67,6 +71,10 @@ def topo_sort(links, starts):
 
 
 def DAG(ng):
+    """
+    preprocess the node layout in suitable way
+    for topo_sort
+    """
     links = collections.defaultdict(list)
 
     # needs to preprocess certain things
@@ -89,7 +97,14 @@ def DAG(ng):
 
 
 def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
+    """
+    does the exec for each node by recursively matching input trees
+    and building output tree
+    """
     def assign_tree(tree, level, data):
+        """
+        writes data to tree
+        """
         if tree is None:
             return
         if level == 0:
@@ -101,6 +116,10 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             tree.level = 1
 
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
+        """
+        All tree levels a correct, build arguments for node func
+        call it and store results
+        """
         args = []
         for tree in in_trees:
             if tree.level == 0:
@@ -136,7 +155,7 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
                         args.append(inner_tree[i])
                     else:
                         args.append(inner_tree[-1])
-            
+
             outs = []
             for ot in out_trees:
                 if ot:
@@ -162,6 +181,7 @@ def exec_node_group(node_group):
 
         for param, level in func.parameters:
             in_levels.append(level)
+            #  int refers to socket index, str to a property name on the node
             if isinstance(param, int):
                 socket = node.inputs[param]
                 if socket.is_linked:
