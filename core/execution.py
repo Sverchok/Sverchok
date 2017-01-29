@@ -66,18 +66,29 @@ def topo_sort(links, starts):
     return sorted(weights.keys(), key=lambda n: -weights[n])
 
 
+
+
 def DAG(ng):
+
     links = collections.defaultdict(list)
 
     # needs to preprocess certain things
-    # 1. reroutes
-    # 2. wifi node replacement
+    # 1. reroutes, done
+    # 2. type info
+    # 3. wifi node replacement
 
     for l in ng.links:
+
         if not l.is_valid:
             links = {}
             break
-        links[l.to_node].append(l.from_node)
+        if l.to_node.bl_idname == 'NodeReroute':
+            continue
+        if l.from_node.bl_idname == 'NodeReroute':
+            links[l.to_node] = l.to_socket.other.node
+        else:
+            links[l.to_node].append(l.from_node)
+
 
     from_nodes = {l.from_node for l in ng.links}
     starts = {l.to_node for l in ng.links if l.to_node not in from_nodes}

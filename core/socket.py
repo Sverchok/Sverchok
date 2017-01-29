@@ -29,6 +29,30 @@ from bpy.props import (FloatProperty,
 def exec_socket(self, context):
     self.id_data.update()
 
+def get_other_socket(socket):
+    """
+    Get next real upstream socket.
+    This should be expanded to support wifi nodes also.
+    Will return None if there isn't a another socket connect
+    so no need to check socket.links
+    """
+
+    if not socket.is_linked:
+        return None
+
+    if not socket.is_output:
+        other = socket.links[0].from_socket
+    else:
+        other = socket.links[0].to_socket
+
+    if other.node.bl_idname == 'NodeReroute':
+        if not socket.is_output:
+            return get_other_socket(other.node.inputs[0])
+        else:
+            return get_other_socket(other.node.outputs[0])
+    else:  #other.node.bl_idname == 'WifiInputNode':
+        return other
+
 
 class SocketBase:
     default_value = None
@@ -54,6 +78,10 @@ class SocketBase:
     @property
     def socket_id(self):
         return hash(self)
+
+    @property
+    def other(self):
+        return get_other_socket(self)
 
 
 def replace_socket(socket, new_type=None, new_name=None, default=None):
