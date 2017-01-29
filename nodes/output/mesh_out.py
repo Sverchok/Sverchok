@@ -89,8 +89,8 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0, 
     def assign_empty_mesh(idx):
         # if rx_name in meshes:
         bm = bmesh.new()   # create an empty BMesh
-        bm.from_mesh(meshes[rx_name])
-        bm.clear()
+        # bm.from_mesh(meshes[rx_name])
+        # bm.clear()
         bm.to_mesh(meshes[rx_name])
         bm.free()
         return meshes[rx_name]
