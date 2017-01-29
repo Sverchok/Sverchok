@@ -50,7 +50,7 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
             meshes.remove(meshes[rx_name])
         return meshes.new(rx_name)
     
-    if name in objects:
+    if rx_name in objects:
         obj = objects[rx_name]
         obj.data = assign_empty_mesh(idx)
     else:
