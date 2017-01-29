@@ -37,56 +37,64 @@ class MeshOut(Stateful):
 
 
 
-def default_mesh(name):
-    verts, faces = [(1, 1, -1), (1, -1, -1), (-1, -1, -1)], [(0, 1, 2)]
-    mesh_data = bpy.data.meshes.new(name)
-    mesh_data.from_pydata(verts, [], faces)
-    mesh_data.update()
-    return mesh_data
-
-
 def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0):
+
     scene = bpy.context.scene
     meshes = bpy.data.meshes
     objects = bpy.data.objects
-    name = name + "." + str(idx).zfill(4)
-    vert_count = len(verts)
 
+    rx_name = name + "." + str(idx).zfill(4)
+
+    def assign_empty_mesh(idx):
+        if rx_name in meshes:
+            meshes.remove(meshes[rx_name])
+        return meshes.new(rx_name)
+    
     if name in objects:
-        sv_object = objects[name]
+        obj = objects[rx_name]
+        obj.data = assign_empty_mesh(idx)
     else:
-        temp_mesh = default_mesh(name)
-        sv_object = objects.new(name, temp_mesh)
-        scene.objects.link(sv_object)
+        # this is only executed once, upon the first run.
+        mesh = meshes.new(rx_name)
+        obj = objects.new(rx_name, mesh)
+        scene.objects.link(obj)
 
-    mesh = sv_object.data
+        obj['idx'] = idx
+        obj['basename'] = name
+
+    # at this point the mesh is always fresh and empty
 
     ''' get bmesh, write bmesh to obj, free bmesh'''
-    bm = bmesh_from_pydata(verts, edges, faces)
-    bm.to_mesh(sv_object.data)
+    bm = bmesh_from_pydata(verts, edges, faces, normal_update=True)
+    bm.to_mesh(obj.data)
     bm.free()
 
-    sv_object.hide_select = False
+    obj.update_tag(refresh={'OBJECT', 'DATA'})
+    obj.hide_select = False
 
 
-def bmesh_from_pydata(verts=None, edges=None, faces=None):
-    ''' verts is necessary, edges/faces are optional '''
+def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
+    ''' verts is necessary, edges/faces are optional
+        normal_update, will update verts/edges/faces normals at the end
+    '''
 
     bm = bmesh.new()
     add_vert = bm.verts.new
-    [add_vert(co) for co in verts]
+
+    for co in verts:
+        add_vert(co)
+
     bm.verts.index_update()
+    bm.verts.ensure_lookup_table()
 
-    if hasattr(bm.verts, "ensure_lookup_table"):
-        bm.verts.ensure_lookup_table()
-
-    if len(faces):
+    if not faces is None and len(faces):
         add_face = bm.faces.new
         for face in faces:
             add_face(tuple(bm.verts[i] for i in face))
+
         bm.faces.index_update()
 
-    if len(edges):
+    if not edges is None and len(edges):
         add_edge = bm.edges.new
         for edge in edges:
             edge_seq = tuple(bm.verts[i] for i in edge)
@@ -98,4 +106,6 @@ def bmesh_from_pydata(verts=None, edges=None, faces=None):
 
         bm.edges.index_update()
 
+    if normal_update:
+        bm.normal_update()
     return bm
