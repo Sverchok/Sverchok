@@ -89,16 +89,6 @@ def DAG(ng):
 
 
 def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
-    def assign_tree(tree, level, data):
-        if tree is None:
-            return
-        if level == 0:
-            tree.data = data
-            tree.level = 0
-        elif level == 1:
-            for d in data:
-                tree.add_child(data=d).level = 0
-            tree.level = 1
 
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
         args = []
@@ -111,9 +101,10 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
         #print("results:", f.label, '\n', results)
         if len(out_trees) > 1:
             for out_tree, l, result in zip(out_trees, out_levels, zip(*results)):
-                assign_tree(out_tree, l, result)
-        elif len(out_trees) == 1:  # results is a single socket
-            assign_tree(out_trees[0], out_levels[0], results)
+                if out_tree:
+                    out_tree.assign(l, result)
+        elif len(out_trees) == 1 and out_trees[0]:  # results is a single socket
+            out_trees[0].assign(out_levels[0], results)
         else:  # no output
             pass
     else:
