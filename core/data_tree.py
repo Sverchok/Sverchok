@@ -87,3 +87,12 @@ class SvDataTree:
 
     def get_level(self):
         return self.level
+
+    def assign(self, level, data):
+        if level == 0:
+            self.data = data
+            self.level = 0
+        elif level == 1:
+            for d in data:
+                self.add_child(data=d).level = 0
+            self.level = 1

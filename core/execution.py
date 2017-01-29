@@ -70,22 +70,32 @@ def topo_sort(links, starts):
     return sorted(weights.keys(), key=lambda n: -weights[n])
 
 
+
+
 def DAG(ng):
     """
     preprocess the node layout in suitable way
     for topo_sort
     """
+
     links = collections.defaultdict(list)
 
     # needs to preprocess certain things
-    # 1. reroutes
-    # 2. wifi node replacement
+    # 1. reroutes, done
+    # 2. type info
+    # 3. wifi node replacement
 
     for l in ng.links:
+
         if not l.is_valid:
             links = {}
             break
-        links[l.to_node].append(l.from_node)
+        if l.to_node.bl_idname == 'NodeReroute':
+            continue
+        if l.from_node.bl_idname == 'NodeReroute':
+            links[l.to_node] = l.to_socket.other.node
+        else:
+            links[l.to_node].append(l.from_node)
 
     from_nodes = {l.from_node for l in ng.links}
     starts = {l.to_node for l in ng.links if l.to_node not in from_nodes}
@@ -101,19 +111,6 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
     does the exec for each node by recursively matching input trees
     and building output tree
     """
-    def assign_tree(tree, level, data):
-        """
-        writes data to tree
-        """
-        if tree is None:
-            return
-        if level == 0:
-            tree.data = data
-            tree.level = 0
-        elif level == 1:
-            for d in data:
-                tree.add_child(data=d).level = 0
-            tree.level = 1
 
     if all(t.level == l for t, l in zip(in_trees, in_levels)):
         """
@@ -127,12 +124,12 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
             else:
                 args.append(list(tree))
         results = f(*args)
-        #print("results:", f.label, '\n', results)
         if len(out_trees) > 1:
             for out_tree, l, result in zip(out_trees, out_levels, zip(*results)):
-                assign_tree(out_tree, l, result)
-        elif len(out_trees) == 1:  # results is a single socket
-            assign_tree(out_trees[0], out_levels[0], results)
+                if out_tree:
+                    out_tree.assign(l, result)
+        elif len(out_trees) == 1 and out_trees[0]:  # results is a single socket
+            out_trees[0].assign(out_levels[0], results)
         else:  # no output
             pass
     else:
@@ -187,7 +184,7 @@ def exec_node_group(node_group):
                 if socket.is_linked:
                     #  here a more intelligent loookup is needed
                     #  to support reroutes and wifi replacement
-                    tree = data_trees.get(socket.links[0].from_socket)
+                    tree = data_trees.get(socket.other)
                 else:
                     tree = SvDataTree(socket)
             else:  # prop parameter
