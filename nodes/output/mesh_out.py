@@ -97,8 +97,8 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0, 
     
     if rx_name in objects:
         obj = objects[rx_name]
-        obj.data = assign_empty_mesh(idx)
-        obj.data.update()
+        # obj.data = assign_empty_mesh(idx)   #  these may not be needed
+        # obj.data.update()                   #  these may not be needed
     else:
         # this is only executed once, upon the first run.
         mesh = meshes.new(rx_name)
