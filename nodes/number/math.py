@@ -6,7 +6,7 @@ from svrx.nodes.node_base import node_func
 
 from svrx.typing import Number, Float, Int
 
-@node_func(bl_idname='SvRxNodeMath', multi_label="MATH", id=0)
+@node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0)
 def add(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x + y
 
