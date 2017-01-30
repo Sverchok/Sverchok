@@ -1,27 +1,22 @@
 import bpy
 import bmesh
 
-from svrx.nodes.node_base import Stateful
-from svrx.typing import Vertices, Required, Faces, Edges
+from svrx.nodes.node_base import stateful
+from svrx.typing import Vertices, Required, Faces, Edges, StringP
 from svrx.util.mesh import bmesh_from_pydata
 
 # pylint: disable=C0326
 
-class MeshOut(Stateful):
-    def __init__(self):
+@stateful
+class MeshOut():
+
+    def __init__(self, node=None):
+        if node:
+            self.base_name = node.name
         self.start()
 
     bl_idname = "SvRxNodeMeshOut"
     label = "Mesh out"
-
-    inputs_template = [('SvRxVertexSocket', 'Vertices', None),
-                       ('SvRxTopoSocket', 'Edges', None),
-                       ('SvRxTopoSocket', 'Faces', None)]
-
-    outputs_template = []
-    properties = {}
-    parameters = [(0, 0), (1, 0), (2, 0)]
-    returns = []
 
     def start(self):
         self.verts = []

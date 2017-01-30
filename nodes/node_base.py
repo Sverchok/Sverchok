@@ -239,15 +239,37 @@ def parse_type(s_type):
         return s_type, 0
 
 _node_funcs = {}
+_node_classes = {}
 
 class NodeStateful(NodeBase):
 
-    @classmethod
-    def compile(cls):
-        return cls()
+    def compile(self):
+        return _node_classes[self.bl_idname](self)
 
 class Stateful:
-    cls_base = (NodeStateful,)
+    cls_bases = (NodeStateful,)
+
+def stateful(cls):
+    func = cls()
+    get_signature(func)
+    module_name = func.__module__.split(".")[-2]
+
+    props = getattr(cls, 'properties', {})
+    props.update(func.properties)
+
+    class InnerStateful(cls, Stateful):
+        category = module_name
+        inputs_template = func.inputs_template.copy()
+        outputs_template = func.outputs_template.copy()
+        properties = props.copy()
+        parameters = func.parameters.copy()
+        returns = func.returns.copy()
+
+    func_new = InnerStateful()
+    class_factory(func_new)
+    InnerStateful.node_cls = func_new.cls
+    _node_classes[cls.bl_idname] = InnerStateful
+    return InnerStateful
 
 
 def register_stateful():
@@ -291,6 +313,10 @@ def register():
 
     for func in _node_funcs.values():
         bpy.utils.register_class(func.cls)
+
+    for cls in _node_classes.values():
+        bpy.utils.register_class(cls.node_cls)
+
 
 
 def unregister():
