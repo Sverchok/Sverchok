@@ -3,6 +3,7 @@ import bmesh
 
 from svrx.nodes.node_base import Stateful
 from svrx.typing import Vertices, Required, Faces, Edges
+from svrx.util.mesh import bmesh_from_pydata
 
 # pylint: disable=C0326
 
@@ -30,7 +31,8 @@ class MeshOut(Stateful):
 
     def stop(self):
         obj_index = 0
-        for idx, verts, edges, faces in zip(range(1000), self.verts, self.edges, self.faces):
+        #  using range to limit object number for now during testing
+        for idx, verts, edges, faces in zip(range(100), self.verts, self.edges, self.faces):
             obj_index = idx
             make_bmesh_geometry(verts[:, :3], edges, faces, idx=idx, normal_update=False)
 
@@ -101,41 +103,3 @@ def make_bmesh_geometry(verts, edges=None, faces=None, name="svrx_mesh", idx=0, 
 
     obj.update_tag(refresh={'OBJECT', 'DATA'})
     obj.hide_select = False
-
-
-def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
-    ''' verts is necessary, edges/faces are optional
-        normal_update, will update verts/edges/faces normals at the end
-    '''
-
-    bm = bmesh.new()
-    add_vert = bm.verts.new
-
-    for co in verts:
-        add_vert(co)
-
-    bm.verts.index_update()
-    bm.verts.ensure_lookup_table()
-
-    if not faces is None and len(faces):
-        add_face = bm.faces.new
-        for face in faces:
-            add_face(tuple(bm.verts[i] for i in face))
-
-        bm.faces.index_update()
-
-    if not edges is None and len(edges):
-        add_edge = bm.edges.new
-        for edge in edges:
-            edge_seq = tuple(bm.verts[i] for i in edge)
-            try:
-                add_edge(edge_seq)
-            except ValueError:
-                # edge exists!
-                pass
-
-        bm.edges.index_update()
-
-    if normal_update:
-        bm.normal_update()
-    return bm
