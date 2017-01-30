@@ -205,7 +205,6 @@ def get_signature(func):
             if not (parameter.default == inspect.Signature.empty or parameter.default is None):
                 annotation.add("default", parameter.default)
             func.properties[name] = annotation.get_prop()
-            print(func.properties[name], name, func.label)
             func.parameters.append((name, 0))
         else:
             raise SyntaxError
@@ -248,11 +247,16 @@ class NodeStateful(NodeBase):
 class Stateful:
     cls_bases = (NodeStateful,)
 
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
 def stateful(cls):
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
-    print(module_name)
     props = getattr(cls, 'properties', {})
     props.update(func.properties)
 
