@@ -1,7 +1,7 @@
 from typing import List
 import numpy as np
 
-from bpy.props import FloatProperty, IntProperty, StringProperty, FloatVectorProperty
+from bpy.props import EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
 
 
 class SvRxBaseType:
@@ -83,9 +83,16 @@ class SMesh(SvRxBaseType):
 
 # Property types
 
+def exec_node(self, context):
+    self.id_data.update()
+
+
 class SvRxBaseTypeP:
     def __init__(self, **kwargs):
-        self.kwargs = kwargs
+        self.kwargs = {}
+        self.kwargs['update'] = exec_node
+        self.kwargs.update(kwargs)  
+
 
     def add(self, key, value):
         self.kwargs[key] = value
@@ -108,6 +115,10 @@ class VectorP(SvRxBaseTypeP):
 
 class StringP(SvRxBaseTypeP):
     prop_func = StringProperty
+
+
+class EnumP(SvRxBaseTypeP):
+    prop_func = EnumProperty
 
 
 # Value Types, used for outputs

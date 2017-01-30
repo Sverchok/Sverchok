@@ -55,6 +55,12 @@ class NodeBase:
     def compile(self):
         return _node_funcs[self.bl_idname]
 
+    def draw_buttons(self, context, layout):
+        props = self.compile().properties
+
+        for name in props.keys():
+            layout.prop(self, name)
+
     def adjust_sockets(self):
         inputs_template = _node_funcs[self.bl_idname].inputs_template
         for socket, socket_data in zip(self.inputs, inputs_template):
@@ -113,7 +119,7 @@ def class_factory(func):
     cls_dict['bl_idname'] = func.bl_idname
     cls_dict['bl_label'] = func.label
 
-    for name, prop in func.properties:
+    for name, prop in func.properties.items():
         cls_dict[name] = prop
 
     for name in {"draw_buttons", "draw_buttons_ext", "update", "draw_label"}:
@@ -170,6 +176,7 @@ def get_signature(func):
             if not (parameter.default == inspect.Signature.empty or parameter.default is None):
                 annotation.add("default", parameter.default)
             func.properties[name] = annotation.get_prop()
+            print(func.properties[name], name, func.label)
             func.parameters.append((name, 0))
         else:
             raise SyntaxError
