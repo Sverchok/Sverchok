@@ -7,6 +7,9 @@ from svrx.nodes.node_base import node_func
 from svrx.typing import Number, Float, Int
 
 def draw_label(self):
+    if not self.hide:
+        return self.label or self.name
+
     name_or_value = [self.mode.title()]
     for socket in self.inputs:
         if socket.is_linked:
