@@ -15,13 +15,14 @@ def sub(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x - y
 
 @node_func(bl_idname='SvRxNodeMath', id=2)
-def sub(x: Number = 0.0, y: Number = 0.0) -> Number:
+def mul(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x * y
 
 @node_func(bl_idname='SvRxNodeMath', id=3)
 def div(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x / y
 
+    return x ** .5
 
 
 @node_func(bl_idname='SvRxNodeMath', id=10)
@@ -51,7 +52,6 @@ def as_int(x: Number = 0.0) -> Int:
 @node_func(bl_idname='SvRxNodeMath', id=16)
 def round(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
-
 
 
 #  Constants
