@@ -95,7 +95,6 @@ class NodeBase:
         elif diff < 0:
             for bl_id, name in outputs_template[diff:]:
                 s = self.outputs.new(bl_id, name)
-                s.default_value = default
 
 
 _multi_storage = {}

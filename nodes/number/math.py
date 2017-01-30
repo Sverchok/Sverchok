@@ -22,6 +22,8 @@ def mul(x: Number = 0.0, y: Number = 0.0) -> Number:
 def div(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x / y
 
+@node_func(bl_idname='SvRxNodeMath', id=4)
+def sqrt(x: Number = 1.0) -> Number:
     return x ** .5
 
 
