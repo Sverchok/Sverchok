@@ -93,7 +93,7 @@ def DAG(ng):
         if l.to_node.bl_idname == 'NodeReroute':
             continue
         if l.from_node.bl_idname == 'NodeReroute':
-            links[l.to_node] = l.to_socket.other.node
+            links[l.to_node].append(l.to_socket.other.node)
         else:
             links[l.to_node].append(l.from_node)
 
