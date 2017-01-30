@@ -1,6 +1,6 @@
 import numpy as np
 
-from svrx.typing import IntValue, FloatValue
+from svrx.typing import IntValue, FloatValue, PointValue
 from svrx.nodes.node_base import stateful
 
 
@@ -32,4 +32,12 @@ class FloatNode(ValueNodeCommon):
     label = "Float input"
 
     def __call__(self) -> FloatValue("f"):
+        return np.array([self.value])
+
+@stateful
+class PointValue(ValueNodeCommon):
+    bl_idname = "SvRxNodePointValue"
+    label = "Point input"
+
+    def __call__(self) -> PointValue("p"):
         return np.array([self.value])

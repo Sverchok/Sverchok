@@ -136,3 +136,7 @@ class IntValue(SvRxBaseType):
 
 class FloatValue(SvRxBaseType):
     bl_idname = "SvRxValueFloatSocket"
+
+
+class PointValue(SvRxBaseType):
+    bl_idname = "SvRxValuePointSocket"

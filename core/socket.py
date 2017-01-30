@@ -202,27 +202,35 @@ class MeshSocket(bpy.types.NodeSocket, SocketBase):
     color = (.1, .1, .1, 1.0)
 
 
-class ValueIntSocket(bpy.types.NodeSocket, SocketNumber):
+class ValueSocket:
+    def draw(self, context, layout, node, text):
+        if self.is_output:
+            layout.prop(self, "default_value", text=text)
+        else:
+            pass
+
+class ValueIntSocket(bpy.types.NodeSocket, ValueSocket, SocketNumber):
     bl_idname = "SvRxValueIntSocket"
     bl_label = "Value Int Socket"
 
     default_value = IntProperty(update=exec_socket)
 
-    def draw(self, context, layout, node, text):
-        if self.is_output:
-            layout.prop(self, "default_value", text=text)
-        else:
-            pass
 
 
-class ValueFloatSocket(bpy.types.NodeSocket, SocketNumber):
+
+class ValueFloatSocket(bpy.types.NodeSocket, ValueSocket, SocketNumber):
     bl_idname = "SvRxValueFloatSocket"
     bl_label = "Value Float Socket"
 
     default_value = FloatProperty(update=exec_socket)
 
+
+class ValuePointSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
+    bl_idname = "SvRxValuePointSocket"
+    bl_label = "Value Point Socket"
+
+    default_value = FloatVectorProperty(size=4, update=exec_socket)
+
     def draw(self, context, layout, node, text):
         if self.is_output:
-            layout.prop(self, "default_value", text=text)
-        else:
-            pass
+            layout.prop(self, "default_value", text=' ')
