@@ -233,4 +233,7 @@ class ValuePointSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
 
     def draw(self, context, layout, node, text):
         if self.is_output:
-            layout.prop(self, "default_value", text=' ')
+            column = layout.column(align=True)
+            for i in range(4):
+                row = column.row(align=True)
+                row.prop(self, "default_value", index=i, text='XYZW'[i])

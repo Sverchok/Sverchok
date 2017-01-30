@@ -11,12 +11,6 @@ class ValueNodeCommon:
         else:
             self.value = 0
 
-    def start(self):
-        pass
-
-    def stop(self):
-        pass
-
 
 @stateful
 class IntNode(ValueNodeCommon):

@@ -247,11 +247,16 @@ class NodeStateful(NodeBase):
 class Stateful:
     cls_bases = (NodeStateful,)
 
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
 def stateful(cls):
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
-    print(module_name)
     props = getattr(cls, 'properties', {})
     props.update(func.properties)
 
