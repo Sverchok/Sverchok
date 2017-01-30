@@ -17,6 +17,8 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 import bpy
+from bpy.props import EnumProperty, StringProperty
+
 import inspect
 
 import svrx
@@ -62,7 +64,8 @@ class NodeBase:
             layout.prop(self, name)
 
     def adjust_sockets(self):
-        inputs_template = _node_funcs[self.bl_idname].inputs_template
+        func = self.compile()
+        inputs_template = func.inputs_template
         for socket, socket_data in zip(self.inputs, inputs_template):
             socket.replace_socket(*socket_data)
 
@@ -79,7 +82,7 @@ class NodeBase:
                 if default is not None:
                     s.default_value = default
 
-        outputs_template = _node_funcs[self.bl_idname].outputs_template
+        outputs_template = func.outputs_template
 
         for socket, socket_data in zip(self.outputs, outputs_template):
             socket.replace_socket(*socket_data)
@@ -95,11 +98,30 @@ class NodeBase:
                 s.default_value = default
 
 
+_multi_storage = {}
+
+
 class NodeDynSignature(NodeBase):
 
     def compile(self):
-        return self.func_dict[self.mode]
+        func_dict, _ = _multi_storage[self.bl_idname]
+        return func_dict[self.mode]
 
+    def update_mode(self, context):
+        self.adjust_sockets()
+        self.id_data.update()
+
+    def draw_buttons(self, context, layout):
+        layout.prop(self, 'mode')
+        super().draw_buttons(context, layout)
+
+
+def add_multi(func):
+    if not func.bl_idname in _multi_storage:
+        _multi_storage[func.bl_idname] = ({}, [])
+    func_dict, func_list = _multi_storage[func.bl_idname]
+    func_list.append((func.label, func.label, func.label, func.id))
+    func_dict[func.label] = func
 
 def make_valid_identifier(name):
     """Create a valid python identifier from name for use a a part of class name"""
@@ -110,7 +132,7 @@ def make_valid_identifier(name):
 
 def class_factory(func):
     if hasattr(func, "cls_bases"):
-        bases = tuple(func.cls_base + [bpy.types.Node])
+        bases = func.cls_bases + (bpy.types.Node,)
     else:
         bases = (NodeBase, bpy.types.Node)
 
@@ -121,6 +143,14 @@ def class_factory(func):
 
     for name, prop in func.properties.items():
         cls_dict[name] = prop
+
+    if hasattr(func, 'id'):
+        func_dict, func_list = _multi_storage[func.bl_idname]
+        default = func_list[0][0]
+        cls_dict['mode'] = EnumProperty(items=func_list,
+                                        default=default,
+                                        update=NodeDynSignature.update_mode)
+        cls_dict['bl_label'] = func.multi_label
 
     for name in {"draw_buttons", "draw_buttons_ext", "update", "draw_label"}:
         attr = getattr(func, name, None)
@@ -228,6 +258,7 @@ def register_stateful():
         _node_funcs[cls.bl_idname] = f
 
 
+
 def node_func(*args, **values):
     def real_node_func(func):
         def annotate(func):
@@ -235,6 +266,14 @@ def node_func(*args, **values):
                 setattr(func, key, value)
         annotate(func)
         get_signature(func)
+
+        if hasattr(func, 'id'):
+            add_multi(func)
+            if func.bl_idname in _node_funcs:
+                func.categoy = 'SKIP'
+                return func
+            else:
+                func.cls_bases = (NodeDynSignature,)
         class_factory(func)
         _node_funcs[func.bl_idname] = func
         module_name = func.__module__.split(".")[-2]
