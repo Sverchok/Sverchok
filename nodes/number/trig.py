@@ -1,10 +1,12 @@
-
 from functools import wraps
 import numpy as np
 
 from svrx.nodes.node_base import node_func
 
 from svrx.typing import Number, Float, Int
+
+
+# pylint: disable=C0326
 
 local_name = 'SvRxNodeTrig'
 
@@ -44,16 +46,16 @@ def cosine(x: Number = 0.0) -> Number:
     return np.cos(x)
 
 @node_func(bl_idname=local_name, id=2)
-def sincos(x: Number = 0.0) -> [Number, Number]:
-    return np.sin(s), np.cos(x)
+def sincos(x: Number = 0.0) -> ([Number], [Number]):
+    return np.sin(x), np.cos(x)
 
 @node_func(bl_idname=local_name, id=3)
 def degrees(x: Number = 0.0) -> Number:
-    return np.degrees(s)
+    return np.degrees(x)
 
 @node_func(bl_idname=local_name, id=4)
 def radians(x: Number = 0.0) -> Number:
-    return np.radians(s)
+    return np.radians(x)
 
 @node_func(bl_idname=local_name, id=20)
 def tangent(x: Number = 0.0) -> Number:
