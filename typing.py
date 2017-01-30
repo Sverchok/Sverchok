@@ -23,6 +23,8 @@ class Number(SvRxBaseType):
 class Int(Number):
     bl_idname = "SvRxIntSocket"
 
+class Bool(Int):
+    pass
 
 class Float(Number):
     bl_idname = "SvRxFloatSocket"
