@@ -46,7 +46,7 @@ def cosine(x: Number = 0.0) -> Number:
     return np.cos(x)
 
 @node_func(bl_idname=local_name, id=2)
-def sincos(x: Number = 0.0) -> ([Number], [Number]):
+def sincos(x: Number = 0.0) -> (Number("sin"), Number("cos")):
     return np.sin(x), np.cos(x)
 
 @node_func(bl_idname=local_name, id=3)
