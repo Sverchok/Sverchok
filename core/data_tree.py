@@ -34,7 +34,8 @@ class SvDataTree:
             self.name = socket.node.name + ": " + socket.name
             self.level = 0
             if not socket.is_linked:
-                self.data = np.array([socket.default_value])
+                if socket.default_value is not None:
+                    self.data = np.array([socket.default_value])
         elif node and prop is not None:
             self.name = node.name + "." + prop
             self.data = getattr(node, prop)
