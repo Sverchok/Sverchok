@@ -37,7 +37,7 @@ def constant_times_n(func):
     return inner
 
 
-@node_func(bl_idname=local_name, multi_label="TRIG", id=0)
+@node_func(bl_idname=local_name, multi_label="Trig", id=0)
 def sine(x: Number = 0.0) -> Number:
     return np.sin(x)
 
