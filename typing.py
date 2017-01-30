@@ -35,6 +35,9 @@ class Vertices(Number):
 class Vector(Number):
     bl_idname = "SvRxVectorSocket"
 
+class Point(Number):
+    bl_idname = "SvRxPointSocket"
+
 
 class Edges(SvRxBaseType):
     bl_idname = "SvRxTopoSocket"
@@ -91,7 +94,7 @@ class SvRxBaseTypeP:
     def __init__(self, **kwargs):
         self.kwargs = {}
         self.kwargs['update'] = exec_node
-        self.kwargs.update(kwargs)  
+        self.kwargs.update(kwargs)
 
 
     def add(self, key, value):

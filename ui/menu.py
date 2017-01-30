@@ -37,11 +37,15 @@ def make_node_cats():
 
     node_cats = OrderedDict()
     node_funcs = svrx.nodes.node_base._node_funcs
+    node_classes = svrx.nodes.node_base._node_classes
     cats = set(func.category for func in node_funcs.values())
+    cats = cats.union(cls.category for cls in node_classes.values())
 
     for cat in sorted(cats):
         nodes = [func.cls for func in node_funcs.values() if func.category == cat]
-        node_cat = sorted([(node.bl_idname, node.bl_label) for node in nodes], key=lambda x: x[1])
+        nodes += [cls.node_cls for cls in node_classes.values() if cls.category == cat]
+        node_cat = sorted([(node.bl_idname, node.bl_label) for node in nodes],
+                          key=lambda x: x[1])
         node_cats[cat.title()] = node_cat
 
     return node_cats

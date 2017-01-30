@@ -1,4 +1,4 @@
-# Sverchok Reudx
+# Sverchok Redux
 
 A refactoring of Sverchok
 

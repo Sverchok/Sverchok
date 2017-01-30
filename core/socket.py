@@ -169,6 +169,18 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
             super().draw(context, layout, node, text)
 
 
+class PointSocket(bpy.types.NodeSocket, SocketVector):
+    bl_idname = "SvRxPointSocket"
+    bl_label = "Point Socket"
+
+    default_value = FloatVectorProperty(size=4, update=exec_socket)
+
+    def draw(self, context, layout, node, text):
+        if not self.is_linked:
+            layout.template_component_menu(self, "default_value", name=text)
+        else:
+            super().draw(context, layout, node, text)
+
 class TopoSocket(bpy.types.NodeSocket, SocketBase):
     bl_idname = "SvRxTopoSocket"
     bl_label = "Topo Socket"

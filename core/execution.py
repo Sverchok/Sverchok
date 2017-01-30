@@ -125,7 +125,9 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
                 args.append(list(tree))
         results = f(*args)
         if len(out_trees) > 1:
-            for out_tree, l, result in zip(out_trees, out_levels, zip(*results)):
+            if any(l > 0 for l in out_levels):
+                results = zip(*results)
+            for out_tree, l, result in zip(out_trees, out_levels, results):
                 if out_tree:
                     out_tree.assign(l, result)
         elif len(out_trees) == 1 and out_trees[0]:  # results is a single socket
