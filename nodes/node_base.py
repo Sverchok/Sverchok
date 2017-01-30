@@ -205,7 +205,6 @@ def get_signature(func):
             if not (parameter.default == inspect.Signature.empty or parameter.default is None):
                 annotation.add("default", parameter.default)
             func.properties[name] = annotation.get_prop()
-            print(func.properties[name], name, func.label)
             func.parameters.append((name, 0))
         else:
             raise SyntaxError

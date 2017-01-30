@@ -130,9 +130,9 @@ class ValueBase:
     bl_idname = "SvRxValueIntSocket"
 
 
-class IntValue:
+class IntValue(SvRxBaseType):
     bl_idname = "SvRxValueIntSocket"
 
 
-class FloatValue:
+class FloatValue(SvRxBaseType):
     bl_idname = "SvRxValueFloatSocket"
