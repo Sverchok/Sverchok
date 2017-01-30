@@ -111,8 +111,8 @@ def tau(n: Number = 1.0) -> Number:
 
 @node_func(bl_idname=local_name, id=62)
 @constant_times_n
-def e(n: Number = 1.0) -> Number:
-    return np.e * n
+def phi(n: Number = 1.0) -> Number:
+    return np.empty((1 + 5 ** 0.5) / 2) * n
 
 
 
