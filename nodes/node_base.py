@@ -253,7 +253,7 @@ def stateful(cls):
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
-
+    print(module_name)
     props = getattr(cls, 'properties', {})
     props.update(func.properties)
 
@@ -270,14 +270,6 @@ def stateful(cls):
     InnerStateful.node_cls = func_new.cls
     _node_classes[cls.bl_idname] = InnerStateful
     return InnerStateful
-
-
-def register_stateful():
-    for cls in Stateful.__subclasses__():
-        f = cls()
-        class_factory(f)
-        f.category = cls.__module__.split(".")[-2]
-        _node_funcs[cls.bl_idname] = f
 
 
 
@@ -309,7 +301,6 @@ def node_func(*args, **values):
 
 
 def register():
-    register_stateful()
 
     for func in _node_funcs.values():
         bpy.utils.register_class(func.cls)
