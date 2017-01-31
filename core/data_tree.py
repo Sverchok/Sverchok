@@ -16,9 +16,7 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-import time
-from itertools import chain, filterfalse
+import bpy
 import collections
 
 import numpy as np
@@ -35,7 +33,10 @@ class SvDataTree:
             self.level = 0
             if not socket.is_linked:
                 if socket.default_value is not None:
-                    self.data = np.array([socket.default_value])
+                    if isinstance(socket.default_value, str):
+                        self.data = bpy.data.objects.get(socket.default_value)
+                    else:
+                        self.data = np.array([socket.default_value])
         elif node and prop is not None:
             self.name = node.name + "." + prop
             self.data = getattr(node, prop)

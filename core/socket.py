@@ -202,6 +202,23 @@ class MeshSocket(bpy.types.NodeSocket, SocketBase):
     color = (.1, .1, .1, 1.0)
 
 
+class ObjectSocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = 'SvRxObjectSocket'
+    bl_label = 'Blender Objects'
+
+    color = (.2, .2, .2, 1.0)
+
+    default_value = StringProperty(update=exec_socket)
+
+    def draw(self, context, layout, node, text):
+        if not self.is_output:
+            if self.is_linked:
+                layout.label(text)
+            else:
+                layout.prop_search(self, 'default_value', bpy.data, 'objects')
+        else:
+            layout.label(text)
+
 class ValueSocket:
     def draw(self, context, layout, node, text):
         if self.is_output:

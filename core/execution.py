@@ -169,7 +169,7 @@ def exec_node_group(node_group):
     print("exec tree")
     data_trees.clean(node_group)
     for node in DAG(node_group):
-        print("exec node", node.name)
+        #print("exec node", node.name)
         func = node.compile()
         if isinstance(func, Stateful):
             func.start()
@@ -202,7 +202,7 @@ def exec_node_group(node_group):
         recurse_levels(func, in_levels, func.returns, in_trees, out_trees)
         if isinstance(func, Stateful):
             func.stop()
-        print("finished with node", node.name)
+        #print("finished with node", node.name)
         for ot in out_trees:
             if ot:
                 ot.set_level()
