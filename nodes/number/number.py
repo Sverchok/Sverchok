@@ -13,7 +13,6 @@ def linspace(start: Float = 0.0,
              stop: Float = 1.0,
              count: Int = 10
              ) -> [Float]:
-    print("np_l enter", start, stop, count)
     return list(np_linspace(start, stop, count))
 
 
