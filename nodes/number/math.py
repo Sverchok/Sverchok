@@ -1,4 +1,3 @@
-
 import numpy as np
 
 from svrx.nodes.node_base import node_func
@@ -26,6 +25,11 @@ def div(x: Number = 0.0, y: Number = 0.0) -> Number:
 @node_func(bl_idname='SvRxNodeMath', id=4)
 def sqrt(x: Number = 1.0) -> Number:
     return x ** .5
+
+@node_func(bl_idname='SvRxNodeMath', id=5)
+def copy_sign(x: Number = 1.0, y: Number) -> Number:
+    return np.copy_sign(x, y)
+
 
 
 @node_func(bl_idname='SvRxNodeMath', id=10)
