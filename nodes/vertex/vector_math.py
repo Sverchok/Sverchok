@@ -1,5 +1,3 @@
-
-
 import numpy as np
 
 from svrx.typing import Vertices, Float
@@ -43,12 +41,27 @@ def dot(u: Vertices = (0.0, 0.0, 0.0),
         ) -> Float:
     return u.dot(v)
 
+
+def opposite(u: Vertices = (0.0, 0.0, 0.0)) -> Vertices:
+    return -u
+
+
+def distance(u: Vertices = (0.0, 0.0, 0.0), v: Vertices = (0.0, 0.0, 0.0) ) -> Float:
+    u, v = make_compatible(u, v)
+    # speed!?  http://stackoverflow.com/a/9184560/1243487
+    x = u - v
+    return np.sqrt(x * x)
+
+
 func_list = {
     "Cross":  (1, cross),
     "Add":    (2, add),
     "Scale":  (3, sub),
     "Length": (4, length),
     "Dot":    (5, dot),
+
+    "Opposite": (10, opposite),
+    "Distance": (20, distance)
 }
 
 """
