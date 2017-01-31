@@ -49,6 +49,13 @@ def array_as(a, shape):
     new_a[len(a):] = a[-1]
     return new_a
 
+def array_as_cycle(a, shape):
+    if a.shape == shape:
+        return a
+    new_a = np.empty(shape, dtype=a.dtype)
+    for i in range(shape[0]):
+        new_a[i] = a[i % len(a)]
+    return new_a
 
 def is_broadcastable(a, b):
     return all((x == 1 or y == 1 or x == y) for x, y in zip(a.shape[::-1], b.shape[::-1]))
