@@ -1,22 +1,11 @@
 
-from functools import wraps
 import numpy as np
 
 from svrx.nodes.node_base import node_func
 
 from svrx.typing import Number, Float, Int
+from svrx.util.function import constant, draw_label
 
-def draw_label(self):
-    if not self.hide:
-        return self.label or self.name
-
-    name_or_value = [self.mode.title()]
-    for socket in self.inputs:
-        if socket.is_linked:
-            name_or_value.append(socket.name.title())
-        else:
-            name_or_value.append(str(socket.default_value))
-    return ' '.join(name_or_value)
 
 @node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0, draw_label=draw_label)
 def add(x: Number = 0.0, y: Number = 0.0) -> Number:
@@ -67,14 +56,6 @@ def as_int(x: Number = 0.0) -> Int:
 def round(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
 
-
-#  Constants
-
-def constant(func):
-    @wraps(func)
-    def inner():
-        return np.array([func()])
-    return inner
 
 
 @node_func(bl_idname='SvRxNodeMath', id=60)
