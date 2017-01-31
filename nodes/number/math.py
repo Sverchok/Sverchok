@@ -27,7 +27,7 @@ def sqrt(x: Number = 1.0) -> Number:
     return x ** .5
 
 @node_func(bl_idname='SvRxNodeMath', id=5)
-def copy_sign(x: Number = 1.0, y: Number) -> Number:
+def copy_sign(x: Number = 1.0, y: Number = 0.0) -> Number:
     return np.copy_sign(x, y)
 
 
