@@ -1,3 +1,6 @@
+
+import numpy as np
+
 from svrx.typing import Bool, Number, Required
 from svrx.nodes.node_base import node_func
 
