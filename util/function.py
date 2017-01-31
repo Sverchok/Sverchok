@@ -27,3 +27,28 @@ def draw_label(self):
         else:
             name_or_value.append(str(socket.default_value))
     return ' '.join(name_or_value)
+
+
+def compat(func):
+    @wraps(func)
+    def inner(a, b):
+        return func(*make_compatible(a, b))
+    return inner
+
+def make_compatible(a, b):
+    if is_broadcastable(a, b):
+        return a, b
+    shape = tuple(max(x, y) for x, y in zip(a.shape, b.shape))
+    return array_as(a, shape), array_as(b, shape)
+
+def array_as(a, shape):
+    if a.shape == shape:
+        return a
+    new_a = np.empty(shape, dtype=a.dtype)
+    new_a[:len(a)] = a
+    new_a[len(a):] = a[-1]
+    return new_a
+
+
+def is_broadcastable(a, b):
+    return all((x == 1 or y == 1 or x == y) for x, y in zip(a.shape[::-1], b.shape[::-1]))
