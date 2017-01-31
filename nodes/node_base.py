@@ -179,11 +179,11 @@ def get_signature(func):
         annotation = parameter.annotation
 
         level = 0
-        if isinstance(annotation, type):
-            annotation = annotation()
 
         if isinstance(annotation, list):
             annotation, level = parse_type(annotation)
+        if isinstance(annotation, type):
+            annotation = annotation()
 
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
 
