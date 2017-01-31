@@ -47,8 +47,8 @@ def opposite(u: Vertices = (0.0, 0.0, 0.0)) -> Vertices:
 
 
 def distance(u: Vertices = (0.0, 0.0, 0.0), v: Vertices = (0.0, 0.0, 0.0) ) -> Float:
-    u, v = make_compatible(u, v)
     # speed!?  http://stackoverflow.com/a/9184560/1243487
+    u, v = make_compatible(u, v)
     x = u - v
     return np.sqrt(x * x)
 
