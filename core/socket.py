@@ -50,7 +50,7 @@ def get_other_socket(socket):
             return get_other_socket(other.node.inputs[0])
         else:
             return get_other_socket(other.node.outputs[0])
-    else:  #other.node.bl_idname == 'WifiInputNode':
+    else:
         return other
 
 

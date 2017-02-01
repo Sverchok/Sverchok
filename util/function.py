@@ -13,6 +13,16 @@ def constant(func):
     return inner
 
 
+def std_wrap(func):
+    """wrap a function func so it can return a single number/value
+    that is wrapped into an array.
+    """
+    @wraps(func)
+    def inner(*args):
+        return np.array([func(*args)])
+    return inner
+
+
 def draw_label(self):
     """
     draws label for mutli mode nodes like math, logic and trigonometey

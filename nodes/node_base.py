@@ -28,23 +28,8 @@ from svrx.nodes.classes import (NodeBase,
                                 NodeDynSignature,
                                 NodeStateful)
 
-"""
-For a node to exist there needs to be two things:
 
-1) A function signature
-2) A class representation of said signature for the node
 
-For many cases 2 can ge generated from 1 but there is also
-the possible to suppply parts of 2 like draw function or write the whole
-thing for some complex cases
-
-For certain cases a function signature that may need a dynamic function signature
-which cannot be resolved easily we may need to add a way to directly generate
-the internal "compiled" representation of a function signature.
-
-That however isn't the first priority
-
-"""
 
 def make_valid_identifier(name):
     """Create a valid python identifier from name for use a a part of class name"""
@@ -54,6 +39,9 @@ def make_valid_identifier(name):
 
 
 def class_factory(func):
+    """create a node class based on a function that has been preprocessed
+    with get signature or from @stateful"""
+
     if hasattr(func, "cls_bases"):
         bases = func.cls_bases + (bpy.types.Node,)
     else:
@@ -111,7 +99,6 @@ def get_signature(func):
             annotation = annotation()
 
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
-
             if parameter.default is None or parameter.default is Required:
                 socket_settings = None
             else:
@@ -123,7 +110,6 @@ def get_signature(func):
                 socket_name = name
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
-
             func.parameters.append((len(func.inputs_template) - 1, level))
 
         elif isinstance(annotation, SvRxBaseTypeP):
@@ -162,7 +148,6 @@ def parse_type(s_type):
 
 
 
-
 class Stateful:
     cls_bases = (NodeStateful,)
 
@@ -173,6 +158,9 @@ class Stateful:
         pass
 
 def stateful(cls):
+    """
+    class decorator for creating stateful class
+    """
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
@@ -203,6 +191,10 @@ def stateful(cls):
 
 
 def node_func(*args, **values):
+    """
+    annotates and registers a node function, also creates classes
+    if needed
+    """
     def real_node_func(func):
         def annotate(func):
             for key, value in values.items():
