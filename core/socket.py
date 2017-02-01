@@ -118,7 +118,7 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
         inputs.remove(socket)
         new_socket = inputs.new(socket_type, socket_name)
         if default is not None:
-            socket.default_value = default
+            new_socket.default_value = default
         if from_socket:
             ng.links.new(from_socket, new_socket)
 
