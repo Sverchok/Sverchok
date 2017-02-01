@@ -23,104 +23,13 @@ import inspect
 
 import svrx
 
-"""
-For a node to exist there needs to be two things:
-
-1) A function signature
-2) A class representation of said signature for the node
-
-For many cases 2 can ge generated from 1 but there is also
-the possible to suppply parts of 2 like draw function or write the whole
-thing for some complex cases
-
-For certain cases a function signature that may need a dynamic function signature
-which cannot be resolved easily we may need to add a way to directly generate
-the internal "compiled" representation of a function signature.
-
-That however isn't the first priority
-
-"""
-
-import svrx
 from svrx.typing import SvRxBaseType, SvRxBaseTypeP, Required
+from svrx.nodes.classes import (NodeBase,
+                                NodeDynSignature,
+                                NodeStateful)
 
 
-class NodeBase:
 
-    @classmethod
-    def poll(cls, ntree):
-        return ntree.bl_idname in {'SvRxTree'}
-
-    def init(self, context):
-        self.adjust_sockets()
-
-    def compile(self):
-        return _node_funcs[self.bl_idname]
-
-    def draw_buttons(self, context, layout):
-        props = self.compile().properties
-
-        for name in props.keys():
-            layout.prop(self, name)
-
-    def adjust_sockets(self):
-        func = self.compile()
-        inputs_template = func.inputs_template
-        for socket, socket_data in zip(self.inputs, inputs_template):
-            socket.replace_socket(*socket_data)
-
-        diff = len(self.inputs) - len(inputs_template)
-
-        if diff > 0:
-            for i in range(diff):
-                self.inputs.remove(self.inputs[-1])
-        elif diff < 0:
-            print(inputs_template[diff:])
-            for bl_id, name, default in inputs_template[diff:]:
-                print(bl_id, name, default)
-                s = self.inputs.new(bl_id, name)
-                if default is not None:
-                    s.default_value = default
-
-        outputs_template = func.outputs_template
-
-        for socket, socket_data in zip(self.outputs, outputs_template):
-            socket.replace_socket(*socket_data)
-
-        diff = len(self.outputs) - len(outputs_template)
-
-        if diff > 0:
-            for i in range(diff):
-                self.outputs.remove(self.outputs[-1])
-        elif diff < 0:
-            for bl_id, name in outputs_template[diff:]:
-                s = self.outputs.new(bl_id, name)
-
-
-_multi_storage = {}
-
-
-class NodeDynSignature(NodeBase):
-
-    def compile(self):
-        func_dict, _ = _multi_storage[self.bl_idname]
-        return func_dict[self.mode]
-
-    def update_mode(self, context):
-        self.adjust_sockets()
-        self.id_data.update()
-
-    def draw_buttons(self, context, layout):
-        layout.prop(self, 'mode')
-        super().draw_buttons(context, layout)
-
-
-def add_multi(func):
-    if not func.bl_idname in _multi_storage:
-        _multi_storage[func.bl_idname] = ({}, [])
-    func_dict, func_list = _multi_storage[func.bl_idname]
-    func_list.append((func.label, func.label, func.label, func.id))
-    func_dict[func.label] = func
 
 def make_valid_identifier(name):
     """Create a valid python identifier from name for use a a part of class name"""
@@ -130,6 +39,9 @@ def make_valid_identifier(name):
 
 
 def class_factory(func):
+    """create a node class based on a function that has been preprocessed
+    with get signature or from @stateful"""
+
     if hasattr(func, "cls_bases"):
         bases = func.cls_bases + (bpy.types.Node,)
     else:
@@ -141,10 +53,11 @@ def class_factory(func):
     cls_dict['bl_label'] = func.label
 
     for name, prop in func.properties.items():
+        print(name, prop)
         cls_dict[name] = prop
 
     if hasattr(func, 'id'):
-        func_dict, func_list = _multi_storage[func.bl_idname]
+        func_dict, func_list = NodeDynSignature.get_multi(func)
         default = func_list[0][0]
         cls_dict['mode'] = EnumProperty(items=func_list,
                                         default=default,
@@ -173,7 +86,7 @@ def get_signature(func):
     func.returns = []
 
     if not hasattr(func, "label"):
-        func.label = func.__name__
+        func.label = func.__name__.replace("_",' ').strip().title()
 
     for name, parameter in sig.parameters.items():
         annotation = parameter.annotation
@@ -186,7 +99,6 @@ def get_signature(func):
             annotation = annotation()
 
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
-
             if parameter.default is None or parameter.default is Required:
                 socket_settings = None
             else:
@@ -198,7 +110,6 @@ def get_signature(func):
                 socket_name = name
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
-
             func.parameters.append((len(func.inputs_template) - 1, level))
 
         elif isinstance(annotation, SvRxBaseTypeP):
@@ -209,7 +120,6 @@ def get_signature(func):
         else:
             raise SyntaxError
 
-    print(sig.return_annotation)
     if sig.return_annotation is inspect.Signature.empty:
         return
     elif isinstance(sig.return_annotation, tuple):
@@ -236,13 +146,7 @@ def parse_type(s_type):
     else:
         return s_type, 0
 
-_node_funcs = {}
-_node_classes = {}
 
-class NodeStateful(NodeBase):
-
-    def compile(self):
-        return _node_classes[self.bl_idname](self)
 
 class Stateful:
     cls_bases = (NodeStateful,)
@@ -254,10 +158,19 @@ class Stateful:
         pass
 
 def stateful(cls):
+    """
+    class decorator for creating stateful class
+    """
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
-    props = getattr(cls, 'properties', {})
+    props = {}
+    for name, prop in getattr(cls, 'properties', {}).items():
+        if isinstance(prop, SvRxBaseTypeP):
+            props[name] = prop.get_prop()
+        else:
+            props[name] = prop
+
     props.update(func.properties)
 
     class InnerStateful(cls, Stateful):
@@ -271,12 +184,17 @@ def stateful(cls):
     func_new = InnerStateful()
     class_factory(func_new)
     InnerStateful.node_cls = func_new.cls
-    _node_classes[cls.bl_idname] = InnerStateful
+
+    NodeStateful.add_cls(cls.bl_idname, InnerStateful)
     return InnerStateful
 
 
 
 def node_func(*args, **values):
+    """
+    annotates and registers a node function, also creates classes
+    if needed
+    """
     def real_node_func(func):
         def annotate(func):
             for key, value in values.items():
@@ -285,14 +203,16 @@ def node_func(*args, **values):
         get_signature(func)
 
         if hasattr(func, 'id'):
-            add_multi(func)
-            if func.bl_idname in _node_funcs:
+            # has Dynamic Signature
+            NodeDynSignature.add_multi(func)
+            func_ref = NodeBase.get_func(func.bl_idname)
+            if func_ref:
                 func.categoy = 'SKIP'
                 return func
-            else:
+            elif not hasattr(func, "cls_bases"):
                 func.cls_bases = (NodeDynSignature,)
         class_factory(func)
-        _node_funcs[func.bl_idname] = func
+        NodeBase.add_func(func)
         module_name = func.__module__.split(".")[-2]
         func.category = module_name
         return func
@@ -301,18 +221,3 @@ def node_func(*args, **values):
     else:
         print(args, values)
         return real_node_func
-
-
-def register():
-
-    for func in _node_funcs.values():
-        bpy.utils.register_class(func.cls)
-
-    for cls in _node_classes.values():
-        bpy.utils.register_class(cls.node_cls)
-
-
-
-def unregister():
-    for func in _node_funcs.values():
-        bpy.utils.unregister_class(func.cls)

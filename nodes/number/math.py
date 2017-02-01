@@ -1,12 +1,12 @@
 import numpy as np
 
 from svrx.nodes.node_base import node_func
+from svrx.nodes.classes import NodeMathBase
 
 from svrx.typing import Number, Float, Int
-from svrx.util.function import constant, draw_label
+from svrx.util.function import constant
 
-
-@node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0, draw_label=draw_label)
+@node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0, cls_bases=(NodeMathBase,))
 def add(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x + y
 

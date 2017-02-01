@@ -12,24 +12,28 @@ class MeshOut():
 
     def __init__(self, node=None):
         if node:
-            self.base_name = node.name
+            self.base_name = node.mesh_name
         self.start()
 
     bl_idname = "SvRxNodeMeshOut"
     label = "Mesh out"
+
+    properties = {'mesh_name': StringP(name='Mesh name', default="svrx_mesh")}
 
     def start(self):
         self.verts = []
         self.edges = []
         self.faces = []
 
-
     def stop(self):
         obj_index = 0
         #  using range to limit object number for now during testing
         for idx, verts, edges, faces in zip(range(100), self.verts, self.edges, self.faces):
             obj_index = idx
-            make_bmesh_geometry(verts[:, :3], edges, faces, idx=idx, normal_update=False)
+            make_bmesh_geometry(verts[:, :3], edges, faces,
+                                name=self.base_name,
+                                idx=idx,
+                                normal_update=False)
 
         # cleanup
         self.remove_non_updated_objects(obj_index)
@@ -48,7 +52,7 @@ class MeshOut():
 
 
     def remove_non_updated_objects(self, obj_index):
-        objs = self.get_children("svrx_mesh")
+        objs = self.get_children(self.base_name)
         objs = [obj.name for obj in objs if obj['idx'] > obj_index]
         if not objs:
             return

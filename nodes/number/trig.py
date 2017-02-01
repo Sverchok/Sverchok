@@ -2,7 +2,7 @@ from functools import wraps
 import numpy as np
 
 from svrx.nodes.node_base import node_func
-
+from svrx.nodes.classes import NodeMathBase
 from svrx.typing import Number, Float, Int
 
 
@@ -11,7 +11,7 @@ from svrx.typing import Number, Float, Int
 local_name = 'SvRxNodeTrig'
 
 '''
--  SINE     / COSINE     / SIN(x), COS(x) 
+-  SINE     / COSINE     / SIN(x), COS(x)
 -  DEGREES  / RADIANS    / TANGENT
 -  ARCSINE  / ARCCOSINE  / ARCTANGENT
 -  ACOSH    / ASINH      / ATANH
@@ -37,7 +37,7 @@ def constant_times_n(func):
     return inner
 
 
-@node_func(bl_idname=local_name, multi_label="Trig", id=0)
+@node_func(bl_idname=local_name, multi_label="Trig", id=0, cls_bases=(NodeMathBase,))
 def sine(x: Number = 0.0) -> Number:
     return np.sin(x)
 
@@ -113,6 +113,3 @@ def tau(n: Number = 1.0) -> Number:
 @constant_times_n
 def phi(n: Number = 1.0) -> Number:
     return np.empty((1 + 5 ** 0.5) / 2) * n
-
-
-

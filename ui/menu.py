@@ -18,7 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import svrx.nodes.node_base
+import svrx.nodes.classes
 
 from collections import OrderedDict, defaultdict
 
@@ -36,8 +36,8 @@ class SvRxNodeCategory(NodeCategory):
 def make_node_cats():
 
     node_cats = OrderedDict()
-    node_funcs = svrx.nodes.node_base._node_funcs
-    node_classes = svrx.nodes.node_base._node_classes
+    node_funcs = svrx.nodes.classes._node_funcs
+    node_classes = svrx.nodes.classes._node_classes
     cats = set(func.category for func in node_funcs.values())
     cats = cats.union(cls.category for cls in node_classes.values())
 

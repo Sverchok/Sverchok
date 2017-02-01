@@ -39,7 +39,7 @@ def scale_reciprocal(u: Vertices = ZEROS, s: Float = 1.0 ) -> Vertices:
 
 @node_func(bl_idname="SvRxVectorMathNode", id=26)
 def length(u: Vertices = ZEROS ) -> Float:
-    return np.linalg.norm(u, axis=0)
+    return np.sqrt(u * u)
 
 @node_func(bl_idname="SvRxVectorMathNode", id=32)
 def dot(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
@@ -59,21 +59,6 @@ def distance(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
 @node_func(bl_idname="SvRxVectorMathNode", multi_label="round", id=48)
 def rx_round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
     return np.round_(u, n)
-
-
-
-# func_list = {
-#     "Cross":    (1, cross),
-#     "Add":      (4, add),
-#     "Sub":      (8, sub),
-#     "Scale":    (12, scale),
-#     "1/Scale":  (16, scale_reciprocal),    
-#     "Length":   (20, length),
-#     "Dot":      (24, dot),
-#     "Opposite": (30, opposite),
-#     "Distance": (40, distance),
-#     "Round":    (50, rx_round)
-# }
 
 """
 class SvrxVectorMathNode:

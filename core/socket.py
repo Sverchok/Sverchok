@@ -50,7 +50,7 @@ def get_other_socket(socket):
             return get_other_socket(other.node.inputs[0])
         else:
             return get_other_socket(other.node.outputs[0])
-    else:  #other.node.bl_idname == 'WifiInputNode':
+    else:
         return other
 
 
@@ -93,12 +93,14 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
     socket_name = new_name or socket.name
 
     ng = socket.id_data
+    """
+    terminate early leads to bugs
     if socket.bl_idname == socket_type:
         socket.name = new_name
         if default is not None:
             socket.default_value = default
         return
-
+    """
     if socket.is_output:
         outputs = socket.node.outputs
         to_sockets = [l.to_socket for l in socket.links]
@@ -115,7 +117,8 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
 
         inputs.remove(socket)
         new_socket = inputs.new(socket_type, socket_name)
-
+        if default is not None:
+            new_socket.default_value = default
         if from_socket:
             ng.links.new(from_socket, new_socket)
 
