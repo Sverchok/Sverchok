@@ -86,7 +86,7 @@ def get_signature(func):
     func.returns = []
 
     if not hasattr(func, "label"):
-        func.label = func.__name__
+        func.label = func.__name__.replace("_",' ').strip().title()
 
     for name, parameter in sig.parameters.items():
         annotation = parameter.annotation
