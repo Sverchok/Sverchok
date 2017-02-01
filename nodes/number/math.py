@@ -36,7 +36,7 @@ def copy_sign(x: Number = 1.0, y: Number = 0.0) -> Number:
 
 
 @node_func(bl_idname=MATHNODE, id=6)
-def abs(x: Number = 1.0) -> Number:
+def absolute(x: Number = 1.0) -> Number:
     return np.absolute(x)
 
 
