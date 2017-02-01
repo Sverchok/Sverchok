@@ -1,10 +1,19 @@
 import numpy as np
 
-from svrx.typing import Vertices, Float
+from svrx.typing import Vector, Float
+from svrx.nodes.node_base import node_func
+
+from svrx.util.function import make_compatible
+
+X_AXIS = (1, 0, 0)
+Y_AXIS = (0, 1, 0)
+Z_AXIS = (0, 0, 1)
+ZERO = (1, 0, 0)
 
 
-def add(u: Vertices = (0.0, 0.0, 0.0),
-        v: Vertices = (0.0, 0.0, 0.0)
+@node_func(bl_idname="SvRxVectorMathNode", multi_label="Vector Math", id=0)
+def add(u: Vector = ZERO,
+        v: Vector = ZERO
         ) -> Vertices:
     u, v = make_compatible(u, v)
     return u + v
@@ -33,7 +42,7 @@ def scale(u: Vertices = (0.0, 0.0, 0.0),
 
 def length(u: Vertices = (0.0, 0.0, 0.0)
            ) -> Float:
-    return np.linalg.norm(u, axis=0)
+    return np.sqrt(u * u)
 
 
 def dot(u: Vertices = (0.0, 0.0, 0.0),
@@ -51,25 +60,3 @@ def distance(u: Vertices = (0.0, 0.0, 0.0), v: Vertices = (0.0, 0.0, 0.0) ) -> F
     u, v = make_compatible(u, v)
     x = u - v
     return np.sqrt(x * x)
-
-
-func_list = {
-    "Cross":  (1, cross),
-    "Add":    (2, add),
-    "Scale":  (3, sub),
-    "Length": (4, length),
-    "Dot":    (5, dot),
-
-    "Opposite": (10, opposite),
-    "Distance": (20, distance)
-}
-
-"""
-class SvrxVectorMathNode:
-
-    mode = EnumProperty(items=func_list)
-
-    @property
-    def function(self):
-        return func_dict[self.mode]
-"""
