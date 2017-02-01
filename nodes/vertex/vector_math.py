@@ -10,6 +10,11 @@ Y_AXIS = (0, 1, 0)
 Z_AXIS = (0, 0, 1)
 ZEROS = (0, 0, 0)
 
+""" missing
+- Angle Rad, Angle Deg, Project, Reflect, Componentwise-multiplication, Normalize
+
+"""
+
 # pylint: disable=C0326
 
 @node_func(bl_idname="SvRxVectorMathNode", multi_label="Vector Math", id=0)
