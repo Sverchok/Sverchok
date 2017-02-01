@@ -1,6 +1,6 @@
 import numpy as np
 
-from svrx.typing import Vector, Float
+from svrx.typing import Vector, Float, Vertices
 from svrx.nodes.node_base import node_func
 
 from svrx.util.function import make_compatible
