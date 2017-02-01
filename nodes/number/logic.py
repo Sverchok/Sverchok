@@ -3,9 +3,11 @@ import numpy as np
 from svrx.util.function import constant, draw_label
 
 from svrx.nodes.node_base import node_func
+from svrx.nodes.classes import NodeMathBase
+
 from svrx.typing import Number, Bool
 
-@node_func(bl_idname='SvRxNodeLogic', multi_label='Logic', id=0, draw_label=draw_label)
+@node_func(bl_idname='SvRxNodeLogic', multi_label='Logic', id=0,  cls_bases=(NodeMathBase,))
 def equal(x: Number = 0, y: Number= 0) -> Bool:
     return x == y
 
