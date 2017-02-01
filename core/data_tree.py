@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 import bpy
 import collections
+from itertools import  chain
 
 import numpy as np
 
