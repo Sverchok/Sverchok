@@ -40,7 +40,8 @@ class NodeBase:
 
     def adjust_inputs(self, template):
         inputs_template = template
-        for socket, socket_data in zip(self.inputs, inputs_template):
+        for socket, socket_data in zip(self.inputs[:], inputs_template):
+            print(socket_data)
             socket.replace_socket(*socket_data)
 
         diff = len(self.inputs) - len(inputs_template)
@@ -58,7 +59,7 @@ class NodeBase:
     def adjust_outputs(self, template):
         outputs_template = template
 
-        for socket, socket_data in zip(self.outputs, outputs_template):
+        for socket, socket_data in zip(self.outputs[:], outputs_template):
             socket.replace_socket(*socket_data)
 
         diff = len(self.outputs) - len(outputs_template)
