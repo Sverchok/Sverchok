@@ -21,8 +21,3 @@ def arange(start: Int = 0,
            stop: Int = 10,
            step: Int = 1) -> [Int]:
     return list(np_arange(start, stop, step))
-
-
-@node_func(bl_idname="SvRxTestAdd")
-def add(x: Float = 0.0, y: Float = 0.0) -> Float:
-    return x + y
