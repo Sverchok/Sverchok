@@ -41,7 +41,6 @@ class NodeBase:
     def adjust_inputs(self, template):
         inputs_template = template
         for socket, socket_data in zip(self.inputs, inputs_template):
-            print(socket_data)
             socket.replace_socket(*socket_data)
 
         diff = len(self.inputs) - len(inputs_template)
@@ -51,7 +50,6 @@ class NodeBase:
                 self.inputs.remove(self.inputs[-1])
         elif diff < 0:
             for bl_id, name, default in inputs_template[diff:]:
-                print(bl_id, name, default)
                 s = self.inputs.new(bl_id, name)
                 if default is not None:
                     s.default_value = default
