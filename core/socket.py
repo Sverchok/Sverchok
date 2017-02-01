@@ -93,12 +93,14 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
     socket_name = new_name or socket.name
 
     ng = socket.id_data
+    """
+    terminate early leads to bugs
     if socket.bl_idname == socket_type:
         socket.name = new_name
         if default is not None:
             socket.default_value = default
         return
-
+    """
     if socket.is_output:
         outputs = socket.node.outputs
         to_sockets = [l.to_socket for l in socket.links]

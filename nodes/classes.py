@@ -40,7 +40,7 @@ class NodeBase:
 
     def adjust_inputs(self, template):
         inputs_template = template
-        for socket, socket_data in zip(self.inputs[:], inputs_template):
+        for socket, socket_data in zip(self.inputs, inputs_template):
             print(socket_data)
             socket.replace_socket(*socket_data)
 
