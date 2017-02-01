@@ -35,7 +35,7 @@ class NodeBase:
     def adjust_sockets(self):
         func = self.compile()
         self.adjust_inputs(func.inputs_template)
-        self.adjust_outputs(func.inputs_template)
+        self.adjust_outputs(func.outputs_template)
 
 
     def adjust_inputs(self, template):
