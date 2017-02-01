@@ -65,6 +65,7 @@ def class_factory(func):
     cls_dict['bl_label'] = func.label
 
     for name, prop in func.properties.items():
+        print(name, prop)
         cls_dict[name] = prop
 
     if hasattr(func, 'id'):
@@ -175,7 +176,13 @@ def stateful(cls):
     func = cls()
     get_signature(func)
     module_name = func.__module__.split(".")[-2]
-    props = getattr(cls, 'properties', {})
+    props = {}
+    for name, prop in getattr(cls, 'properties', {}).items():
+        if isinstance(prop, SvRxBaseTypeP):
+            props[name] = prop.get_prop()
+        else:
+            props[name] = prop
+
     props.update(func.properties)
 
     class InnerStateful(cls, Stateful):
