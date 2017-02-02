@@ -17,6 +17,7 @@
 # ##### END GPL LICENSE BLOCK #####
 import numpy as np
 
+from svrx.typing import Float, Int, Vertices, BoolP
 from svrx.nodes.node_base import node_func
 
 from svrx.util.geom import vectorize
@@ -30,11 +31,13 @@ def gen_rand_vecs(dims, number):
 
 
 @vectorize
+def rand_vec(size, seed, scale, point=False):
     np.random.seed(seed)
     if point:
         res = np.ones((size, 4))
     else:
         res = np.zeros((size, 4))
+    res[:, :3] = scale * gen_rand_vecs(3, size)
     return res
 
 @node_func(bl_idname="SvRxVectorRandom")
@@ -42,4 +45,5 @@ def random_unit_vector(size: Int =1,
                        seed: Int = 1,
                        scale: Float = 1.0,
                        point: BoolP = False
+                       ) -> [Vertices]:
     return list(rand_vec(size, seed, scale, [point]))
