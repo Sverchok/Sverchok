@@ -2,7 +2,7 @@ import bpy
 import bmesh
 
 from svrx.nodes.node_base import stateful
-from svrx.typing import Vertices, Required, Faces, Edges, StringP, Matrix
+from svrx.typing import Vertices, Required, Faces, Edges, StringP, IntP, Matrix
 from svrx.util.mesh import bmesh_from_pydata
 
 # pylint: disable=C0326
@@ -13,12 +13,14 @@ class MeshOut():
     def __init__(self, node=None):
         if node:
             self.base_name = node.mesh_name
+            self.max_mesh_count = node.max_mesh_count
         self.start()
 
     bl_idname = "SvRxNodeMeshOut"
     label = "Mesh out"
 
-    properties = {'mesh_name': StringP(name='Mesh name', default="svrx_mesh")}
+    properties = {'mesh_name': StringP(name='Mesh name', default="svrx_mesh"),
+                  'max_mesh_count': IntP(name="Max count", default=100)}
 
     def start(self):
         self.verts = []
@@ -29,7 +31,7 @@ class MeshOut():
     def stop(self):
         obj_index = 0
         #  using range to limit object number for now during testing
-        param = zip(range(100), self.verts, self.edges, self.faces, self.mats)
+        param = zip(range(self.max_mesh_count), self.verts, self.edges, self.faces, self.mats)
         for idx, verts, edges, faces, mat in param:
             obj_index = idx
             obj = make_bmesh_geometry(verts[:, :3], edges, faces,
