@@ -18,6 +18,7 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import collections
+from itertools import chain
 
 import svrx
 from svrx.core.data_tree import SvDataTree
@@ -37,13 +38,13 @@ class SvTreeDB:
 
     def get(self, socket):
         ng_id = socket.id_data.name
-        s_id = socket.socket_id
+
         if ng_id not in self.data_trees:
             self.data_trees[ng_id] = {}
         ng_trees = self.data_trees[ng_id]
-        if s_id not in ng_trees:
-            ng_trees[s_id] = SvDataTree(socket=socket)
-        return ng_trees[s_id]
+        if socket not in ng_trees:
+            ng_trees[socket] = SvDataTree(socket=socket)
+        return ng_trees[socket]
 
     def clean(self, ng):
         ng_id = ng.name
@@ -51,6 +52,47 @@ class SvTreeDB:
 
 data_trees = SvTreeDB()
 
+
+class VirtualNode:
+    """
+    Used to represent node that don't have real conterpart in the layout
+    """
+    bl_idname = "VirtualNode"
+
+    def __init__(self, func, ng):
+        self.func = func
+        self.id_data = ng
+        self.inputs = []
+        for _, name, default in func.inputs_template:
+            self.inputs.append(VirtualSocket(self, name=name, default=default))
+        self.outputs = [VirtualSocket(self) for _ in func.returns]
+        self.name = "VirtualNode<{}>".format(func.label)
+
+    def compile(self):
+        return self.func
+
+class VirtualLink:
+    bl_idname = "VirtualLink"
+    def __init__(self, from_socket, to_socket):
+        self.from_socket = from_socket
+        self.from_node = from_socket.node
+        self.to_node = to_socket.node
+        self.to_socket = to_socket
+
+        if isinstance(from_socket, VirtualSocket):
+            from_socket.is_linked = True
+
+        if isinstance(to_socket, VirtualSocket):
+            to_socket.is_linked = True
+            to_socket.other = from_socket
+
+class VirtualSocket:
+    def __init__(self, node, name=None, default=None):
+        self.name = name or "VirtualSocket"
+        self.node = node
+        self.id_data = node.id_data
+        self.default_value = default
+        self.is_linked = False
 
 def topo_sort(links, starts):
     """
@@ -67,42 +109,84 @@ def topo_sort(links, starts):
 
     for start in starts:
         visit(start, 0)
-    return sorted(weights.keys(), key=lambda n: -weights[n])
+    return sorted(weights.keys(), key=lambda n: weights[n])
 
 
+converion_table = {}
+
+def needs_conversion(from_type, to_type):
+    return (from_type, to_type) in converion_table
+
+def get_conversion(from_type, to_type):
+    return converion_table[(from_type, to_type)]
 
 
-def DAG(ng):
+def DAG(ng, nodes, socket_links):
     """
     preprocess the node layout in suitable way
     for topo_sort
     """
+    from svrx.typing import Vertices, Matrix
+    from svrx.nodes.matrix.create import create_matrix
+    converion_table[(Vertices, Matrix)] = create_matrix
 
-    links = collections.defaultdict(list)
-
+    links = []
     # needs to preprocess certain things
     # 1. reroutes, done
     # 2. type info
     # 3. wifi node replacement
 
     for l in ng.links:
-
         if not l.is_valid:
-            links = {}
-            break
+            return []
         if l.to_node.bl_idname == 'NodeReroute':
             continue
         if l.from_node.bl_idname == 'NodeReroute':
-            links[l.to_node].append(l.to_socket.other.node)
+            links.append(VirtualLink(l.to_socket.other, l.to_socket))
         else:
-            links[l.to_node].append(l.from_node)
+            links.append(l)
 
-    from_nodes = {l.from_node for l in ng.links}
-    starts = {l.to_node for l in ng.links if l.to_node not in from_nodes}
+    skip = set()
+    for i in range(len(links)):
+        l = links[i]
+        if l.from_node not in nodes:
+             nodes[l.from_node] = l.from_node.compile()
+        if l.to_node not in nodes:
+             nodes[l.to_node] = l.to_node.compile()
+        to_func = nodes[l.to_node]
+        from_func = nodes[l.from_node]
+        from_type = from_func.returns[l.from_socket.index][0]
+
+        to_type = None
+        socket_index = l.to_socket.index
+        for index, _, s_type in to_func.parameters:
+            if index == socket_index:
+                to_type = s_type
+        print(from_type, to_type)
+        if needs_conversion(from_type, to_type):
+            print("found in converion_table")
+            skip.add(i)
+            func = get_conversion(from_type, to_type)
+            node = VirtualNode(func, l.id_data)
+            nodes[node] = func
+            links.append(VirtualLink(l.from_socket, node.inputs[0]))
+            links.append(VirtualLink(node.outputs[0], l.to_socket))
+
+    real_links = collections.defaultdict(list)
+
+    for idx, l in enumerate(links):
+        if idx in skip:
+            continue
+        real_links[l.from_node].append(l.to_node)
+        socket_links[l.to_socket] = l.from_socket
+
+
+    from_nodes = set(node for node in chain(*real_links.values()))
+    starts = {node for node in real_links.keys() if node not in from_nodes}
 
     nodes = starts.union(from_nodes)
-    node_list = topo_sort(links, starts)
-
+    node_list = topo_sort(real_links, starts)
+    print([n.name for n in node_list])
     return node_list
 
 
@@ -168,9 +252,11 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
 def exec_node_group(node_group):
     print("exec tree")
     data_trees.clean(node_group)
-    for node in DAG(node_group):
-        #print("exec node", node.name)
-        func = node.compile()
+    nodes = {}
+    socket_links = {}
+    for node in DAG(node_group, nodes, socket_links):
+        print("exec node", node.name)
+        func = nodes[node]
         if isinstance(func, Stateful):
             func.start()
 
@@ -178,15 +264,14 @@ def exec_node_group(node_group):
         in_trees = []
         in_levels = []
 
-        for param, level in func.parameters:
+        for param, level, data_type in func.parameters:
             in_levels.append(level)
             #  int refers to socket index, str to a property name on the node
             if isinstance(param, int):
                 socket = node.inputs[param]
                 if socket.is_linked:
-                    #  here a more intelligent loookup is needed
-                    #  to support reroutes and wifi replacement
-                    tree = data_trees.get(socket.other)
+                    other = socket_links[socket]
+                    tree = data_trees.get(other)
                 else:
                     tree = SvDataTree(socket)
             else:  # prop parameter
@@ -199,7 +284,7 @@ def exec_node_group(node_group):
             else:
                 out_trees.append(None)
 
-        recurse_levels(func, in_levels, func.returns, in_trees, out_trees)
+        recurse_levels(func, in_levels , [l for _, l in func.returns], in_trees, out_trees)
         if isinstance(func, Stateful):
             func.stop()
         #print("finished with node", node.name)

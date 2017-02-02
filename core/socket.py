@@ -83,6 +83,15 @@ class SocketBase:
     def other(self):
         return get_other_socket(self)
 
+    @property
+    def index(self):
+        """Index of socket"""
+        node = self.node
+        sockets = node.outputs if self.is_output else node.inputs
+        for i, s in enumerate(sockets):
+            if s == self:
+                return i
+
 
 def replace_socket(socket, new_type=None, new_name=None, default=None):
     '''
