@@ -5,7 +5,6 @@ from svrx.nodes.node_base import node_func
 
 from svrx.util.geom import vectorize
 
-random_ints = vectorize(np.random.random_integers)
 
 
 @vectorize

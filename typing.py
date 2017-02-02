@@ -1,7 +1,7 @@
 from typing import List
 import numpy as np
 
-from bpy.props import EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
+from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
 
 
 class SvRxBaseType:
@@ -124,6 +124,10 @@ class StringP(SvRxBaseTypeP):
 
 class EnumP(SvRxBaseTypeP):
     prop_func = EnumProperty
+
+
+class BoolP(SvRxBaseTypeP):
+    prop_func = BoolProperty
 
 
 # Value Types, used for outputs
