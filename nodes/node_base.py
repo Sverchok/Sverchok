@@ -204,6 +204,8 @@ def node_func(*args, **values):
 
         if hasattr(func, 'id'):
             # has Dynamic Signature
+            if not hasattr(func, 'bl_idname'):
+                func.bl_idname = NodeDynSignature.last_bl_idname
             NodeDynSignature.add_multi(func)
             func_ref = NodeBase.get_func(func.bl_idname)
             if func_ref:
