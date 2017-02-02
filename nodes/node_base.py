@@ -110,7 +110,7 @@ def get_signature(func):
                 socket_name = name
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
-            func.parameters.append((len(func.inputs_template) - 1, level))
+            func.parameters.append((len(func.inputs_template) - 1, level, type(annotation)))
 
         elif isinstance(annotation, SvRxBaseTypeP):
             if not (parameter.default == inspect.Signature.empty or parameter.default is None):
@@ -132,10 +132,11 @@ def get_signature(func):
         socket_type = s_type.bl_idname
         if isinstance(s_type, SvRxBaseType):
             name = s_type.name
+            s_type = type(s_type)
         else:
             name = s_type.__name__
         func.outputs_template.append((socket_type, name))
-        func.returns.append(level)
+        func.returns.append((s_type, level))
 
 
 def parse_type(s_type):
