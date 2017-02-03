@@ -100,22 +100,25 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
 
     socket_type = new_type or socket.bl_idname
     socket_name = new_name or socket.name
+    socket_pos = socket.index
 
     ng = socket.id_data
-    """
-    terminate early leads to bugs
+
     if socket.bl_idname == socket_type:
+        if socket.name == new_name:
+            return socket
         socket.name = new_name
         if default is not None:
             socket.default_value = default
-        return
-    """
+        return socket
+
     if socket.is_output:
         outputs = socket.node.outputs
         to_sockets = [l.to_socket for l in socket.links]
 
         outputs.remove(socket)
         new_socket = outputs.new(socket_type, socket_name)
+        outputs.move(len(outputs)-1, socket_pos)
 
         for to_socket in to_sockets:
             ng.links.new(new_socket, to_socket)
@@ -126,6 +129,8 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
 
         inputs.remove(socket)
         new_socket = inputs.new(socket_type, socket_name)
+        inputs.move(len(inputs)-1, socket_pos)
+
         if default is not None:
             new_socket.default_value = default
         if from_socket:
@@ -240,13 +245,10 @@ class ObjectSocket(bpy.types.NodeSocket, SocketBase):
     default_value = StringProperty(update=exec_socket)
 
     def draw(self, context, layout, node, text):
-        if not self.is_output:
-            if self.is_linked:
-                layout.label(text)
-            else:
-                layout.prop_search(self, 'default_value', bpy.data, 'objects')
+        if not self.is_linked:
+            layout.prop_search(self, 'default_value', bpy.data, 'objects')
         else:
-            layout.label(text)
+            super().draw(context, layout, node, text)
 
 class ValueSocket:
     def draw(self, context, layout, node, text):
@@ -260,7 +262,6 @@ class ValueIntSocket(bpy.types.NodeSocket, ValueSocket, SocketNumber):
     bl_label = "Value Int Socket"
 
     default_value = IntProperty(update=exec_socket)
-
 
 
 
@@ -294,3 +295,18 @@ class ValueColorSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
                                         update=exec_socket,
                                         soft_min=0.0,
                                         soft_max=1.0)
+
+
+class ValueObjectSocket(bpy.types.NodeSocket, ValueSocket, SocketBase):
+    bl_idname = "SvRxValueObjectSocket"
+    bl_label = "Value Object Socket"
+
+    default_value = StringProperty(update=exec_socket)
+    color = (.2, .2, .2, 1.0)
+
+
+    def draw(self, context, layout, node, text):
+        if self.is_output:
+            layout.prop_search(self, 'default_value', bpy.data, 'objects', text=text)
+        else:
+            pass
