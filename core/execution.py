@@ -113,20 +113,8 @@ def topo_sort(links, starts):
     return sorted(weights.keys(), key=lambda n: -weights[n])
 
 
-
-def DAG(ng, nodes, socket_links):
-    """
-    preprocess the node layout in suitable way
-    for topo_sort
-    """
-
-    # needs to preprocess certain things
-    # 1. reroutes, done
-    # 2. type inf, done
-    # 3. wifi node replacement
-
+def filter_reroute(ng):
     links = []
-
     for l in ng.links:
         if not l.is_valid:
             return []
@@ -137,6 +125,10 @@ def DAG(ng, nodes, socket_links):
         else:
             links.append(l)
 
+    return links
+
+
+def verify_links(links, nodes, socket_links):
     skip = set()
     for i in range(len(links)):
         l = links[i]
@@ -172,6 +164,24 @@ def DAG(ng, nodes, socket_links):
         real_links[l.to_node].append(l.from_node)
         socket_links[l.to_socket] = l.from_socket
 
+    return real_links
+
+
+def DAG(ng, nodes, socket_links):
+    """
+    preprocess the node layout in suitable way
+    for topo_sort, removing reroutes and verifying
+    type info
+    """
+
+    # needs to preprocess certain things
+    # 1. reroutes, done
+    # 2. type inf, done
+    # 3. wifi node replacement
+
+    links = filter_reroute(ng)
+
+    real_links = verify_links(links, nodes, socket_links)
 
     from_nodes = set(node for node in chain(*real_links.values()))
     starts = {node for node in real_links.keys() if node not in from_nodes}
