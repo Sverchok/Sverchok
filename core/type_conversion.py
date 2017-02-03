@@ -16,3 +16,27 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
+
+from svrx.typing import Vertices, Vector, Point, Matrix, Number
+
+converion_table = {}
+
+def needs_conversion(from_type, to_type):
+    return (from_type, to_type) in converion_table
+
+def get_conversion(from_type, to_type):
+    return converion_table[(from_type, to_type)]
+
+
+
+def register():
+    """
+    done at register time to be able to use loaded nodes
+
+    also this should be more clever and use the type hierarchy which
+    should also be reworked
+    """
+    from svrx.nodes.matrix.create import create_matrix
+    from svrx.nodes.vertex.vector_in import vector_in
+    converion_table[(Vertices, Matrix)] = (create_matrix, (0,), 0)
+    converion_table[(Number, Vector)] = (vector_in, (0, 1, 2), 0)

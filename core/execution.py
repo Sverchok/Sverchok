@@ -22,6 +22,7 @@ from itertools import chain
 
 import svrx
 from svrx.core.data_tree import SvDataTree
+from svrx.core.type_conversion import needs_conversion, get_conversion
 from svrx.nodes.node_base import Stateful
 
 
@@ -109,16 +110,8 @@ def topo_sort(links, starts):
 
     for start in starts:
         visit(start, 0)
-    return sorted(weights.keys(), key=lambda n: weights[n])
+    return sorted(weights.keys(), key=lambda n: -weights[n])
 
-
-converion_table = {}
-
-def needs_conversion(from_type, to_type):
-    return (from_type, to_type) in converion_table
-
-def get_conversion(from_type, to_type):
-    return converion_table[(from_type, to_type)]
 
 
 def DAG(ng, nodes, socket_links):
@@ -126,15 +119,13 @@ def DAG(ng, nodes, socket_links):
     preprocess the node layout in suitable way
     for topo_sort
     """
-    from svrx.typing import Vertices, Matrix
-    from svrx.nodes.matrix.create import create_matrix
-    converion_table[(Vertices, Matrix)] = create_matrix
 
-    links = []
     # needs to preprocess certain things
     # 1. reroutes, done
-    # 2. type info
+    # 2. type inf, done
     # 3. wifi node replacement
+
+    links = []
 
     for l in ng.links:
         if not l.is_valid:
@@ -166,18 +157,19 @@ def DAG(ng, nodes, socket_links):
         if needs_conversion(from_type, to_type):
             print("found in converion_table")
             skip.add(i)
-            func = get_conversion(from_type, to_type)
+            func, to_index, from_index = get_conversion(from_type, to_type)
             node = VirtualNode(func, l.id_data)
             nodes[node] = func
-            links.append(VirtualLink(l.from_socket, node.inputs[0]))
-            links.append(VirtualLink(node.outputs[0], l.to_socket))
+            for idx in to_index:
+                links.append(VirtualLink(l.from_socket, node.inputs[idx]))
+            links.append(VirtualLink(node.outputs[from_index], l.to_socket))
 
     real_links = collections.defaultdict(list)
 
     for idx, l in enumerate(links):
         if idx in skip:
             continue
-        real_links[l.from_node].append(l.to_node)
+        real_links[l.to_node].append(l.from_node)
         socket_links[l.to_socket] = l.from_socket
 
 
@@ -255,7 +247,7 @@ def exec_node_group(node_group):
     nodes = {}
     socket_links = {}
     for node in DAG(node_group, nodes, socket_links):
-        print("exec node", node.name)
+        #print("exec node", node.name)
         func = nodes[node]
         if isinstance(func, Stateful):
             func.start()
