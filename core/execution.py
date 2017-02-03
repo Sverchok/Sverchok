@@ -149,12 +149,18 @@ def verify_links(links, nodes, socket_links):
         if needs_conversion(from_type, to_type):
             print("found in converion_table")
             skip.add(i)
-            func, to_index, from_index = get_conversion(from_type, to_type)
-            node = VirtualNode(func, l.id_data)
-            nodes[node] = func
+            bl_idname, to_index, from_index = get_conversion(from_type, to_type)
+            #node = VirtualNode(func, l.id_data)
+            #nodes[node] = func
+            ng = l.id_data
+            node = ng.nodes.new(bl_idname)
+            node.hide = True
+            node.select = False
+            nodes[node] = node.compile()
+            node.location = (l.from_node.location + l.to_node.location) * .5
             for idx in to_index:
-                links.append(VirtualLink(l.from_socket, node.inputs[idx]))
-            links.append(VirtualLink(node.outputs[from_index], l.to_socket))
+                links.append(ng.links.new(l.from_socket, node.inputs[idx]))
+            links.append(ng.links.new(node.outputs[from_index], l.to_socket))
 
     real_links = collections.defaultdict(list)
 
@@ -186,7 +192,6 @@ def DAG(ng, nodes, socket_links):
     from_nodes = set(node for node in chain(*real_links.values()))
     starts = {node for node in real_links.keys() if node not in from_nodes}
 
-    nodes = starts.union(from_nodes)
     node_list = topo_sort(real_links, starts)
     print([n.name for n in node_list])
     return node_list
