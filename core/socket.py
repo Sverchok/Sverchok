@@ -193,6 +193,23 @@ class PointSocket(bpy.types.NodeSocket, SocketVector):
         else:
             super().draw(context, layout, node, text)
 
+
+class ColorSocket(bpy.types.NodeSocket, SocketVector):
+    bl_idname = 'SvRxColorSocket'
+    bl_label = 'Color Socket'
+
+    default_value = FloatVectorProperty(size=4,
+                                        subtype='COLOR',
+                                        update=exec_socket,
+                                        soft_min=0.0,
+                                        soft_max=1.0)
+
+    def draw(self, context, layout, node, text):
+        if not self.is_linked and not self.is_output:
+            layout.prop(self, 'default_value')
+        else:
+            super().draw(context, layout, node, text)
+
 class TopoSocket(bpy.types.NodeSocket, SocketBase):
     bl_idname = "SvRxTopoSocket"
     bl_label = "Topo Socket"
@@ -266,3 +283,14 @@ class ValuePointSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
             for i in range(4):
                 row = column.row(align=True)
                 row.prop(self, "default_value", index=i, text='XYZW'[i])
+
+
+class ValueColorSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
+    bl_idname = "SvRxValueColorSocket"
+    bl_label = "Value Color Socket"
+
+    default_value = FloatVectorProperty(size=4,
+                                        subtype='COLOR',
+                                        update=exec_socket,
+                                        soft_min=0.0,
+                                        soft_max=1.0)

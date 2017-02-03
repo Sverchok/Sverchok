@@ -85,6 +85,9 @@ class BMesh(SvRxBaseType):
 class SMesh(SvRxBaseType):
     bl_idname = "SvRxMeshSocket"
 
+class Color(Number):
+    bl_idname = "SvRxColorSocket"
+
 
 # Property types
 
@@ -146,3 +149,7 @@ class FloatValue(SvRxBaseType):
 
 class PointValue(SvRxBaseType):
     bl_idname = "SvRxValuePointSocket"
+
+
+class ColorValue(SvRxBaseType):
+    bl_idname = "SvRxValueColorSocket"
