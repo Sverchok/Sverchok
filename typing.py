@@ -153,3 +153,7 @@ class PointValue(SvRxBaseType):
 
 class ColorValue(SvRxBaseType):
     bl_idname = "SvRxValueColorSocket"
+
+
+class ObjectValue(SvRxBaseType):
+    bl_idname = "SvRxValueObjectSocket"
