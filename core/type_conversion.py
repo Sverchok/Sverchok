@@ -22,6 +22,8 @@ from svrx.typing import Vertices, Vector, Point, Matrix, Number
 converion_table = {}
 
 def needs_conversion(from_type, to_type):
+    if from_type == to_type:
+        return False
     return (from_type, to_type) in converion_table
 
 def get_conversion(from_type, to_type):
