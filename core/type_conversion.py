@@ -38,5 +38,5 @@ def register():
     """
     from svrx.nodes.matrix.create import create_matrix
     from svrx.nodes.vertex.vector_in import vector_in
-    converion_table[(Vertices, Matrix)] = (create_matrix, (0,), 0)
+    converion_table[(Vertices, Matrix)] = ('SvRxNodeCreateMatrix', (0,), 0)
     converion_table[(Number, Vector)] = (vector_in, (0, 1, 2), 0)
