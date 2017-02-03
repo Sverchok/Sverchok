@@ -128,7 +128,7 @@ def filter_reroute(ng):
     return links
 
 
-def verify_links(links, nodes, socket_links):
+def verify_links(links, nodes, socket_links, real_nodes=False):
     skip = set()
     for i in range(len(links)):
         l = links[i]
@@ -145,22 +145,26 @@ def verify_links(links, nodes, socket_links):
         for index, _, s_type in to_func.parameters:
             if index == socket_index:
                 to_type = s_type
-        print(from_type, to_type)
         if needs_conversion(from_type, to_type):
-            print("found in converion_table")
             skip.add(i)
-            bl_idname, to_index, from_index = get_conversion(from_type, to_type)
-            #node = VirtualNode(func, l.id_data)
-            #nodes[node] = func
+            func, to_index, from_index = get_conversion(from_type, to_type)
             ng = l.id_data
-            node = ng.nodes.new(bl_idname)
-            node.hide = True
-            node.select = False
-            nodes[node] = node.compile()
-            node.location = (l.from_node.location + l.to_node.location) * .5
-            for idx in to_index:
-                links.append(ng.links.new(l.from_socket, node.inputs[idx]))
-            links.append(ng.links.new(node.outputs[from_index], l.to_socket))
+            if real_nodes:
+                node = ng.nodes.new(func.bl_idname)
+                node.hide = True
+                node.select = False
+                nodes[node] = node.compile()
+                node.location = (l.from_node.location + l.to_node.location) * .5
+                for idx in to_index:
+                    links.append(ng.links.new(l.from_socket, node.inputs[idx]))
+                links.append(ng.links.new(node.outputs[from_index], l.to_socket))
+            else:
+                node = VirtualNode(func, ng)
+                nodes[node] = func
+                for idx in to_index:
+                    links.append(VirtualLink(l.from_socket, node.inputs[idx]))
+                links.append(VirtualLink(node.outputs[from_index], l.to_socket))
+
 
     real_links = collections.defaultdict(list)
 

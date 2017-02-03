@@ -22,6 +22,8 @@ from svrx.typing import Vertices, Vector, Point, Matrix, Number
 converion_table = {}
 
 def needs_conversion(from_type, to_type):
+    if from_type == to_type:
+        return False
     return (from_type, to_type) in converion_table
 
 def get_conversion(from_type, to_type):
@@ -38,5 +40,5 @@ def register():
     """
     from svrx.nodes.matrix.create import create_matrix
     from svrx.nodes.vertex.vector_in import vector_in
-    converion_table[(Vertices, Matrix)] = ('SvRxNodeCreateMatrix', (0,), 0)
+    converion_table[(Vertices, Matrix)] = (create_matrix, (0,), 0)
     converion_table[(Number, Vector)] = (vector_in, (0, 1, 2), 0)
