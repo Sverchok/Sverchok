@@ -5,7 +5,6 @@ from svrx.nodes.node_base import node_func
 
 from svrx.util.geom import vectorize
 
-random_ints = vectorize(np.random.random_integers)
 
 
 @vectorize
@@ -17,7 +16,7 @@ def rand_ints(size, low, high, seed):
 @vectorize
 def random_ints(size, low, high, seed):
     np.random.seed(seed)
-    return np.random.random_integer(low, high, size)
+    return np.random.random_integers(low, high, size)
 
 @vectorize
 def random_floats(size, low, high, seed):

@@ -1,6 +1,8 @@
 import numpy as np
 
-from svrx.typing import IntValue, FloatValue, PointValue
+import bpy
+
+from svrx.typing import IntValue, FloatValue, PointValue, ColorValue, ObjectValue
 from svrx.nodes.node_base import stateful
 
 
@@ -35,3 +37,20 @@ class PointValue(ValueNodeCommon):
 
     def __call__(self) -> PointValue("p"):
         return np.array([self.value])
+
+@stateful
+class ColorValue(ValueNodeCommon):
+    bl_idname = "SvRxNodeColorValue"
+    label = "Color input"
+
+    def __call__(self) -> ColorValue("c"):
+        return np.array([self.value])
+
+
+@stateful
+class ObjectValue(ValueNodeCommon):
+    bl_idname = "SvRxNodeObjectValue"
+    label = "Object input"
+
+    def __call__(self) -> ObjectValue("o"):
+        return bpy.data.objects.get(self.value)

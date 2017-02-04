@@ -1,7 +1,7 @@
 from typing import List
 import numpy as np
 
-from bpy.props import EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
+from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
 
 
 class SvRxBaseType:
@@ -85,6 +85,9 @@ class BMesh(SvRxBaseType):
 class SMesh(SvRxBaseType):
     bl_idname = "SvRxMeshSocket"
 
+class Color(Number):
+    bl_idname = "SvRxColorSocket"
+
 
 # Property types
 
@@ -126,6 +129,10 @@ class EnumP(SvRxBaseTypeP):
     prop_func = EnumProperty
 
 
+class BoolP(SvRxBaseTypeP):
+    prop_func = BoolProperty
+
+
 # Value Types, used for outputs
 
 class ValueBase:
@@ -142,3 +149,11 @@ class FloatValue(SvRxBaseType):
 
 class PointValue(SvRxBaseType):
     bl_idname = "SvRxValuePointSocket"
+
+
+class ColorValue(SvRxBaseType):
+    bl_idname = "SvRxValueColorSocket"
+
+
+class ObjectValue(SvRxBaseType):
+    bl_idname = "SvRxValueObjectSocket"

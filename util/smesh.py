@@ -74,7 +74,7 @@ class SvPolygon:
         loop_info[1:,1] = loop_info[:-1,0].cumsum()
         vertex_indices = np.fromiter(chain.from_iterable(faces),
                                      dtype=np.uint32,
-                                     count=self.loop_info[:,0].sum())
+                                     count=loop_info[:,0].sum())
         return cls(loop_info, vertex_indices)
 
     def __init__(self, loop_info=None, vertex_indices=None):

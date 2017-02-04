@@ -97,6 +97,7 @@ class NodeDynSignature(NodeBase):
         func_dict, func_list = _multi_storage[func.bl_idname]
         func_list.append((func.label, func.label, func.label, func.id))
         func_dict[func.label] = func
+        NodeDynSignature.last_bl_idname = func.bl_idname
 
     @staticmethod
     def get_multi(func):

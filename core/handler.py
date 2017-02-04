@@ -36,10 +36,24 @@ def sv_main_handler(scene):
         if ng.has_changed:
             ng.execute()
 
+@persistent
+def sv_file_load(scene):
+    """
+    To make sure nodes follow signature on node changes
+    NOT READY TO BE USED DUE TO ADJUST SOCKETS BUGS
+    """
+    for ng in svrx_trees():
+        for node in ng.nodes:
+            if hasattr(node, "adjust_sockets"):
+                node.adjust_sockets()
+
+
 
 def register():
     bpy.app.handlers.scene_update_pre.append(sv_main_handler)
+    #bpy.app.handlers.load_post.append(sv_file_load)
 
 
 def unregister():
     bpy.app.handlers.scene_update_pre.remove(sv_main_handler)
+    #bpy.app.handlers.load_post.append.remove(sv_file_load)
