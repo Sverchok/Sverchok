@@ -7,6 +7,7 @@ from svrx.typing import Number, Float, Int
 from svrx.util.function import constant
 
 # pylint: disable=C0326
+# pylint: disable=W0622
 
 @node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0, cls_bases=(NodeMathBase,))
 def add(x: Number = 0.0, y: Number = 0.0) -> Number:

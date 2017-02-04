@@ -16,6 +16,7 @@ ZEROS = (0, 0, 0)
 """
 
 # pylint: disable=C0326
+# pylint: disable=W0622 
 
 @node_func(bl_idname="SvRxVectorMathNode", multi_label="Vector Math", id=0)
 def add(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
@@ -61,8 +62,8 @@ def distance(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
     x = u - v
     return np.sqrt(x * x)
 
-@node_func(multi_label="round", id=48)
-def rx_round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
+@node_func(id=48)
+def round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
     return np.round_(u, n)
 
 """
