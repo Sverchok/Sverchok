@@ -21,7 +21,7 @@ def mul(x: Number = 0.0, y: Number = 0.0) -> Number:
     return x * y
 
 @node_func(id=3)
-def div(x: Number = 0.0, y: Number = 0.0) -> Number:
+def div(x: Number = 2.0, y: Number = 1.0) -> Number:
     return x / y
 
 @node_func(id=4)
@@ -29,15 +29,15 @@ def sqrt(x: Number = 1.0) -> Number:
     return np.sqrt(x)
 
 @node_func(id=5)
-def copy_sign(x: Number = 1.0, y: Number = 0.0) -> Number:
+def copy_sign(x: Number = 1.0, y: Number = -1.0) -> Number:
     return np.copy_sign(x, y)
 
 @node_func(id=6)
-def absolute(x: Number = 1.0) -> Number:
+def absolute(x: Number = -1.0) -> Number:
     return np.absolute(x)
 
 @node_func(id=9)
-def reciprocal(x: Number = 0.0) -> Number:
+def reciprocal(x: Number = 1.0) -> Number:
     return 1 / x
 
 @node_func(id=10)
