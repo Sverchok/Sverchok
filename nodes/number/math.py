@@ -66,8 +66,18 @@ def as_int(x: Number = 0.0) -> Int:
     return x.astype(int)
 
 @node_func(id=16)
-def round(x: Number = 0.0, y: Int = 0) -> Float:
+def round(x: Number = 0.0) -> Float:
+    return x.round(1)
+
+@node_func(id=17)
+def round_n(x: Number = 0.0, y: Int = 3) -> Float:
     return x.round(y)
+
+
+@node_func(id=20)
+def ceil(x: Number = 1.0) -> Float:
+    return np.ceil(x)
+
 
 @node_func(id=61)
 @constant
