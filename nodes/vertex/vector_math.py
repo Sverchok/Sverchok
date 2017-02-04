@@ -22,46 +22,46 @@ def add(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
     u, v = make_compatible(u, v)
     return u + v
 
-@node_func(bl_idname="SvRxVectorMathNode", id=6)
+@node_func(id=6)
 def sub(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
     u, v = make_compatible(u, v)
     return u - v
 
-@node_func(bl_idname="SvRxVectorMathNode", id=12)
+@node_func(id=12)
 def cross(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
     u, v = make_compatible(u, v)
     return np.cross(u, v)
 
-@node_func(bl_idname="SvRxVectorMathNode", id=18)
+@node_func(id=18)
 def scale(u: Vertices = ZEROS, s: Float = 1.0 ) -> Vertices:
     u, s = make_compatible(u, s)
     return u * s
 
-@node_func(bl_idname="SvRxVectorMathNode", id=22)
+@node_func(id=22)
 def scale_reciprocal(u: Vertices = ZEROS, s: Float = 1.0 ) -> Vertices:
     u, s = make_compatible(u, s)
     return u * (1 / s)
 
-@node_func(bl_idname="SvRxVectorMathNode", id=26)
+@node_func(id=26)
 def length(u: Vertices = ZEROS ) -> Float:
     return np.sqrt(u * u)
 
-@node_func(bl_idname="SvRxVectorMathNode", id=32)
+@node_func(id=32)
 def dot(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
     return u.dot(v)  # .. not sure
 
-@node_func(bl_idname="SvRxVectorMathNode", id=38)
+@node_func(id=38)
 def opposite(u: Vertices = ZEROS ) -> Vertices:
     return -u
 
-@node_func(bl_idname="SvRxVectorMathNode", id=44)
+@node_func(id=44)
 def distance(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
     # speed!?  http://stackoverflow.com/a/9184560/1243487
     u, v = make_compatible(u, v)
     x = u - v
     return np.sqrt(x * x)
 
-@node_func(bl_idname="SvRxVectorMathNode", multi_label="round", id=48)
+@node_func(multi_label="round", id=48)
 def rx_round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
     return np.round_(u, n)
 
