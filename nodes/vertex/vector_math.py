@@ -11,7 +11,12 @@ Z_AXIS = (0, 0, 1)
 ZEROS = (0, 0, 0)
 
 """ missing
-- Angle Rad, Angle Deg, Project, Reflect, Componentwise-multiplication, Normalize
+- Angle Rad, 
+- Angle Deg, 
+- Project, 
+- Reflect, 
+- Componentwise-multiplication, 
+- Normalize
 
 """
 
