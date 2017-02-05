@@ -39,6 +39,7 @@ def absolute(x: Number = -1.0) -> Number:
 
 @node_func(id=9)
 def reciprocal(x: Number = 1.0) -> Number:
+    # numpy.reciprocal  is not designed to work with integers.
     return 1 / x
 
 @node_func(id=10)
