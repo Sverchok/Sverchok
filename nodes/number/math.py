@@ -10,19 +10,19 @@ from svrx.util.function import constant
 # pylint: disable=W0622
 
 @node_func(bl_idname='SvRxNodeMath', multi_label="Math", id=0, cls_bases=(NodeMathBase,))
-def add(x: Number = 0.0, y: Number = 0.0) -> Number:
+def add(x: Number = 0.0, y: Number = 1.0) -> Number:
     return x + y
 
 @node_func(id=1)
-def sub(x: Number = 0.0, y: Number = 0.0) -> Number:
+def sub(x: Number = 0.0, y: Number = 1.0) -> Number:
     return x - y
 
 @node_func(id=2)
-def mul(x: Number = 0.0, y: Number = 0.0) -> Number:
+def mul(x: Number = 0.0, y: Number = 2.0) -> Number:
     return x * y
 
 @node_func(id=3)
-def div(x: Number = 2.0, y: Number = 1.0) -> Number:
+def div(x: Number = 1.0, y: Number = 2.0) -> Number:
     return x / y
 
 @node_func(id=4)
@@ -45,32 +45,12 @@ def reciprocal(x: Number = 1.0) -> Number:
 def negate(x: Number = 0.0) -> Number:
     return -x
 
-@node_func(id=11)
-def add_1(x: Number = 0.0) -> Number:
-    return x + 1
-
-@node_func(id=12)
-def sub_1(x: Number = 0.0) -> Number:
-    return x - 1
-
-@node_func(id=13)
-def div_2(x: Number = 0.0) -> Number:
-    return x / 2
-
-@node_func(id=14)
-def mul_2(x: Number = 0.0) -> Number:
-    return x * 2
-
 @node_func(id=15)
 def as_int(x: Number = 0.0) -> Int:
     return x.astype(int)
 
-@node_func(id=16)
-def round(x: Number = 0.0) -> Float:
-    return x.round()
-
 @node_func(id=17)
-def round_n(x: Number = 0.0, y: Int = 3) -> Float:
+def round_n(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
 
 
