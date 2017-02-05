@@ -53,10 +53,29 @@ def as_int(x: Number = 0.0) -> Int:
 def round_n(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
 
-
 @node_func(id=20)
 def ceil(x: Number = 1.0) -> Float:
     return np.ceil(x)
+
+@node_func(id=22)
+def pow(x: Number = 1.0, y: Int = 2) -> Number:
+    return np.power(x, y)
+
+@node_func(id=24)
+def exp(x: Number = 1.0) -> Number:
+    return np.exp(x)
+
+# each element individually compared returns smallest
+@node_func(id=26)
+def minimum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
+    return np.minimum(x1, x2)
+
+# each element individually compared returns largest
+@node_func(id=26)
+def maximum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
+    return np.maximum(x1, x2)
+
+
 
 
 @node_func(id=61)
