@@ -71,7 +71,7 @@ def minimum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
     return np.minimum(x1, x2)
 
 # each element individually compared returns largest
-@node_func(id=26)
+@node_func(id=27)
 def maximum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
     return np.maximum(x1, x2)
 
