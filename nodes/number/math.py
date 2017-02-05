@@ -67,7 +67,7 @@ def as_int(x: Number = 0.0) -> Int:
 
 @node_func(id=16)
 def round(x: Number = 0.0) -> Float:
-    return x.round(1)
+    return x.round(0)
 
 @node_func(id=17)
 def round_n(x: Number = 0.0, y: Int = 3) -> Float:
