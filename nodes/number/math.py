@@ -57,6 +57,10 @@ def round_n(x: Number = 0.0, y: Int = 0) -> Float:
 def ceil(x: Number = 1.0) -> Float:
     return np.ceil(x)
 
+@node_func(id=21)
+def ceil(x: Number = 1.5) -> Float:
+    return np.floor(x)
+
 @node_func(id=22)
 def pow(x: Number = 1.0, y: Int = 2) -> Number:
     return np.power(x, y)
