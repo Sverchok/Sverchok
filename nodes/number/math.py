@@ -69,13 +69,26 @@ def pow(x: Number = 1.0, y: Int = 2) -> Number:
 def exp(x: Number = 1.0) -> Number:
     return np.exp(x)
 
-# each element individually compared returns smallest
+@node_func(id=25)
+def ln(x: Number = 1.0) -> Number:
+    return np.log(x)
+
 @node_func(id=26)
+def log10(x: Number = 1.0) -> Number:
+    return np.log10(x)
+
+@node_func(id=27)
+def logn(x1: Number = 1.0, x2: Number = 1.0) -> Number:
+    return np.logn(x1, x2)
+
+
+# each element individually compared returns smallest
+@node_func(id=30)
 def minimum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
     return np.minimum(x1, x2)
 
 # each element individually compared returns largest
-@node_func(id=27)
+@node_func(id=31)
 def maximum(x1: Number = 1.0, x2: Number = -1.0) -> Number:
     return np.maximum(x1, x2)
 
