@@ -75,7 +75,7 @@ def floor(x: Number = 1.5) -> Float:
     return np.floor(x)
 
 @node_func(id=22)
-def pow(x: Number = 1.0, y: Int = 2) -> Number:
+def pow(x: Number = 1.0, y: Number = 2.0) -> Number:
     return np.power(x, y)
 
 @node_func(id=24)
