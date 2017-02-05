@@ -57,6 +57,14 @@ def as_int(x1: Number = 1.0, x2: Number = 2.0) -> Int:
 def round_n(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
 
+@node_func(id=18)
+def modulo(x1: Number = 1.0, x2: Number = 1.0) -> Float:
+    return np.mod(x1, x2)
+
+@node_func(id=19)
+def fmodulo(x1: Number = 1.0, x2: Number = 1.0) -> Float:
+    return np.fmod(x1, x2)
+
 @node_func(id=20)
 def ceil(x: Number = 1.0) -> Float:
     return np.ceil(x)
