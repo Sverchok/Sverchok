@@ -31,7 +31,7 @@ def sqrt(x: Number = 1.0) -> Number:
 
 @node_func(id=5)
 def copy_sign(x: Number = 1.0, y: Number = -1.0) -> Number:
-    return np.copy_sign(x, y)
+    return np.copysign(x, y)
 
 @node_func(id=6)
 def absolute(x: Number = -1.0) -> Number:
