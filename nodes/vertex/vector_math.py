@@ -71,6 +71,15 @@ def distance(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Float:
 def round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
     return np.round_(u, n)
 
+@node_func(id=50)
+def normalize(u: Vertices = ZEROS) -> Vertices:
+    # placeholder
+    new_u = np.empty(np.shape(u))
+    for idx, v in enumerate(u):
+        new_u[idx] = v / np.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+    return new_u
+
+
 """
 class SvrxVectorMathNode:
 
