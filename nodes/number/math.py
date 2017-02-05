@@ -49,6 +49,10 @@ def negate(x: Number = 0.0) -> Number:
 def as_int(x: Number = 0.0) -> Int:
     return x.astype(int)
 
+@node_func(id=16)
+def as_int(x1: Number = 1.0, x2: Number = 2.0) -> Int:
+    return np.floor_divide(x1, x2)
+
 @node_func(id=17)
 def round_n(x: Number = 0.0, y: Int = 0) -> Float:
     return x.round(y)
@@ -58,7 +62,7 @@ def ceil(x: Number = 1.0) -> Float:
     return np.ceil(x)
 
 @node_func(id=21)
-def ceil(x: Number = 1.5) -> Float:
+def floor(x: Number = 1.5) -> Float:
     return np.floor(x)
 
 @node_func(id=22)
@@ -78,7 +82,7 @@ def log10(x: Number = 1.0) -> Number:
     return np.log10(x)
 
 @node_func(id=27)
-def logn(x1: Number = 1.0, x2: Number = 1.0) -> Number:
+def logn(x1: Number = 1.0, x2: Number = 2.0) -> Number:
     return np.logn(x1, x2)
 
 
