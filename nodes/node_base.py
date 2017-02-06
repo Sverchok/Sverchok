@@ -26,7 +26,8 @@ import svrx
 from svrx.typing import SvRxBaseType, SvRxBaseTypeP, Required
 from svrx.nodes.classes import (NodeBase,
                                 NodeDynSignature,
-                                NodeStateful)
+                                NodeStateful,
+                                NodeScript)
 
 
 
@@ -139,11 +140,12 @@ def get_signature(func):
         func.returns.append((s_type, level))
 
 
-def parse_type(s_type):
+def parse_type(s_type, level=0):
     """parse type into level, right now only supports one level
     """
     if isinstance(s_type, list):
-        return s_type[0], 1
+        s_type, level = parse_type(s_type[0], level)
+        return s_type, level + 1
     else:
         return s_type, 0
 
@@ -191,7 +193,7 @@ def stateful(cls):
 
 
 
-def node_func(*args, **values):
+def node_func(**values):
     """
     annotates and registers a node function, also creates classes
     if needed
@@ -219,8 +221,15 @@ def node_func(*args, **values):
         module_name = func.__module__.split(".")[-2]
         func.category = module_name
         return func
-    if args and callable(args[0]):
-        return real_node_func(args[0])
-    else:
-        print(args, values)
-        return real_node_func
+    return real_node_func
+
+
+def node_script(func):
+
+    module = func.__module__.split(".")[-1]
+    func.bl_idname = "SvRxNodeScript"
+    func.category = "Script"
+    func.module = module
+    get_signature(func)
+    NodeScript.add(func)
+    return func
