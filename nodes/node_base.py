@@ -140,11 +140,12 @@ def get_signature(func):
         func.returns.append((s_type, level))
 
 
-def parse_type(s_type):
+def parse_type(s_type, level=0):
     """parse type into level, right now only supports one level
     """
     if isinstance(s_type, list):
-        return s_type[0], 1
+        s_type, level = parse_type(s_type[0], level)
+        return s_type, level + 1
     else:
         return s_type, 0
 
