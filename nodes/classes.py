@@ -1,7 +1,8 @@
 
 import bpy
-from bpy.props import EnumProperty
+from bpy.props import EnumProperty, StringProperty
 
+import importlib
 
 _node_funcs = {}
 
@@ -174,20 +175,34 @@ class NodeMathBase(NodeDynSignature):
         self.adjust_outputs(func.outputs_template)
 
 
+_node_scripts = {}
 
-class NodeScript:
-    bl_idname = "SvRxScriptNode"
+class NodeScript(NodeBase):
+    bl_idname = "SvRxNodeScript"
+    bl_label = "Script"
 
+    def load_text(self, context):
+        if self.text_file in bpy.data.texts:
+            importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+        else:
+            pass #  fail
+
+    text_file = StringProperty(update=load_text)
 
     def compile(self):
-        pass
+        return _node_scripts[self.text_file]
 
     @staticmethod
     def add(func):
-        pass
+        _node_scripts[func.module] = func
 
     def draw_buttons(self, context, layout):
-        pass
+        if not self.text_file:
+            layout.prop_search(self, 'text_file', bpy.data, 'texts')
+
+
+class RealNodeScript(NodeScript, bpy.types.Node):
+    pass
 
 def register():
 

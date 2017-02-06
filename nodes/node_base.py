@@ -26,7 +26,8 @@ import svrx
 from svrx.typing import SvRxBaseType, SvRxBaseTypeP, Required
 from svrx.nodes.classes import (NodeBase,
                                 NodeDynSignature,
-                                NodeStateful)
+                                NodeStateful,
+                                NodeScript)
 
 
 
@@ -223,9 +224,10 @@ def node_func(**values):
 
 
 def node_script(func):
-    name = func.__module__.split(".")[-1]
+    module = func.__module__.split(".")[-1]
     func.bl_idname = "SvRxNodeScript"
     func.category = "Script"
+    func.module = module
     get_signature(func)
     NodeScript.add(func)
     return func
