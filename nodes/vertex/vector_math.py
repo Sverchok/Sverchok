@@ -74,10 +74,16 @@ def round(u: Vertices = ZEROS, n: Int = 7 ) -> Vertices:
 @node_func(id=50)
 def normalize(u: Vertices = ZEROS) -> Vertices:
     # placeholder
-    new_u = np.empty(np.shape(u))
-    for idx, v in enumerate(u):
-        new_u[idx] = v / np.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-    return new_u
+    # new_u = np.empty(np.shape(u))
+    # for idx, v in enumerate(u):
+    #     new_u[idx] = v / np.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
+    # return new_u
+
+    A = np.power(u, 2)
+    B = np.sum(A, axis=1)
+    C = np.sqrt(B)
+    D = u / C[:, None]
+    return D
 
 
 """
