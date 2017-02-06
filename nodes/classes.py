@@ -174,6 +174,20 @@ class NodeMathBase(NodeDynSignature):
         self.adjust_outputs(func.outputs_template)
 
 
+
+class NodeScript:
+
+
+    def compile(self):
+        pass
+
+    @staticmethod
+    def add(func):
+        pass
+
+    def draw_buttons(self, context, layout):
+        pass
+
 def register():
 
     for func in _node_funcs.values():

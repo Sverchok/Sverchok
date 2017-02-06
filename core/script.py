@@ -21,24 +21,24 @@
 import importlib
 import importlib.abc
 import importlib.util
-import keyword
 import sys
-import inspect
-from itertools import chain
+
+import bpy
 
 
-class SvFinder(importlib.abc.MetaPathFinder):
+class SvRxFinder(importlib.abc.MetaPathFinder):
 
     def find_spec(self, fullname, path, target=None):
         if fullname.startswith("svrx.nodes.script."):
             name = fullname.split(".")[-1]
-            text_name = _name_lookup.get(name, "")
+            #text_name = _name_lookup.get(name, "")
+            text_name = name
             if text_name in bpy.data.texts:
-                return importlib.util.spec_from_loader(fullname, SvLoader(text_name))
+                return importlib.util.spec_from_loader(fullname, SvRxLoader(text_name))
             else:
                 print("couldn't find file")
 
-        elif fullname == "sverchok.nodes.script":
+        elif fullname == "svrx.nodes.script":
             # load Module, right now uses real but empty module, will perhaps change
             pass
         return None
@@ -46,19 +46,27 @@ class SvFinder(importlib.abc.MetaPathFinder):
 
 
 
-class SvLoader(importlib.abc.SourceLoader):
+class SvRxLoader(importlib.abc.SourceLoader):
 
     def __init__(self, text):
         self._text = text
 
-
     def get_data(self, path):
         # here we should insert things and preprocss the file to make it valid
         # this will upset line numbers...
-        standard_header = """from svrx.nodes.node_base import nodescript; from svrx.typing import *"""
+        standard_header = """from svrx.nodes.node_base import node_script; from svrx.typing import *"""
         source = "".join((standard_header,
                           bpy.data.texts[self._text].as_string()))
         return source
 
     def get_filename(self, fullname):
         return "<bpy.data.texts[{}]>".format(self._text)
+
+
+def register():
+    sys.meta_path.append(SvRxFinder())
+
+def unregister():
+    for finder in sys.meta_path[:]:
+        if isinstance(finder, SvRxFinder):
+            sys.meta_path.remove(finder)

@@ -191,7 +191,7 @@ def stateful(cls):
 
 
 
-def node_func(*args, **values):
+def node_func(**values):
     """
     annotates and registers a node function, also creates classes
     if needed
@@ -219,8 +219,13 @@ def node_func(*args, **values):
         module_name = func.__module__.split(".")[-2]
         func.category = module_name
         return func
-    if args and callable(args[0]):
-        return real_node_func(args[0])
-    else:
-        print(args, values)
-        return real_node_func
+    return real_node_func
+
+
+def node_script(func):
+    name = func.__module__.split(".")[-1]
+    func.bl_idname = "SvRxNodeScript"
+    func.category = "Script"
+    get_signature(func)
+    NodeScript.add(func)
+    return func
