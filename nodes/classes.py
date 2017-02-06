@@ -199,9 +199,30 @@ class NodeScript(NodeBase):
     def add(func):
         _node_scripts[func.module] = func
 
+
+    def reset(self):
+        self.text_file = ''
+        self.inputs.clear()
+        self.outputs.clear()
+
     def draw_buttons(self, context, layout):
         if not self.text_file:
             layout.prop_search(self, 'text_file', bpy.data, 'texts')
+        else:
+            row = layout.row()
+            row.operator("node.svrxscript_ui_callback", text='Reset').fn_name = 'reset'
+            row.operator("node.svrxscript_ui_callback", text='Reload').fn_name = 'load_text'
+
+
+class SvScriptNodeLiteCallBack(bpy.types.Operator):
+
+    bl_idname = "node.svrxscript_ui_callback"
+    bl_label = "SvRx Script callback"
+    fn_name = bpy.props.StringProperty(default='')
+
+    def execute(self, context):
+        getattr(context.node, self.fn_name)()
+        return {'FINISHED'}
 
 
 class RealNodeScript(NodeScript, bpy.types.Node):

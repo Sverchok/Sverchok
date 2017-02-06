@@ -225,6 +225,7 @@ def node_func(**values):
 
 
 def node_script(func):
+
     module = func.__module__.split(".")[-1]
     func.bl_idname = "SvRxNodeScript"
     func.category = "Script"
