@@ -177,13 +177,15 @@ class NodeMathBase(NodeDynSignature):
 
 _node_scripts = {}
 
+
 class NodeScript(NodeBase):
     bl_idname = "SvRxNodeScript"
     bl_label = "Script"
 
-    def load_text(self, context):
+    def load_text(self, context=None):
         if self.text_file in bpy.data.texts:
-            importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+            mod = importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+            importlib.reload(mod)
             self.adjust_sockets()
         else:
             pass #  fail
