@@ -64,8 +64,35 @@ def make_categories():
             items=[NodeItem(*data) for data in nodes]))
         node_count += len(nodes)
 
+    node_categories.append(SvRxNodeCategory('SVRX_Script','Scripts', items=script_nodes))
     return node_categories, node_count
 
+
+def script_nodes(context):
+    """
+    Based on the built in node_group_items in the blender distrubution
+    somewhat edited to fit.
+    """
+    if context is None:
+        return
+    space = context.space_data
+    if not space:
+        return
+    ntree = space.edit_tree
+    if not ntree:
+        return
+
+    yield NodeItem("SvRxNodeScript", "Script Node")
+
+    """
+    rough sketch
+    for script in scrip_node_source:
+        yeild NodeItem('SvRxNodeScript', script.name, {'text_file': script.text_file})
+    """
+
+
+def draw_script(self, layout, context):
+    pass
 
 def reload_menu():
     menu, node_count = make_categories()
@@ -75,10 +102,7 @@ def reload_menu():
 
 
 def register():
-    menu, node_count = make_categories()
-    if 'SVRX' in nodeitems_utils._node_categories:
-        nodeitems_utils.unregister_node_categories("SVRX")
-    nodeitems_utils.register_node_categories("SVRX", menu)
+    reload_menu()
 
 
 def unregister():

@@ -16,33 +16,3 @@
 #  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #
 # ##### END GPL LICENSE BLOCK #####
-
-import time
-
-import bpy
-from bpy.props import BoolProperty
-
-from svrx.core.execution import exec_node_group, DAG
-
-
-
-class SverchokReduxTree(bpy.types.NodeTree):
-    bl_idname = 'SvRxTree'
-    bl_label = 'SverchokRedux Node Tree'
-    bl_icon = 'NODE'
-
-    has_changed = BoolProperty(default=False)
-
-    def update(self):
-        self.has_changed = True
-
-    def execute(self):
-        start = time.perf_counter()
-        self.has_changed = False
-        exec_node_group(self)
-        self.has_changed = False
-        stop = time.perf_counter()
-        print(self.name, "{:f}".format(stop-start))
-
-    def update_list(self):
-        return DAG(self)

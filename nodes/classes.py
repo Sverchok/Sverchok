@@ -1,7 +1,8 @@
 
 import bpy
-from bpy.props import EnumProperty
+from bpy.props import EnumProperty, StringProperty
 
+import importlib
 
 _node_funcs = {}
 
@@ -173,6 +174,59 @@ class NodeMathBase(NodeDynSignature):
         self.adjust_inputs(inputs_template)
         self.adjust_outputs(func.outputs_template)
 
+
+_node_scripts = {}
+
+
+class NodeScript(NodeBase):
+    bl_idname = "SvRxNodeScript"
+    bl_label = "Script"
+
+    def load_text(self, context=None):
+        if self.text_file in bpy.data.texts:
+            mod = importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+            importlib.reload(mod)
+            self.adjust_sockets()
+        else:
+            pass #  fail
+
+    text_file = StringProperty(update=load_text)
+
+    def compile(self):
+        return _node_scripts[self.text_file]
+
+    @staticmethod
+    def add(func):
+        _node_scripts[func.module] = func
+
+
+    def reset(self):
+        self.text_file = ''
+        self.inputs.clear()
+        self.outputs.clear()
+
+    def draw_buttons(self, context, layout):
+        if not self.text_file:
+            layout.prop_search(self, 'text_file', bpy.data, 'texts')
+        else:
+            row = layout.row()
+            row.operator("node.svrxscript_ui_callback", text='Reset').fn_name = 'reset'
+            row.operator("node.svrxscript_ui_callback", text='Reload').fn_name = 'load_text'
+
+
+class SvScriptNodeLiteCallBack(bpy.types.Operator):
+
+    bl_idname = "node.svrxscript_ui_callback"
+    bl_label = "SvRx Script callback"
+    fn_name = bpy.props.StringProperty(default='')
+
+    def execute(self, context):
+        getattr(context.node, self.fn_name)()
+        return {'FINISHED'}
+
+
+class RealNodeScript(NodeScript, bpy.types.Node):
+    pass
 
 def register():
 
