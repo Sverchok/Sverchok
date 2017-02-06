@@ -176,6 +176,7 @@ class NodeMathBase(NodeDynSignature):
 
 
 class NodeScript:
+    bl_idname = "SvRxScriptNode"
 
 
     def compile(self):
