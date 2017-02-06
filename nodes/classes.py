@@ -184,6 +184,7 @@ class NodeScript(NodeBase):
     def load_text(self, context):
         if self.text_file in bpy.data.texts:
             importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+            self.adjust_sockets()
         else:
             pass #  fail
 
