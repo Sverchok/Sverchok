@@ -51,7 +51,7 @@ def as_int(x: Number = 0.0) -> Int:
     return x.astype(int)
 
 @node_func(id=16)
-def as_int(x1: Number = 1.0, x2: Number = 2.0) -> Int:
+def int_div(x1: Number = 1.0, x2: Number = 2.0) -> Int:
     return np.floor_divide(x1, x2)
 
 @node_func(id=17)
