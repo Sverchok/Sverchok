@@ -1,6 +1,27 @@
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
 
+import numpy as np
 
 import bmesh
+
+from svrx.util.smesh import SvPolygon
+
 
 def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
     ''' verts is necessary, edges/faces are optional
@@ -38,3 +59,13 @@ def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
     if normal_update:
         bm.normal_update()
     return bm
+
+
+def rxdata_from_bm(bm):
+    vert_count = len(bm.verts)
+    vertices = np.ones((vert_count, 4), dtype=np.float64)
+    for idx, v in enumerate(bm.verts):
+        vertices[idx,:3] = v.co
+    edges = np.array([(e.verts[0].index, e.verts[1].index) for e in bm.edges], dtype=np.uint32)
+    faces = SvPolygon.from_pydata([[i.index for i in p.verts] for p in bm.faces])
+    return vertices, edges, faces

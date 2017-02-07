@@ -192,6 +192,10 @@ class NodeScript(NodeBase):
 
     text_file = StringProperty(update=load_text)
 
+
+    def draw_label(self):
+        return "Script: {}".format(self.compile().label)
+
     def compile(self):
         return _node_scripts[self.text_file]
 

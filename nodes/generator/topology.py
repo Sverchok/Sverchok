@@ -16,7 +16,6 @@ def line(verts: Vertices = Required) -> (Vertices, Edges, Faces):
 def cirle(verts: Vertices = Required) -> (Vertices, Edges, Faces):
     count = len(verts)
     edges = np.array([np.arange(0, count), np.arange(1, count + 1) % count], dtype=np.uint32).T
-    print(edges)
     faces = SvPolygon.from_pydata([np.arange(0, count)])
 
     return verts, edges, faces
@@ -27,7 +26,7 @@ def plane(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     y = len(verts)
     x = len(verts[0])
-    edges = np.array(plane_edges(x, y), dtype=np.uint32)
+    edges = np.array(plane_edges(x,     y), dtype=np.uint32)
     faces = SvPolygon.from_pydata(plane_faces(x, y))
     return vertices, edges, faces
 
@@ -58,6 +57,9 @@ def plane_edges(x, y):
     for i in range(y):
         for j in range(x-1):
             edges.append((x*i+j, x*i+j+1))
+    for i in range(x):
+        for j in range(y-1):
+            edges.append((x*j+i, x*j+i+x))
     return edges
 
 def plane_faces(x, y):
@@ -65,6 +67,7 @@ def plane_faces(x, y):
     for i in range(x-1):
         for j in range(y-1):
             polygons.append((x*j+i, x*j+i+1, x*j+i+x+1, x*j+i+x))
+
     return polygons
 
 
