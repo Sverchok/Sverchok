@@ -25,7 +25,11 @@ ZEROS = (0, 0, 0)
 @node_func(bl_idname="SvRxVectorMathNode", multi_label="Vector Math", id=0)
 def add(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
     u, v = make_compatible(u, v)
-    return u + v
+    max_len, _ = np.shape(u)
+    out = np.zeros((max_len, 4))
+    out[:,:3] = u[:,:3] + v[:,:3]
+    out[:, 3] = min(max(u[:,3], v[:,3]), 1.0)
+    return out
 
 @node_func(id=6)
 def sub(u: Vertices = ZEROS, v: Vertices = ZEROS ) -> Vertices:
