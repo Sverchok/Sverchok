@@ -5,10 +5,10 @@ from svrx.nodes.node_base import node_func
 
 from svrx.util.function import make_compatible
 
-X_AXIS = (1, 0, 0)
-Y_AXIS = (0, 1, 0)
-Z_AXIS = (0, 0, 1)
-ZEROS = (0, 0, 0)
+X_AXIS = (1, 0, 0, 1)
+Y_AXIS = (0, 1, 0, 1)
+Z_AXIS = (0, 0, 1, 1)
+ZEROS = (0, 0, 0, 1)
 
 """ missing
 - Angle Rad, 
