@@ -185,8 +185,8 @@ def create_knots(pts, metric="DISTANCE"):
 
 
 class LinearSpline:
-    def __init__(self, pts, tknots=None, metric='DISTANCE'):
-        self.pts = np.array(pts).T
+    def __init__(self, locs, tknots=None, metric='DISTANCE'):
+        self.pts = locs.T
         if tknots is None:
             tknots = create_knots(locs, metric)
 

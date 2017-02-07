@@ -4,23 +4,34 @@ from svrx.typing import Vertices, Float, Int, Required, FloatP
 
 from svrx.util.geom import CubicSpline, LinearSpline
 from svrx.nodes.node_base import node_func
-# sketches below
-"""
+
+
 @node_func(bl_idname="SvRxVertexInterpol", multi_label="Interpolation", id=0)
 def cubic_spline(verts: Vertices = Required,
                  t: Float = 0.5,
                  h: FloatP = 0.001,
                 ) -> (Vertices, Vertices("Tanget")):
-    spl = CubicSpline(verts)
-    return spl.eval(t), spl.tangent(t, h)
+    spl = CubicSpline(verts[:,:3])
+    points_out = np.ones((len(t), 4), dtype=np.float64)
+    tangents_out = np.zeros((len(t), 4), dtype=np.float64)
+    points_out[:, :3] = spl.eval(t)
+    tangents_out[:, :3] = spl.tangent(t, h)
+    return points_out, tangents_out
+
+
 
 @node_func(bl_idname='SvRxVertexInterpol', id=1)
-def liner_spline(verts: Vertices = Required,
-                 t: Float = 0.5
-                 ) -> Vertices:
-    spl = LinearSpline(verts)
-    return spl.eval(t)
+def linear_spline(verts: Vertices = Required,
+                 t: Float = 0.5,
+                ) -> Vertices:
+    spl = LinearSpline(verts[:,:3])
+    points_out = np.ones((len(t), 4), dtype=np.float64)
+    points_out[:, :3] = spl.eval(t)
+    return points_out
 
+
+"""
+# sketches below
 
 @node_func(bl_idname='SvRxVertexInterpol', id=2)
 def surface_patch(verts : [Vertices] = Required,
