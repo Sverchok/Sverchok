@@ -16,7 +16,6 @@ ZEROS = (0, 0, 0)
 - Project, 
 - Reflect, 
 - Componentwise-multiplication, 
-- Normalize
 
 """
 
