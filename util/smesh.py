@@ -1,3 +1,22 @@
+# ##### BEGIN GPL LICENSE BLOCK #####
+#
+#  This program is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU General Public License
+#  as published by the Free Software Foundation; either version 2
+#  of the License, or (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software Foundation,
+#  Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+#
+# ##### END GPL LICENSE BLOCK #####
+
+
 from itertools import chain, islice, accumulate
 
 import numpy as np
@@ -69,7 +88,7 @@ class SvPolygon:
     @classmethod
     def from_pydata(cls, faces):
 
-        loop_info = np.zeros((len(faces), 2),dtype=np.uint32)
+        loop_info = np.zeros((len(faces), 2), dtype=np.uint32)
         loop_info[:, 0] = tuple(map(len, faces))
         loop_info[1:,1] = loop_info[:-1,0].cumsum()
         vertex_indices = np.fromiter(chain.from_iterable(faces),
