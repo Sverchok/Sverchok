@@ -44,7 +44,7 @@ class SvRxFinder(importlib.abc.MetaPathFinder):
         return None
 
 
-
+STANDAD_HEADER = "from svrx.nodes.node_base import node_script; from svrx.typing import *;"
 
 class SvRxLoader(importlib.abc.SourceLoader):
 
@@ -52,11 +52,10 @@ class SvRxLoader(importlib.abc.SourceLoader):
         self._text = text
 
     def get_data(self, path):
-        # here we should insert things and preprocss the file to make it valid
-        # this will upset line numbers...
-        standard_header = """from svrx.nodes.node_base import node_script; from svrx.typing import *"""
-        source = "".join((standard_header,
-                          bpy.data.texts[self._text].as_string()))
+        text = bpy.data.texts[self._text]
+        lines = [l.body for l in text.lines[1:]]
+        lines.insert(0, STANDAD_HEADER + text.lines[0].body)
+        source = "\n".join(lines)
         return source
 
     def get_filename(self, fullname):
