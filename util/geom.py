@@ -137,6 +137,7 @@ class CubicSpline:
         with values in [0,1]
         returns and np array with the corresponding points
         """
+        t_in = t_in.clip(0.0, 1.0)
         splines = self.splines
         tknots = self.tknots
         index = tknots.searchsorted(t_in, side='left') - 1
