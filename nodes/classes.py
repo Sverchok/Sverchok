@@ -177,16 +177,30 @@ class NodeMathBase(NodeDynSignature):
 
 _node_scripts = {}
 
+# This should be more generic and custom
+
+FAIL_COLOR = (0.8, 0.1, 0.1)
+READY_COLOR = (0, 0.8, 0.95)
 
 class NodeScript(NodeBase):
     bl_idname = "SvRxNodeScript"
     bl_label = "Script"
 
+
+    def init(self, context):
+        super().init(context)
+
+
     def load_text(self, context=None):
         if self.text_file in bpy.data.texts:
+            if self.text_file == 'Text':
+                self.text_file = ''
+                return
             mod = importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
             importlib.reload(mod)
             self.adjust_sockets()
+            self.color = READY_COLOR
+            self.use_custom_color = True
         else:
             pass #  fail
 

@@ -26,12 +26,25 @@ import sys
 import bpy
 
 
+def make_valid_identifier(name):
+    """Create a valid python identifier from name for use a a part of class name"""
+    if not name[0].isalpha():
+        name = "SvRx" + name
+    return "".join(ch for ch in name if ch.isalnum() or ch == "_")
+
+
+_text_lookup = {}
+
+def add_script(text_name):
+    identifier = make_valid_identifier(text_name)
+    _text_lookup[identifier] = text_name
+
 class SvRxFinder(importlib.abc.MetaPathFinder):
 
     def find_spec(self, fullname, path, target=None):
         if fullname.startswith("svrx.nodes.script."):
             name = fullname.split(".")[-1]
-            #text_name = _name_lookup.get(name, "")
+            #text_name = _text_lookup.get(name, "")
             text_name = name
             if text_name in bpy.data.texts:
                 return importlib.util.spec_from_loader(fullname, SvRxLoader(text_name))
@@ -44,7 +57,7 @@ class SvRxFinder(importlib.abc.MetaPathFinder):
         return None
 
 
-
+STANDAD_HEADER = "from svrx.nodes.node_base import node_script; from svrx.typing import *;"
 
 class SvRxLoader(importlib.abc.SourceLoader):
 
@@ -52,11 +65,10 @@ class SvRxLoader(importlib.abc.SourceLoader):
         self._text = text
 
     def get_data(self, path):
-        # here we should insert things and preprocss the file to make it valid
-        # this will upset line numbers...
-        standard_header = """from svrx.nodes.node_base import node_script; from svrx.typing import *"""
-        source = "".join((standard_header,
-                          bpy.data.texts[self._text].as_string()))
+        text = bpy.data.texts[self._text]
+        lines = [l.body for l in text.lines[1:]]
+        lines.insert(0, STANDAD_HEADER + text.lines[0].body)
+        source = "\n".join(lines)
         return source
 
     def get_filename(self, fullname):
