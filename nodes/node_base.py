@@ -54,7 +54,7 @@ def class_factory(func):
     cls_dict['bl_label'] = func.label
 
     for name, prop in func.properties.items():
-        print(name, prop)
+        #print(name, prop)
         cls_dict[name] = prop
 
     if hasattr(func, 'id'):

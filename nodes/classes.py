@@ -35,6 +35,8 @@ class NodeBase:
 
     def adjust_sockets(self):
         func = self.compile()
+        if func is None:
+            return
         self.adjust_inputs(func.inputs_template)
         self.adjust_outputs(func.outputs_template)
 
@@ -208,10 +210,13 @@ class NodeScript(NodeBase):
 
 
     def draw_label(self):
-        return "Script: {}".format(self.compile().label)
+        if self.text_file:
+            return "Script: {}".format(self.text_file)
+        else:
+            return "Script"
 
     def compile(self):
-        return _node_scripts[self.text_file]
+        return _node_scripts.get(self.text_file)
 
     @staticmethod
     def add(func):
