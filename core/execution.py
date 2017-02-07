@@ -197,7 +197,6 @@ def DAG(ng, nodes, socket_links):
     starts = {node for node in real_links.keys() if node not in from_nodes}
 
     node_list = topo_sort(real_links, starts)
-    print([n.name for n in node_list])
     return node_list
 
 
