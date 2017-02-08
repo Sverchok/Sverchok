@@ -3,7 +3,7 @@ from svrx.nodes.node_base import node_func
 from svrx.util.transforms import translation_matrix, concatenate_matrices, rotation_matrix, scale_matrix
 from svrx.util.geom import vectorize
 
-from svrx.typing import Vector, Float, Matrix, List
+from svrx.typing import Vector, Float, Matrix
 
 
 @vectorize

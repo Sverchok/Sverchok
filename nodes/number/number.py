@@ -1,7 +1,7 @@
 import numpy as np
 
 from svrx.nodes.node_base import node_func
-from svrx.typing import Float, Int, List
+from svrx.typing import Float, Int
 from svrx.util.geom import vectorize
 
 np_linspace = vectorize(np.linspace)
