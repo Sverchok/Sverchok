@@ -17,17 +17,17 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-from svrx.typing import Vertices, Vector, Point, Matrix, Number
+from svrx.typing import Matrix, Number, Number4f, _lookup
 
 converion_table = {}
 
 def needs_conversion(from_type, to_type):
     if from_type == to_type:
         return False
-    return (from_type, to_type) in converion_table
+    return (_lookup[from_type], _lookup[to_type]) in converion_table
 
 def get_conversion(from_type, to_type):
-    return converion_table[(from_type, to_type)]
+    return converion_table[(_lookup[from_type], _lookup[to_type])]
 
 
 
@@ -40,5 +40,5 @@ def register():
     """
     from svrx.nodes.matrix.create import create_matrix
     from svrx.nodes.vertex.vector_in import vector_in
-    converion_table[(Vertices, Matrix)] = (create_matrix, (0,), 0)
-    converion_table[(Number, Vector)] = (vector_in, (0, 1, 2), 0)
+    converion_table[(Number4f, Matrix)] = (create_matrix, (0,), 0)
+    converion_table[(Number, Number4f)] = (vector_in, (0, 1, 2), 0)

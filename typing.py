@@ -1,4 +1,3 @@
-from typing import List
 import numpy as np
 
 from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
@@ -16,6 +15,10 @@ class SvRxBaseType:
 Required = object()
 
 
+class Anytype(SvRxBaseType):
+    bl_idname = "SvRxAnySocket"
+
+
 class Number(SvRxBaseType):
     bl_idname = "SvRxFloatSocket"
 
@@ -30,15 +33,21 @@ class Float(Number):
     bl_idname = "SvRxFloatSocket"
 
 
-class Vertices(Number):
+class Number4f(SvRxBaseType):
+    pass
+
+class Color(Number4f):
+    bl_idname = "SvRxColorSocket"
+
+class Vertices(Number4f):
     bl_idname = "SvRxVertexSocket"
 
-
-class Vector(Number):
+class Vector(Number4f):
     bl_idname = "SvRxVectorSocket"
 
-class Point(Number):
+class Point(Number4f):
     bl_idname = "SvRxPointSocket"
+
 
 
 class Edges(SvRxBaseType):
@@ -66,27 +75,19 @@ class Matrix(SvRxBaseType):
     identity = np.identity(4)
 
 
-class Color(SvRxBaseType):
-    bl_idname = "SvRxColorSocket"
-
-
-class Anytype(SvRxBaseType):
-    bl_idname = "SvRxAnySocket"
-
 
 class Mesh(SvRxBaseType):
     bl_idname = "SvRxMeshSocket"
 
 
-class BMesh(SvRxBaseType):
+class BMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
 
 
-class SMesh(SvRxBaseType):
+class SMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
 
-class Color(Number):
-    bl_idname = "SvRxColorSocket"
+
 
 
 # Property types
@@ -139,21 +140,36 @@ class ValueBase:
     bl_idname = "SvRxValueIntSocket"
 
 
-class IntValue(SvRxBaseType):
+class IntValue(Int):
     bl_idname = "SvRxValueIntSocket"
 
 
-class FloatValue(SvRxBaseType):
+class FloatValue(Float):
     bl_idname = "SvRxValueFloatSocket"
 
 
-class PointValue(SvRxBaseType):
+class PointValue(Number4f):
     bl_idname = "SvRxValuePointSocket"
 
 
-class ColorValue(SvRxBaseType):
+class ColorValue(Number4f):
     bl_idname = "SvRxValueColorSocket"
 
 
-class ObjectValue(SvRxBaseType):
+class ObjectValue(Object):
     bl_idname = "SvRxValueObjectSocket"
+
+
+
+bases = [Number, Number4f, Mesh, Object, String, Matrix, Anytype]
+_lookup = {}
+
+def get_classes(cls):
+    for sub_cls in cls.__subclasses__():
+        yield sub_cls
+        yield from get_classes(sub_cls)
+
+for base in bases:
+    _lookup[base] = base
+    for class_ in get_classes(base):
+        _lookup[class_] = base
