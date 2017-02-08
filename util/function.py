@@ -8,10 +8,9 @@ def constant(func):
     that is wrapped into an array.
     """
     @wraps(func)
-    def inner():
-        return np.array([func()])
+    def inner(*args):
+        return np.atleast_1d(*args)
     return inner
-
 
 def std_wrap(func):
     """wrap a function func so it can return a single number/value
@@ -19,7 +18,7 @@ def std_wrap(func):
     """
     @wraps(func)
     def inner(*args):
-        return np.array([func(*args)])
+        return np.atleast_1d(*args)
     return inner
 
 

@@ -43,7 +43,6 @@ def sub(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
 @node_func(id=12)
 def cross(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
     u, v = make_compatible(u, v)
-    u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
     out[:,:3] = np.cross(u[:,:3], v[:,:3])
@@ -51,16 +50,16 @@ def cross(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
 
 @node_func(id=18)
 def scale(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
-    u, s = make_compatible(u, s)
+    u, s = make_compatible(u, s[:, np.newaxis])
     out = u.copy()
-    out[:, :3] = u[:, :3] * s
+    out[:, :3] = u[:, :3] * s[:, :3]
     return out
 
 @node_func(id=22)
 def scale_reciprocal(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
-    u, s = make_compatible(u, s)
+    u, s = make_compatible(u, s[:, np.newaxis])
     out = u.copy()
-    out[:, :3] = u[:, :3] * (1 / s)
+    out[:, :3] = u[:, :3] * (1 / s[:, :3])
     return out
 
 @node_func(id=26)
@@ -87,18 +86,13 @@ def distance(u: Vector = ZEROS, v: Vector = ZEROS ) -> Float:
     return np.sqrt((x * x).sum(axis=1))
 
 @node_func(id=48)
-def round(u: Vector = ZEROS, n: Int = 7 ) -> Vertices:
+def round(u: Vector = ZEROS, n: Int = 7) -> Vertices:
     out = u.copy()
     out[:, :3] =  np.round(u[:, :3], n)
     return out
 
 @node_func(id=50)
 def normalize(u: Vector = ZEROS) -> Vertices:
-    # placeholder
-    # new_u = np.empty(np.shape(u))
-    # for idx, v in enumerate(u):
-    #     new_u[idx] = v / np.sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2])
-    # return new_u
     out = u.copy()
     mag = length(u)
     out[:, :3] /= mag[:, np.newaxis]
