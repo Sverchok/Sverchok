@@ -141,7 +141,8 @@ def get_signature(func):
 
 
 def parse_type(s_type, level=0):
-    """parse type into level, right now only supports one level
+    """parse type into level
+    retrun type, level
     """
     if isinstance(s_type, list):
         s_type, level = parse_type(s_type[0], level)
@@ -225,7 +226,9 @@ def node_func(**values):
 
 
 def node_script(func):
-
+    """
+    limited in scope allowing quick scripts with custom properties/class
+    """
     module = func.__module__.split(".")[-1]
     func.bl_idname = "SvRxNodeScript"
     func.category = "Script"
