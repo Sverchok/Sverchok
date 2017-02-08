@@ -112,7 +112,7 @@ def get_signature(func):
             else:
             should be able to override the parameter name. or not...
             """
-            socket_name = name
+            socket_name = name.replace('_', ' ').title()
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
             func.parameters.append((len(func.inputs_template) - 1, level, type(annotation)))
