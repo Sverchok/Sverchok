@@ -30,11 +30,12 @@ class SMesh:
                    SvPolygon.from_mesh(mesh))
 
     @classmethod
-    def from_pydata(cls, pydata):
-        verts, edges, faces = pydata
+    def from_pydata(cls, verts, edges=None, faces=None):
+        empty_edges = []
+        empty_faces = []
         return cls(SvVertices.from_pydata(verts),
-                   SvEdges.from_pydata(edges),
-                   SvPolygon.from_pydata(faces))
+                   SvEdges.from_pydata(edges or empty_edges),
+                   SvPolygon.from_pydata(faces or empty_faces))
 
     def __init__(self, vertices, edges, faces):
         self.vertices = vertices
