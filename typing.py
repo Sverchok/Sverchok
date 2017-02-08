@@ -24,14 +24,34 @@ class Number(SvRxBaseType):
 
 
 class Int(Number):
-    bl_idname = "SvRxIntSocket"
+    @property
+    def bl_idname(self):
+        if self.max is not None or self.min is not None:
+            return "SvRxIntLimitSocket"
+        else:
+            return "SvRxIntSocket"
+
+    def __init__(self, name=None, min=None, max=None):
+        super().__init__(name)
+        self.min = min
+        self.max = max
+
 
 class Bool(Int):
     pass
 
 class Float(Number):
-    bl_idname = "SvRxFloatSocket"
+    @property
+    def bl_idname(self):
+        if self.max is not None or self.min is not None:
+            return "SvRxFloatLimitSocket"
+        else:
+            return "SvRxFloatSocket"
 
+    def __init__(self, name=None, min=None, max=None):
+        super().__init__(name)
+        self.min = min
+        self.max = max
 
 class Number4f(SvRxBaseType):
     pass

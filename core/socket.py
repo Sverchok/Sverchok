@@ -150,11 +150,40 @@ class IntSocket(bpy.types.NodeSocket, SocketNumber):
     default_value = IntProperty(update=exec_socket)
 
 
+#  property functions for limited value sockets
+
+def get_value(self):
+    value = self.get('default_value', 0)
+    return max(min(value, self.default_value_high), self.default_value_low)
+
+def set_value(self, value):
+    self['default_value'] = max(min(value, self.default_value_high), self.default_value_low)
+
+class IntLimitSocket(bpy.types.NodeSocket, SocketNumber, LimitSocket):
+    bl_idname = "SvRxIntLimitSocket"
+    bl_label = "Int Socket"
+
+    default_value_low = IntProperty(default=-100)
+    default_value_high = IntProperty(default=100)
+    default_value = IntProperty(update=exec_socket, set=set_value, get=get_value)
+
+
 class FloatSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxFloatSocket"
     bl_label = "Float Socket"
 
     default_value = FloatProperty(update=exec_socket)
+
+
+class FloatLimitSocket(bpy.types.NodeSocket, SocketNumber):
+    bl_idname = "SvRxFloatLimitSocket"
+    bl_label = "Float Socket"
+
+    default_value_low = FloatProperty(default=-100)
+    default_value_high = FloatProperty(default=100)
+
+    default_value = FloatProperty(update=exec_socket, set=set_value, get=get_value)
+
 
 
 class SocketVector(SocketBase):
