@@ -7,4 +7,7 @@ import numpy as np
 def transform(vertices: Vertices = Required,
               matrix: Matrix = Matrix.identity
               ) -> Vertices:
-    return vertices.dot(matrix.T)
+    if matrix is None:
+        return vertices
+    else:
+        return vertices.dot(matrix.T)
