@@ -54,6 +54,10 @@ class SMesh:
     def as_pydata(self):
         return self.vertices.as_pydata(), self.edges.as_pydata(), self.faces
 
+    @property
+    def as_rxdata(self):
+        return self.vertices, self.edges, self.faces
+
 
 class SvVertices:
     @classmethod
