@@ -9,7 +9,7 @@ X_AXIS = (1, 0, 0, 1)
 Y_AXIS = (0, 1, 0, 1)
 Z_AXIS = (0, 0, 1, 1)
 ZEROS = (0, 0, 0, 1)
-
+ONES = (1, 1, 1, 1)
 """ missing
 - Angle Rad,
 - Angle Deg,
@@ -33,6 +33,7 @@ def add(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
 
 @node_func(id=6)
 def sub(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
+    # return add(u, opposite(v))
     u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
@@ -41,7 +42,7 @@ def sub(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
     return out
 
 @node_func(id=12)
-def cross(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
+def cross(u: Vector = X_AXIS, v: Vector = Y_AXIS ) -> Vertices:
     u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
@@ -57,10 +58,7 @@ def scale(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
 
 @node_func(id=22)
 def scale_reciprocal(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
-    u, s = make_compatible(u, s[:, np.newaxis])
-    out = u.copy()
-    out[:, :3] = u[:, :3] * (1 / s[:, :3])
-    return out
+    return scale(u, 1 / s)
 
 @node_func(id=26)
 def length(u: Vector = ZEROS ) -> Float:
@@ -81,9 +79,12 @@ def opposite(u: Vector = ZEROS ) -> Vertices:
 @node_func(id=44)
 def distance(u: Vector = ZEROS, v: Vector = ZEROS ) -> Float:
     # speed!?  http://stackoverflow.com/a/9184560/1243487
+    # return length(sub(u, v))
+
     u, v = make_compatible(u, v)
     x = u[:, :3] - v[:, :3]
     return np.sqrt((x * x).sum(axis=1))
+
 
 @node_func(id=48)
 def round(u: Vector = ZEROS, n: Int = 7) -> Vertices:
@@ -97,3 +98,9 @@ def normalize(u: Vector = ZEROS) -> Vertices:
     mag = length(u)
     out[:, :3] /= mag[:, np.newaxis]
     return out
+
+
+@node_func(id=60)
+def component_mul(u: Vector = ONES, v: Vector = ONES) -> Vertices:
+    u, v = make_compatible(u, v)
+    return u * v
