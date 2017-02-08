@@ -29,6 +29,12 @@ class SMesh:
                    SvEdges.from_mesh(mesh),
                    SvPolygon.from_mesh(mesh))
 
+    def from_pydata(cls, pydata):
+        verts, edges, faces = pydata
+        return cls(SvVertices.from_pydata(verts),
+                   SvEdges.from_pydata(edges),
+                   SvPolygon.from_pydata(faces))
+
     def __init__(self, vertices, edges, faces):
         self.vertices = vertices
         self.edges = edges
@@ -77,7 +83,7 @@ class SvEdges:
     def from_mesh(cls, mesh):
         # should use foreach_get
         #   
-        #   like this?
+        #   :: like this?
         #   edges = mesh.edges
         #   k = np.empty(len(edges) * 2, dtype=np.uint32)
         #   edges.foreach_get('vertices', k)
