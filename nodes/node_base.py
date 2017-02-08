@@ -106,10 +106,13 @@ def get_signature(func):
                 socket_settings = {'default_value': parameter.default}
                 socket_settings.update(annotation.get_settings())
 
-            if annotation.name:
+            """
+            if False and annotation.name:
                 socket_name = annotation.name
             else:
-                socket_name = name
+            should be able to override the parameter name. or not...
+            """
+            socket_name = name
 
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
             func.parameters.append((len(func.inputs_template) - 1, level, type(annotation)))
