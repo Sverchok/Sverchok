@@ -57,6 +57,11 @@ class SvVertices:
         real_vertices[:,:3] = vertices
         return cls(real_vertices)
 
+    def from_pydata(cls, vertices):
+        real_vertices = np.ones((len(vertices), 4))
+        real_vertices[:,:3] = vertices
+        return cls(real_vertices)
+
     def __getitem__(self, key):
         return self.vertices[key]
 
@@ -65,6 +70,7 @@ class SvVertices:
 
     def as_pydata(self):
         return self.vertices
+
 
 class SvEdges:
     @classmethod
