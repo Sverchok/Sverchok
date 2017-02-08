@@ -177,7 +177,7 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
     bl_idname = "SvRxVectorSocket"
     bl_label = "Vector Socket"
 
-    default_value = FloatVectorProperty(size=3, update=exec_socket)
+    default_value = FloatVectorProperty(size=4, update=exec_socket, default=(0, 0, 0, 1))
 
     def draw(self, context, layout, node, text):
         if not self.is_linked:
@@ -190,7 +190,7 @@ class PointSocket(bpy.types.NodeSocket, SocketVector):
     bl_idname = "SvRxPointSocket"
     bl_label = "Point Socket"
 
-    default_value = FloatVectorProperty(size=4, update=exec_socket)
+    default_value = FloatVectorProperty(size=4, update=exec_socket, default=(0, 0, 0, 1))
 
     def draw(self, context, layout, node, text):
         if not self.is_linked:
