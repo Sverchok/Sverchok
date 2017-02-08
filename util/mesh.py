@@ -20,7 +20,7 @@ import numpy as np
 
 import bmesh
 
-from svrx.util.smesh import SvPolygon
+from svrx.util.smesh import SvPolygon, SMesh, SvVertices, SvEdges
 
 
 def bmesh_from_pydata(verts, edges=None, faces=None, normal_update=False):
@@ -69,3 +69,10 @@ def rxdata_from_bm(bm):
     edges = np.array([(e.verts[0].index, e.verts[1].index) for e in bm.edges], dtype=np.uint32)
     faces = SvPolygon.from_pydata([[i.index for i in p.verts] for p in bm.faces])
     return vertices, edges, faces
+
+def rxdata_from_pydata(verts, edges=None, faces=None):
+    # return SMesh.from_pydata(verts, edges, faces)
+    v = SvVertices.from_pydata(verts)
+    e = SvEdges.from_pydata(edges)
+    f = SvPolygon.from_pydata(faces)
+    return v, e, f
