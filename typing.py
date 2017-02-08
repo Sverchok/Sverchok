@@ -7,9 +7,12 @@ class SvRxBaseType:
     def __init__(self, name=None):
         self.name = name
 
+    def get_settings(self):
+        return {}
+
 
 # Everytype must have a corresponding socket
-# Types aren't actually concrete types yet, they are just for
+# Types aren't actually concrete types, they are just for
 # auto generating nodes based on introspection
 
 Required = object()
@@ -35,6 +38,14 @@ class Int(Number):
         super().__init__(name)
         self.min = min
         self.max = max
+
+    def get_settings(self):
+        settings = {}
+        if self.max is not None:
+            settings['default_value_high'] = self.max
+        if self.min is not None:
+            settings['default_value_low'] = self.min
+        return settings
 
 
 class Bool(Int):

@@ -103,7 +103,8 @@ def get_signature(func):
             if parameter.default is None or parameter.default is Required:
                 socket_settings = None
             else:
-                socket_settings = parameter.default
+                socket_settings = {'default_value': parameter.default}
+                socket_settings.update(annotation.get_settings())
 
             if annotation.name:
                 socket_name = annotation.name

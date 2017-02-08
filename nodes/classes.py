@@ -52,10 +52,9 @@ class NodeBase:
             for i in range(diff):
                 self.inputs.remove(self.inputs[-1])
         elif diff < 0:
-            for bl_id, name, default in inputs_template[diff:]:
+            for bl_id, name, settings in inputs_template[diff:]:
                 s = self.inputs.new(bl_id, name)
-                if default is not None:
-                    s.default_value = default
+                s.setup(settings)
 
     def adjust_outputs(self, template):
         outputs_template = template

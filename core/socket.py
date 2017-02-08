@@ -72,8 +72,8 @@ class SocketBase:
     def draw_color(self, context, node):
         return self.color
 
-    def replace_socket(self, bl_idname=None, name=None, default=None):
-        replace_socket(self, new_type=bl_idname, new_name=name, default=default)
+    def replace_socket(self, bl_idname=None, name=None, settings=None):
+        replace_socket(self, new_type=bl_idname, new_name=name, settings=settings)
 
     @property
     def socket_id(self):
@@ -92,8 +92,15 @@ class SocketBase:
             if s == self:
                 return i
 
+    def setup(self, settings):
+        if self.default_value is None:
+            return
+        if settings:
+            for key, value in settings.items():
+                setattr(self, key, value)
 
-def replace_socket(socket, new_type=None, new_name=None, default=None):
+
+def replace_socket(socket, new_type=None, new_name=None, settings=None):
     '''
     Replace a socket with a socket of new_type and keep links
     '''
@@ -101,15 +108,14 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
     socket_type = new_type or socket.bl_idname
     socket_name = new_name or socket.name
     socket_pos = socket.index
-
+    settings = settings or {}
     ng = socket.id_data
 
     if socket.bl_idname == socket_type:
         if socket.name == new_name:
             return socket
         socket.name = new_name
-        if default is not None:
-            socket.default_value = default
+        socket.setup(settings)
         return socket
 
     if socket.is_output:
@@ -130,9 +136,8 @@ def replace_socket(socket, new_type=None, new_name=None, default=None):
         inputs.remove(socket)
         new_socket = inputs.new(socket_type, socket_name)
         inputs.move(len(inputs)-1, socket_pos)
+        socket.setup(settings)
 
-        if default is not None:
-            new_socket.default_value = default
         if from_socket:
             ng.links.new(from_socket, new_socket)
 
@@ -159,7 +164,7 @@ def get_value(self):
 def set_value(self, value):
     self['default_value'] = max(min(value, self.default_value_high), self.default_value_low)
 
-class IntLimitSocket(bpy.types.NodeSocket, SocketNumber, LimitSocket):
+class IntLimitSocket(bpy.types.NodeSocket, SocketNumber):
     bl_idname = "SvRxIntLimitSocket"
     bl_label = "Int Socket"
 
