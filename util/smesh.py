@@ -29,6 +29,7 @@ class SMesh:
                    SvEdges.from_mesh(mesh),
                    SvPolygon.from_mesh(mesh))
 
+    @classmethod
     def from_pydata(cls, pydata):
         verts, edges, faces = pydata
         return cls(SvVertices.from_pydata(verts),
@@ -63,6 +64,7 @@ class SvVertices:
         real_vertices[:,:3] = vertices
         return cls(real_vertices)
 
+    @classmethod
     def from_pydata(cls, vertices):
         real_vertices = np.ones((len(vertices), 4))
         real_vertices[:,:3] = vertices
@@ -91,6 +93,7 @@ class SvEdges:
         #
         return cls(np.array(mesh.edge_keys, dtype=np.uint32))
 
+    @classmethod
     def from_pydata(cls, edges):
         return cls(np.array(edges, dtype=np.uint32))
 
