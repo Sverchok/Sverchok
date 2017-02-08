@@ -78,7 +78,7 @@ class SvEdges:
         # should use foreach_get
         #   
         #   like this?
-        #
+        #   edges = mesh.edges
         #   k = np.empty(len(edges) * 2, dtype=int)
         #   edges.foreach_get('vertices', k)
         #   f = k.reshape(-1,2)             # -1 infers whatever is sane for x in (x, 2)
