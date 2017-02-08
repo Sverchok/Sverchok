@@ -76,6 +76,13 @@ class SvEdges:
     @classmethod
     def from_mesh(cls, mesh):
         # should use foreach_get
+        #   
+        #   like this?
+        #
+        #   k = np.empty(len(edges) * 2, dtype=int)
+        #   edges.foreach_get('vertices', k)
+        #   f = k.reshape(-1,2)             # -1 infers whatever is sane for x in (x, 2)
+        #
         return cls(np.array(mesh.edge_keys, dtype=np.uint32))
 
     def from_pydata(cls, edges):
