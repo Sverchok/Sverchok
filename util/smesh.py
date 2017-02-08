@@ -29,6 +29,14 @@ class SMesh:
                    SvEdges.from_mesh(mesh),
                    SvPolygon.from_mesh(mesh))
 
+    @classmethod
+    def from_pydata(cls, verts, edges=None, faces=None):
+        empty_edges = []
+        empty_faces = []
+        return cls(SvVertices.from_pydata(verts),
+                   SvEdges.from_pydata(edges or empty_edges),
+                   SvPolygon.from_pydata(faces or empty_faces))
+
     def __init__(self, vertices, edges, faces):
         self.vertices = vertices
         self.edges = edges
@@ -46,6 +54,10 @@ class SMesh:
     def as_pydata(self):
         return self.vertices.as_pydata(), self.edges.as_pydata(), self.faces
 
+    @property
+    def as_rxdata(self):
+        return self.vertices, self.edges, self.faces
+
 
 class SvVertices:
     @classmethod
@@ -54,6 +66,12 @@ class SvVertices:
         mesh.vertices.foreach_get("co", vertices)
         vertices.shape = (len(mesh.vertices), 3)
         real_vertices = np.ones((len(mesh.vertices), 4))
+        real_vertices[:,:3] = vertices
+        return cls(real_vertices)
+
+    @classmethod
+    def from_pydata(cls, vertices):
+        real_vertices = np.ones((len(vertices), 4))
         real_vertices[:,:3] = vertices
         return cls(real_vertices)
 
@@ -66,12 +84,21 @@ class SvVertices:
     def as_pydata(self):
         return self.vertices
 
+
 class SvEdges:
     @classmethod
     def from_mesh(cls, mesh):
         # should use foreach_get
+        #   
+        #   :: like this?
+        #   edges = mesh.edges
+        #   k = np.empty(len(edges) * 2, dtype=np.uint32)
+        #   edges.foreach_get('vertices', k)
+        #   f = k.reshape(-1, 2)             # -1 infers whatever is sane for x in (x, 2)
+        #
         return cls(np.array(mesh.edge_keys, dtype=np.uint32))
 
+    @classmethod
     def from_pydata(cls, edges):
         return cls(np.array(edges, dtype=np.uint32))
 
