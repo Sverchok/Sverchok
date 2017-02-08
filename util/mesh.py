@@ -71,8 +71,9 @@ def rxdata_from_bm(bm):
     return vertices, edges, faces
 
 def rxdata_from_pydata(verts, edges=None, faces=None):
-    # return SMesh.from_pydata(verts, edges, faces)
-    v = SvVertices.from_pydata(verts)
-    e = SvEdges.from_pydata(edges)
-    f = SvPolygon.from_pydata(faces)
-    return v, e, f
+    # v = SvVertices.from_pydata(verts)
+    # e = SvEdges.from_pydata(edges)
+    # f = SvPolygon.from_pydata(faces)
+    # return v, e, f
+    rxm = SMesh.from_pydata(verts, edges, faces)
+    return rxm.vertices, rxm.edges, rxm.faces
