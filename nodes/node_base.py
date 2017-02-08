@@ -131,14 +131,13 @@ def get_signature(func):
 
     for s_type in return_annotation:
         s_type, level = parse_type(s_type)
+        if isinstance(s_type, type):
+            s_type = s_type()
         socket_type = s_type.bl_idname
-        if isinstance(s_type, SvRxBaseType):
-            name = s_type.name
-            s_type = type(s_type)
-        else:
-            name = s_type.__name__
+        name = s_type.name
+
         func.outputs_template.append((socket_type, name))
-        func.returns.append((s_type, level))
+        func.returns.append((type(s_type), level))
 
 
 def parse_type(s_type, level=0):

@@ -5,7 +5,10 @@ from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, St
 
 class SvRxBaseType:
     def __init__(self, name=None):
-        self.name = name
+        if name is None:
+            self.name = type(self).__name__
+        else:
+            self.name = name
 
     def get_settings(self):
         return {}

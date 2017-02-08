@@ -69,7 +69,7 @@ class NodeBase:
                 self.outputs.remove(self.outputs[-1])
         elif diff < 0:
             for bl_id, name in outputs_template[diff:]:
-                s = self.outputs.new(bl_id, name)
+                self.outputs.new(bl_id, name)
 
 
 _node_classes = {}
