@@ -7,7 +7,7 @@ import numpy as np
 
 
 @node_func(bl_idname="SvRxNodeListSplit")
-def split(size: Int = 1, data: Anytype = None) -> [Anytype("Data")]:
+def split(size: Int = 1, data: Anytype = Required) -> [Anytype("Data")]:
     if size.size == 1:
         s = range(size[0], data.shape[0], size[0])
     else:
