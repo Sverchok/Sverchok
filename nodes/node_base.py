@@ -226,7 +226,20 @@ def node_func(**values):
         class_factory(func)
         NodeBase.add_func(func)
         module_name = func.__module__.split(".")[-2]
-        func.category = module_name
+        if module_name == 'script':
+            func.category = 'User'
+            try:
+                bpy.utils.unregister_class(func.cls)
+            except:
+                print("unregister failed")
+            try:
+                bpy.utils.register_class(func.cls)
+            except:
+                print("register failed", func.label)
+            import svrx.ui.menu
+            svrx.ui.menu.reload_menu()
+        else:
+            func.category = module_name
         return func
     return real_node_func
 
