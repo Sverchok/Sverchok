@@ -29,36 +29,80 @@ only for speed, never for aesthetics or line count or cleverness.
 import math
 import numpy as np
 from functools import wraps
+import itertools
 
 import bmesh
 import mathutils
 
 from svrx.util.smesh import SvPolygon
 
-def match_long_repeat(parameters):
+
+def match_long_repeat(*parameters, limit=None):
     counts = [len(p) for p in parameters]
-    for i in range(max(counts)):
+    if limit is not None:
+        max_len = counts[limit]
+    else:
+        max_len = max(counts)
+    for i in range(max_len):
         args = []
         for c, parameter in zip(counts, parameters):
             args.append(parameter[min(c - 1, i)])
         yield args
 
+def match_long_cycle(*parameters, limit=None):
+    counts = [len(p) for p in parameters]
+    if limit is not None:
+        max_len = counts[limit]
+    else:
+        max_len = max(counts)
+    args = []
+    for c, p in zip(counts, parameters):
+        if c < max_len:
+            args.append(itertools.cycle(p))
+        else:
+            args.append(p)
+    yield from zip(*args)
+
+
+def mactch_short(*parameters, limit=None):
+    yield from zip(*parameters)
 
 def vectorize(func):
     '''
     Will create a yeilding vectorized generator of the
     function it is applied to.
-    Note: arguments must be list or similar OR str, float or int
+    all arguments most be of list type
     '''
     @wraps(func)
     def inner(*args, **kwargs):
         split = len(args)
         keys = kwargs.keys()
         parameters = [p for p in args + tuple(kwargs.values())]
-        for param in match_long_repeat(parameters):
+        for param in match_long_repeat(*parameters):
             kw_args = {k: v for k, v in zip(keys, param[split:])}
             yield func(*param[:split], **kw_args)
     return inner
+
+def generator(func=None, match=None, limit=None):
+    '''
+    Will create a yeilding vectorized generator of the
+    function it is applied to.
+    '''
+    def wrapper(func):
+        @wraps(func)
+        def inner(*args, match=match):
+            parameters = [np.atleast_1d(arg) for arg in args]
+            out = []
+            for param in match(*parameters, limit=limit):
+                out.append(func(*param))
+            return out
+        return inner
+    if func:
+        match = match_long_repeat
+        return wrapper(func)
+    else:
+        return wrapper
+
 
 
 def circle(radius=1.0, phase=0, nverts=20):
