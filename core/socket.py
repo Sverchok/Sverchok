@@ -136,7 +136,7 @@ def replace_socket(socket, new_type=None, new_name=None, settings=None):
         inputs.remove(socket)
         new_socket = inputs.new(socket_type, socket_name)
         inputs.move(len(inputs)-1, socket_pos)
-        socket.setup(settings)
+        new_socket.setup(settings)
 
         if from_socket:
             ng.links.new(from_socket, new_socket)
