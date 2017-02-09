@@ -20,18 +20,22 @@ import numpy as np
 from svrx.typing import Float, Int, Vertices, BoolP
 from svrx.nodes.node_base import node_func
 
-from svrx.util.geom import vectorize
+from svrx.util.geom import generator
 
 
 def gen_rand_vecs(dims, number):
     vecs = np.random.normal(size=(number, dims))
     mags = np.linalg.norm(vecs, axis=-1)
-
     return vecs / mags[..., np.newaxis]
 
 
-@vectorize
-def rand_vec(size, seed, scale, point=False):
+@node_func(bl_idname="SvRxVectorRandom")
+@generator
+def random_unit_vector(size: Int =1,
+                       seed: Int = 1,
+                       scale: Float = 1.0,
+                       point: BoolP = False
+                       ) -> [Vertices]:
     np.random.seed(seed)
     if point:
         res = np.ones((size, 4))
@@ -39,11 +43,3 @@ def rand_vec(size, seed, scale, point=False):
         res = np.zeros((size, 4))
     res[:, :3] = scale * gen_rand_vecs(3, size)
     return res
-
-@node_func(bl_idname="SvRxVectorRandom")
-def random_unit_vector(size: Int =1,
-                       seed: Int = 1,
-                       scale: Float = 1.0,
-                       point: BoolP = False
-                       ) -> [Vertices]:
-    return list(rand_vec(size, seed, scale, [point]))

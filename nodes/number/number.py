@@ -2,22 +2,21 @@ import numpy as np
 
 from svrx.nodes.node_base import node_func
 from svrx.typing import Float, Int
-from svrx.util.geom import vectorize
-
-np_linspace = vectorize(np.linspace)
-np_arange = vectorize(np.arange)
+from svrx.util.geom import generator
 
 
 @node_func(bl_idname="SvRxNumberLinspace")
+@generator
 def linspace(start: Float = 0.0,
              stop: Float = 1.0,
              count: Int = 10
              ) -> [Float]:
-    return list(np_linspace(start, stop, count))
+    return np.linspace(start, stop, count)
 
 
 @node_func(bl_idname="SvRxNumberArange")
+@generator
 def arange(start: Int = 0,
            stop: Int = 10,
            step: Int = 1) -> [Int]:
-    return list(np_arange(start, stop, step))
+    return np.arange(start, stop, step)
