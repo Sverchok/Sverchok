@@ -57,6 +57,7 @@ def get_other_socket(socket):
 class SocketBase:
     default_value = None
     color = (1, 0, 0, 1)  # red to show unset colors
+    required = BoolProperty(default=False)
 
     def draw(self, context, layout, node, text):
 
@@ -93,11 +94,10 @@ class SocketBase:
                 return i
 
     def setup(self, settings):
-        if self.default_value is None:
-            return
         if settings:
             for key, value in settings.items():
-                setattr(self, key, value)
+                if getattr(self, key) is not None:
+                    setattr(self, key, value)
 
 
 def replace_socket(socket, new_type=None, new_name=None, settings=None):

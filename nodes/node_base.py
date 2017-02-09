@@ -100,8 +100,10 @@ def get_signature(func):
             annotation = annotation()
 
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
-            if parameter.default is None or parameter.default is Required:
+            if parameter.default is None:
                 socket_settings = None
+            elif parameter.default is Required:
+                socket_settings = {'required': True}
             else:
                 socket_settings = {'default_value': parameter.default}
                 socket_settings.update(annotation.get_settings())

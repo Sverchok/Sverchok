@@ -94,6 +94,7 @@ class VirtualSocket:
         self.id_data = node.id_data
         self.default_value = default
         self.is_linked = False
+        self.required = False
 
 def topo_sort(links, starts):
     """
@@ -282,6 +283,9 @@ def exec_node_group(node_group):
                 if socket.is_linked:
                     other = socket_links[socket]
                     tree = data_trees.get(other)
+                elif socket.required:
+                    print("Warning Required socket not connected", node.name)
+                    tree = SvDataTree(socket)
                 else:
                     tree = SvDataTree(socket)
             else:  # prop parameter
