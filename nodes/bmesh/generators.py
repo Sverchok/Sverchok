@@ -28,3 +28,10 @@ def create_cube(size: Float = 1.0) -> [BMesh]:
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, size=size)
     return bm
+
+@node_func(id=3)
+@generator
+def create_uvsphere(u: Int = 10, v: Int = 10, diameter: Float = 1.0) -> [BMesh]:
+    bm = bmesh.new()
+    bmesh.ops.create_uvsphere(bm, u_segments=u, v_segments=v, diameter=diameter)
+    return bm

@@ -25,7 +25,7 @@ def wireframe(bm: BMesh = Required, t: Float = 0.01) -> [BMesh]:
 def solidify(bm: BMesh = Required, thickness: Float = 1.0) -> [BMesh]:
     bm = bm.copy()
     geom_in = bm.verts[:] + bm.edges[:] + bm.faces[:]
-    bmesh.ops.solidify(bm, geom_in, thickness)
+    bmesh.ops.solidify(bm, geom=geom_in, thickness=thickness)
     return bm
 
 
