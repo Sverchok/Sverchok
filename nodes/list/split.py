@@ -1,4 +1,4 @@
-from svrx.typing import Anytype, Int
+from svrx.typing import Anytype, Int, Required
 
 from svrx.nodes.node_base import node_func
 
