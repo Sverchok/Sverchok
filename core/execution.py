@@ -65,7 +65,7 @@ class VirtualNode:
         self.id_data = ng
         self.inputs = []
         for _, name, default in func.inputs_template:
-            self.inputs.append(VirtualSocket(self, name=name, default=default))
+            self.inputs.append(VirtualSocket(self, name=name, default=default['default_value']))
         self.outputs = [VirtualSocket(self) for _ in func.returns]
         self.name = "VirtualNode<{}>".format(func.label)
 
@@ -260,13 +260,13 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
 
 
 def exec_node_group(node_group):
-    print("exec tree")
     data_trees.clean(node_group)
     nodes = {}
     socket_links = {}
     for node in DAG(node_group, nodes, socket_links):
         #print("exec node", node.name)
         func = nodes[node]
+        #print(node.name)
         if isinstance(func, Stateful):
             func.start()
 
