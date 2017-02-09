@@ -38,16 +38,29 @@ from svrx.util.smesh import SvPolygon
 
 
 def match_long_repeat(*parameters, limit=None, mask=None):
-    counts = [len(p) for p in parameters]
+    if mask is None:
+        counts = [len(p) for p in parameters]
+    else:
+        counts = [1 if m else len(p) for m, p in zip(mask, parameters)]
     if limit is not None:
         max_len = counts[limit]
     else:
         max_len = max(counts)
-    for i in range(max_len):
-        args = []
-        for c, parameter in zip(counts, parameters):
-            args.append(parameter[min(c - 1, i)])
-        yield args
+    if mask is None:
+        for i in range(max_len):
+            args = []
+            for c, parameter in zip(counts, parameters):
+                args.append(parameter[min(c - 1, i)])
+            yield args
+    else:
+        for i in range(max_len):
+            args = []
+            for c, m, parameter in zip(counts, mask, parameters):
+                if m:
+                    args.append(parameter)
+                else:
+                    args.append(parameter[min(c - 1, i)])
+            yield args
 
 def match_long_cycle(*parameters, limit=None, mask=None):
     counts = [len(p) for p in parameters]
@@ -91,14 +104,18 @@ def generator(func=None, match=None, limit=None, mask=None):
     def wrapper(func):
         @wraps(func)
         def inner(*args, match=match):
-            parameters = [np.atleast_1d(arg) for arg in args]
+            if match is None:
+                match = match_long_repeat
+            if mask is None:
+                parameters = [np.atleast_1d(arg) for arg in args]
+            else:
+                parameters = [arg if m else np.atleast_1d(arg) for arg, m in zip(args, mask)]
             out = []
-            for param in match(*parameters, limit=limit, mask=None):
+            for param in match(*parameters, limit=limit, mask=mask):
                 out.append(func(*param))
             return out
         return inner
     if func:
-        match = match_long_repeat
         return wrapper(func)
     else:
         return wrapper

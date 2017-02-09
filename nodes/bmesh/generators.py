@@ -18,13 +18,13 @@ def make_icosphere(subdiv, diam):
 
 @node_func(id=1)
 @generator
-def create_icosphere(subdiv: Int(min=0, max=8) = 2, diam: Float = 1.0) -> BMesh:
+def create_icosphere(subdiv: Int(min=0, max=8) = 2, diam: Float = 1.0) -> [BMesh]:
     return make_icosphere(min(subdiv, 8), diam)
 
 
 @node_func(id=2)
 @generator
-def create_cube(size: Float = 1.0) -> BMesh:
+def create_cube(size: Float = 1.0) -> [BMesh]:
     bm = bmesh.new()
     bmesh.ops.create_cube(bm, size=size)
     return bm
