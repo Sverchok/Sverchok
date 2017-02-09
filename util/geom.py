@@ -37,7 +37,7 @@ import mathutils
 from svrx.util.smesh import SvPolygon
 
 
-def match_long_repeat(*parameters, limit=None):
+def match_long_repeat(*parameters, limit=None, mask=None):
     counts = [len(p) for p in parameters]
     if limit is not None:
         max_len = counts[limit]
@@ -49,7 +49,7 @@ def match_long_repeat(*parameters, limit=None):
             args.append(parameter[min(c - 1, i)])
         yield args
 
-def match_long_cycle(*parameters, limit=None):
+def match_long_cycle(*parameters, limit=None, mask=None):
     counts = [len(p) for p in parameters]
     if limit is not None:
         max_len = counts[limit]
@@ -64,7 +64,7 @@ def match_long_cycle(*parameters, limit=None):
     yield from zip(*args)
 
 
-def mactch_short(*parameters, limit=None):
+def match_short(*parameters, limit=None, mask=None):
     yield from zip(*parameters)
 
 def vectorize(func):
@@ -83,7 +83,7 @@ def vectorize(func):
             yield func(*param[:split], **kw_args)
     return inner
 
-def generator(func=None, match=None, limit=None):
+def generator(func=None, match=None, limit=None, mask=None):
     '''
     Will create a yeilding vectorized generator of the
     function it is applied to.
@@ -93,7 +93,7 @@ def generator(func=None, match=None, limit=None):
         def inner(*args, match=match):
             parameters = [np.atleast_1d(arg) for arg in args]
             out = []
-            for param in match(*parameters, limit=limit):
+            for param in match(*parameters, limit=limit, mask=None):
                 out.append(func(*param))
             return out
         return inner
