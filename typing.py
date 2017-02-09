@@ -6,7 +6,8 @@ from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, St
 class SvRxBaseType:
     def __init__(self, name=None):
         if name is None:
-            self.name = type(self).__name__
+            self.default_name = type(self).__name__
+            self.name = None
         else:
             self.name = name
 
