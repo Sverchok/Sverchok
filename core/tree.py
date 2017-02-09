@@ -27,6 +27,9 @@ from svrx.core.execution import exec_node_group, DAG
 
 
 class SverchokReduxTree(bpy.types.NodeTree):
+    """
+    Sverchok Redux visual programming language
+    """
     bl_idname = 'SvRxTree'
     bl_label = 'SverchokRedux Node Tree'
     bl_icon = 'NODE'
