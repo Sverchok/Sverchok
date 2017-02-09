@@ -54,9 +54,11 @@ class SMesh:
     def as_pydata(self):
         return self.vertices.as_pydata(), self.edges.as_pydata(), self.faces
 
+
     @property
     def as_rxdata(self):
-        return self.vertices, self.edges, self.faces
+        #  this is sign of broken abstraction, this needs to be given another pass
+        return self.vertices.vertices, self.edges, self.faces
 
 
 class SvVertices:
@@ -89,7 +91,7 @@ class SvEdges:
     @classmethod
     def from_mesh(cls, mesh):
         # should use foreach_get
-        #   
+        #
         #   :: like this?
         #   edges = mesh.edges
         #   k = np.empty(len(edges) * 2, dtype=np.uint32)
