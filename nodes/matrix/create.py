@@ -18,9 +18,9 @@ def mat_create(trans, scale, rotation, angle):
 
 
 @node_func(bl_idname="SvRxNodeCreateMatrix")
-def create_matrix(location: Vector = (0.0, 0.0, 0.0),
-                  scale: Vector = (1.0, 1.0, 1.0),
-                  rotation: Vector = (0.0, 0.0, 1.0),
+def create_matrix(location: Vector = (0.0, 0.0, 0.0, 1.0),
+                  scale: Vector = (1.0, 1.0, 1.0, 0.0),
+                  rotation: Vector = (0.0, 0.0, 1.0, 0.0),
                   angle: Float = 0.0
                   ) -> [Matrix]:
 
