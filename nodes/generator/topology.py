@@ -21,7 +21,7 @@ def cirle(verts: Vertices = Required) -> (Vertices, Edges, Faces):
     return verts, edges, faces
 
 
-@node_func(bl_idname="SvRxGeneratorTopology", id=2)
+@node_func(id=2)
 def plane(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     y = len(verts)
@@ -31,7 +31,7 @@ def plane(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     return vertices, edges, faces
 
 
-@node_func(bl_idname="SvRxGeneratorTopology", id=3)
+@node_func(id=3)
 def cylinder(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     height = len(verts)
@@ -40,9 +40,21 @@ def cylinder(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     faces = SvPolygon.from_pydata(cylinder_faces(height -2, vert_count, False))
     return vertices, edges, faces
 
+
+@node_func(id=4)
+def line_connect(verts : [Vertices] = Required) -> (Vertices, Edges, Faces):
+    vertices = np.concatenate(verts)
+    count = len(verts[0])
+    obj_count = len(verts)
+    e_start = np.arange(0, obj_count * count - count)
+    e_stop = np.arange(count, obj_count * count)
+    edges = np.array((e_start, e_stop)).T
+    return vertices, edges, None
+
+
 """
 
-@node_func(bl_idname="SvRxGeneratorTopology", id=4)
+@node_func( id=4)
 def torus(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     pass
 """
