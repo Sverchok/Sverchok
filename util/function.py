@@ -9,7 +9,7 @@ def constant(func):
     """
     @wraps(func)
     def inner(*args):
-        return np.atleast_1d(*args)
+        return np.atleast_1d(func(*args))
     return inner
 
 def std_wrap(func):
@@ -18,7 +18,7 @@ def std_wrap(func):
     """
     @wraps(func)
     def inner(*args):
-        return np.atleast_1d(*args)
+        return np.atleast_1d(func(*args))
     return inner
 
 
