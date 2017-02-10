@@ -20,6 +20,7 @@ def cubic_spline(verts: Vertices = Required,
 
 
 @node_func(id=2)
+@generator
 def cubic_spline_count(verts: Vertices(iterable=False) = Required,
                        count: Int = 10,
                        h: FloatP = 0.0001
