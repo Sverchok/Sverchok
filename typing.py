@@ -68,6 +68,14 @@ class Float(Number):
         self.min = min
         self.max = max
 
+    def get_settings(self):
+        settings = {}
+        if self.max is not None:
+            settings['default_value_high'] = self.max
+        if self.min is not None:
+            settings['default_value_low'] = self.min
+        return settings
+
 class Number4f(SvRxBaseType):
     pass
 
