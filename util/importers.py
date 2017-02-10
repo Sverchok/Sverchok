@@ -26,8 +26,13 @@ def mesh_objects_path():
 def named_mesh_path(name):
     return os.path.join(mesh_objects_path(), name)
 
+
+
+
 @functools.lru_cache(maxsize=16)
 def obj_to_pydata_lite(path):
+    """Loads external .obj files in a very simple format. Cached
+    """
     verts, edges, faces = [], [], []
     add_vert = verts.append
     add_face = faces.append
@@ -39,3 +44,9 @@ def obj_to_pydata_lite(path):
                 add_face([int(i)-1 for i in line[2:].strip().split(' ')])
 
     return verts, edges, faces
+
+def uncached_obj_to_pydata_lite(path):
+    """
+    Bypasses the data cache for when are working with and changing the file.
+    """
+    return obj_to_pydata_lite.__wrapped__(path)
