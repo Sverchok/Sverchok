@@ -6,7 +6,7 @@ from svrx.util.geom import generator
 
 
 @node_func(bl_idname='SvRxNodeBmeshModifiers', multi_label='Bmesh modifiers', id=0)
-@generator(mask=(1, 0))
+@generator
 def wireframe(bm: BMesh = Required, t: Float = 0.01) -> [BMesh]:
     bm = bm.copy()
     bmesh.ops.wireframe(
@@ -21,7 +21,7 @@ def wireframe(bm: BMesh = Required, t: Float = 0.01) -> [BMesh]:
 
 
 @node_func(id=1)
-@generator(mask=(1, 0))
+@generator
 def solidify(bm: BMesh = Required, thickness: Float = 1.0) -> [BMesh]:
     bm = bm.copy()
     geom_in = bm.verts[:] + bm.edges[:] + bm.faces[:]

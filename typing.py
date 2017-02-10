@@ -4,12 +4,18 @@ from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, St
 
 
 class SvRxBaseType:
-    def __init__(self, name=None):
+    iterable = False
+    def __init__(self, name=None, iterable=None):
         if name is None:
             self.default_name = type(self).__name__
             self.name = None
         else:
             self.name = name
+
+        if iterable is not None:
+            # basiclly only allow chaning to False for types
+            # than can be resonable iterated
+            self.iterable = iterable
 
     def get_settings(self):
         return {}
@@ -28,18 +34,11 @@ class Anytype(SvRxBaseType):
 
 class Number(SvRxBaseType):
     bl_idname = "SvRxFloatSocket"
+    iterable = True
 
-
-class Int(Number):
-    @property
-    def bl_idname(self):
-        if self.max is not None or self.min is not None:
-            return "SvRxIntLimitSocket"
-        else:
-            return "SvRxIntSocket"
-
-    def __init__(self, name=None, min=None, max=None):
-        super().__init__(name)
+    def __init__(self, name=None, iterable=None, min=None, max=None):
+        print(dir(self))
+        super().__init__(name, iterable)
         self.min = min
         self.max = max
 
@@ -51,6 +50,14 @@ class Int(Number):
             settings['default_value_low'] = self.min
         return settings
 
+
+class Int(Number):
+    @property
+    def bl_idname(self):
+        if self.max is not None or self.min is not None:
+            return "SvRxIntLimitSocket"
+        else:
+            return "SvRxIntSocket"
 
 class Bool(Int):
     pass
@@ -63,21 +70,9 @@ class Float(Number):
         else:
             return "SvRxFloatSocket"
 
-    def __init__(self, name=None, min=None, max=None):
-        super().__init__(name)
-        self.min = min
-        self.max = max
-
-    def get_settings(self):
-        settings = {}
-        if self.max is not None:
-            settings['default_value_high'] = self.max
-        if self.min is not None:
-            settings['default_value_low'] = self.min
-        return settings
 
 class Number4f(SvRxBaseType):
-    pass
+    iterable = True
 
 class Color(Number4f):
     bl_idname = "SvRxColorSocket"
@@ -111,25 +106,26 @@ class String(SvRxBaseType):
 
 class Object(SvRxBaseType):
     bl_idname = "SvRxObjectSocket"
+    iterable = False
 
 
 class Matrix(SvRxBaseType):
     bl_idname = "SvRxMatrixSocket"
     identity = np.identity(4)
-
+    iterable = False
 
 
 class Mesh(SvRxBaseType):
     bl_idname = "SvRxMeshSocket"
-
+    iterable = False
 
 class BMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
-
+    iterable = False
 
 class SMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
-
+    iterable = False
 
 
 

@@ -34,6 +34,8 @@ import itertools
 import bmesh
 import mathutils
 
+import inspect
+
 from svrx.util.smesh import SvPolygon
 
 
@@ -96,16 +98,23 @@ def vectorize(func):
             yield func(*param[:split], **kw_args)
     return inner
 
-def generator(func=None, match=None, limit=None, mask=None):
+def generator(func=None, match=None, limit=None):
     '''
     Will create a yeilding vectorized generator of the
     function it is applied to.
     '''
     def wrapper(func):
+        sig = inspect.signature(func)
+        func.mask = []
+        for name, parameter in sig.parameters.items():
+            m = getattr(parameter.annotation, "iterable", False)
+            func.mask.append(not m)
+
         @wraps(func)
         def inner(*args, match=match):
             if match is None:
                 match = match_long_repeat
+            mask = func.mask
             if mask is None:
                 parameters = [np.atleast_1d(arg) for arg in args]
             else:

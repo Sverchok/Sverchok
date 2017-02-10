@@ -80,11 +80,18 @@ def get_signature(func):
     """
     sig = inspect.signature(func)
 
+    # for input socket creation (bl_idname: str, name: str, settings: dict)
     func.inputs_template = []
+    # for output socket creation (bl_idname: str, name: str)
     func.outputs_template = []
+    # needed properties from function signature dict name: BlenderProperty
     func.properties = {}
+    # how to access parameters of the function (int|str, level, type)
+    # int means it is a socket accesed by index, str means name of property in node
     func.parameters = []
+    # (type, level) of return parameters of node
     func.returns = []
+
 
     if not hasattr(func, "label"):
         func.label = func.__name__.replace("_",' ').strip().title()
@@ -115,7 +122,6 @@ def get_signature(func):
                 socket_name = name
 
             socket_name = name.replace('_', ' ').title()
-
             func.inputs_template.append((annotation.bl_idname, socket_name, socket_settings))
             func.parameters.append((len(func.inputs_template) - 1, level, type(annotation)))
 
