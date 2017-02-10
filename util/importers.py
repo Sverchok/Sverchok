@@ -18,6 +18,7 @@
 
 
 import os
+import functools
 
 def mesh_objects_path():
     return os.path.join(os.path.dirname(__file__), 'mesh_objects')
@@ -25,7 +26,7 @@ def mesh_objects_path():
 def named_mesh_path(name):
     return os.path.join(mesh_objects_path(), name)
 
-
+@functools.lru_cache(maxsize=16)
 def obj_to_pydata_lite(path):
     verts, edges, faces = [], [], []
     add_vert = verts.append
@@ -36,5 +37,5 @@ def obj_to_pydata_lite(path):
                 add_vert([float(i) for i in line[2:].strip().split(' ')])
             if line.startswith('f'):
                 add_face([int(i)-1 for i in line[2:].strip().split(' ')])
-    
+
     return verts, edges, faces
