@@ -37,7 +37,6 @@ class Number(SvRxBaseType):
     iterable = True
 
     def __init__(self, name=None, iterable=None, min=None, max=None):
-        print(dir(self))
         super().__init__(name, iterable)
         self.min = min
         self.max = max
