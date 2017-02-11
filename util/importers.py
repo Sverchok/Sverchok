@@ -26,6 +26,8 @@ def mesh_objects_path():
 def named_mesh_path(name):
     return os.path.join(mesh_objects_path(), name)
 
+def get_sn_template_path():
+    return os.path.join(os.path.dirname(__file__), 'snrx_templates')
 
 
 

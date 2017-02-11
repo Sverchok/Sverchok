@@ -1,8 +1,10 @@
-
+import os
 import bpy
 from bpy.props import EnumProperty, StringProperty
 
 import importlib
+from svrx.util.importers import get_sn_template_path
+
 
 _node_funcs = {}
 
@@ -182,11 +184,44 @@ _node_scripts = {}
 
 FAIL_COLOR = (0.8, 0.1, 0.1)
 READY_COLOR = (0, 0.8, 0.95)
+snrx_template_path = get_sn_template_path()
+
+class SvRxScriptNodePyMenu(bpy.types.Menu):
+    bl_label = "svrx sn templates"
+    bl_idname = "SvRxScriptNodePyMenu"
+
+    def draw(self, context):
+        if context.active_node:
+            node = context.active_node
+            if node.selected_mode == 'To TextBlok':
+                self.path_menu([snrx_template_path], "text.open", {"internal": True})
+            else:
+                self.path_menu([snrx_template_path], "node.svrxscript_import")
+
+class SvRxScriptNodeTextImport(bpy.types.Operator):
+    bl_idname = "node.svrxscript_import"
+    bl_label = "SNRX load"
+    filepath = bpy.props.StringProperty()
+
+    def execute(self, context):
+        txt = bpy.data.texts.load(self.filepath)
+        context.node.text_file = os.path.basename(txt.name)  # strip .py ?
+        # context.node.text_load()
+        return {'FINISHED'}
+
 
 class NodeScript(NodeBase):
     bl_idname = "SvRxNodeScript"
     bl_label = "Script"
 
+    mode_options = [(m, m, '', idx) for idx, m in enumerate(["To TextBlok", "To Node"])]
+
+    selected_mode = bpy.props.EnumProperty(
+        items=mode_options,
+        description="load the template directly to the node or add to textblocks",
+        default="To Node",
+        update=updateNode
+    )
 
     def init(self, context):
         super().init(context)
@@ -235,8 +270,14 @@ class NodeScript(NodeBase):
             row.operator("node.svrxscript_ui_callback", text='Reset').fn_name = 'reset'
             row.operator("node.svrxscript_ui_callback", text='Reload').fn_name = 'load_text'
 
+    def draw_buttons_ext(self, context, layout):
+        row = layout.row()
+        row.prop(self, 'selected_mode', expand=True)
+        col = layout.column()
+        col.menu(SvRxScriptNodePyMenu.bl_idname)
 
-class SvScriptNodeLiteCallBack(bpy.types.Operator):
+
+class SvRxScriptNodeCallBack(bpy.types.Operator):
 
     bl_idname = "node.svrxscript_ui_callback"
     bl_label = "SvRx Script callback"
