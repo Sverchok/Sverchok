@@ -219,9 +219,7 @@ class NodeScript(NodeBase):
     selected_mode = bpy.props.EnumProperty(
         items=mode_options,
         description="load the template directly to the node or add to textblocks",
-        default="To Node",
-        update=updateNode
-    )
+        default="To Node")
 
     def init(self, context):
         super().init(context)
