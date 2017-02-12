@@ -41,7 +41,7 @@ class SvRxStethoscope():
         'activate': BoolP(name='activate', default=True), 
     }
 
-    def __init__(self, node=Non):
+    def __init__(self, node=None):
         self.start()
 
     def start(self):
