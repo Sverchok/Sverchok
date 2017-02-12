@@ -57,7 +57,7 @@ class SvRxStethoscope():
     def stop(self):
         n_id = node_id(self)
         bgl_callback.callback_disable(n_id)
-        if self.activate:
+        if self.properties['activate']:
             
             draw_data = {
                 'tree_name': self.id_data.name[:],
