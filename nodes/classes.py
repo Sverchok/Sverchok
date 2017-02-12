@@ -274,6 +274,7 @@ class NodeScript(NodeBase):
         row.prop(self, 'selected_mode', expand=True)
         col = layout.column()
         col.menu(SvRxScriptNodePyMenu.bl_idname)
+        self.draw_buttons(context, layout)
 
 
 class SvRxScriptNodeCallBack(bpy.types.Operator):
