@@ -35,12 +35,13 @@ class SvRxStethoscope():
     bl_idname = "SvRxStethoscope"
     label = "Stethoscope"
 
+    n_id = StringP(default='')
+
     properties = {
         'activate': BoolP(name='activate', default=True), 
-        'n_id': StringP(default='')
     }
 
-    def __init__(self, node=None):
+    def __init__(self, node=Non):
         self.start()
 
     def start(self):
