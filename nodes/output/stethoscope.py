@@ -55,6 +55,8 @@ class SvRxStethoscope():
         return int(a[0] + b[0]), int(a[1] + b[1])
 
     def stop(self):
+        print(dir(self))
+        print(dir(self.data))
         n_id = node_id(self)
         bgl_callback.callback_disable(n_id)
         if self.properties['activate']:
