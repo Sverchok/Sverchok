@@ -22,8 +22,7 @@ import bgl
 
 from bpy.types import SpaceNodeEditor
 
-# from sverchok import node_tree
-# from sverchok.utils.context_managers import sv_preferences
+from svrx.core import tree
 
 callback_dict = {}
 point_dict = {}
@@ -91,7 +90,7 @@ def draw_callback_px(n_id, data):
     ng_name = space.edit_tree.name
     if not (data['tree_name'] == ng_name):
         return
-    if not isinstance(ng_view, node_tree.SverchCustomTree):
+    if not isinstance(ng_view, tree.SverchokReduxTree):
         return
 
     drawing_func = data.get('custom_function')
