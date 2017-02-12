@@ -52,3 +52,18 @@ def uncached_obj_to_pydata_lite(path):
     Bypasses the data cache for when are working with and changing the file.
     """
     return obj_to_pydata_lite.__wrapped__(path)
+
+_text_file_lookup = {}
+
+def text_remap(text_file, reverse=False):
+    if not reverse:
+        remap_name = make_valid_identifier(text_file)
+        _text_file_lookup[remap_name] = text_file
+        return  remap_name
+    return _text_file_lookup.get(text_file)
+
+def make_valid_identifier(name):
+    """Create a valid python identifier from name for use a a part of class name"""
+    if not name[0].isalpha():
+        name = "SvRx" + name
+    return "".join(ch for ch in name if ch.isalnum() or ch == "_")

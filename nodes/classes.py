@@ -3,8 +3,7 @@ import bpy
 from bpy.props import EnumProperty, StringProperty
 
 import importlib
-from svrx.util.importers import get_sn_template_path
-
+from svrx.util.importers import get_sn_template_path, text_remap
 
 _node_funcs = {}
 
@@ -230,7 +229,8 @@ class NodeScript(NodeBase):
             if self.text_file == 'Text':
                 self.text_file = ''
                 return
-            mod = importlib.import_module("svrx.nodes.script.{}".format(self.text_file))
+            text = text_remap(self.text_file)
+            mod = importlib.import_module("svrx.nodes.script.{}".format(text))
             importlib.reload(mod)
             self.adjust_sockets()
             self.color = READY_COLOR
@@ -248,7 +248,8 @@ class NodeScript(NodeBase):
             return "Script"
 
     def compile(self):
-        return _node_scripts.get(self.text_file)
+        module = text_remap(self.text_file)
+        return _node_scripts.get(module)
 
     @staticmethod
     def add(func):
