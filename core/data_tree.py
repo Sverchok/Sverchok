@@ -29,6 +29,7 @@ class SvDataTree:
         self.children = []
         self.name = ""
         self.level = None
+        self.obj_count = None
         if socket:
             self.name = socket.node.name + ": " + socket.name
             self.level = 0
@@ -99,3 +100,13 @@ class SvDataTree:
             for d in data:
                 self.add_child(data=d).level = 0
             self.level = 1
+
+    def count(self):
+        if self.obj_count is None:
+            if self.is_leaf:
+                return 1
+            else:
+                self.obj_count = sum(t.count() for t in self.children)
+                return self.obj_count
+        else:
+            return -1 if self.obj_count is None else self.obj_count

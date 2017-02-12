@@ -25,6 +25,7 @@ from bpy.props import (FloatProperty,
                        BoolProperty,
                        StringProperty)
 
+from .execution import data_trees
 
 def exec_socket(self, context):
     self.id_data.update()
@@ -61,11 +62,11 @@ class SocketBase:
 
     def draw(self, context, layout, node, text):
 
-        if self.is_output or self.is_linked:
-            layout.label(text)
+        if self.is_output and self.is_linked:
+            layout.label(text + " : "  + self.count)
         elif self.is_linked:
             layout.label(text)
-        elif self.default_value is not None:
+        elif not self.is_output and self.default_value is not None:
             layout.prop(self, "default_value", text=text)
         else:
             layout.label(text)
@@ -73,8 +74,24 @@ class SocketBase:
     def draw_color(self, context, node):
         return self.color
 
+
     def replace_socket(self, bl_idname=None, name=None, settings=None):
         replace_socket(self, new_type=bl_idname, new_name=name, settings=settings)
+
+
+    @property
+    def depth(self):
+        level = data_trees.get(self).level
+        if level is not None:
+            return str(level)
+        else:
+            return ""
+
+
+    @property
+    def count(self):
+        tree = data_trees.get(self)
+        return str(tree.count())
 
     @property
     def socket_id(self):
