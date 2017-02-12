@@ -31,7 +31,7 @@ def simple_grid_xy(x, y, args):
 
 
 @stateful
-class SvRxStethoscope(Mesh_out_common):
+class SvRxStethoscope():
 
     bl_idname = "SvRxStethoscope"
     label = "Stethoscope"
