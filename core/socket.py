@@ -87,6 +87,12 @@ class SocketBase:
         else:
             return ""
 
+    @property
+    def data_tree(self):
+        if self.is_output:
+            return data_trees.get(self)
+        else:
+            return self.other.data_tree
 
     @property
     def count(self):
