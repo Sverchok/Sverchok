@@ -2,8 +2,7 @@ import bpy
 import bmesh
 import time
 from svrx.nodes.node_base import stateful
-from svrx.typing import Vertices, Required, Faces, Edges, StringP, IntP, Matrix, BMesh, Anytype, BoolP
-from svrx.util.mesh import bmesh_from_pydata
+from svrx.typing import Required, StringP, Anytype, BoolP
 from svrx.util import bgl_callback 
 # pylint: disable=C0326
 
@@ -38,26 +37,28 @@ class SvRxStethoscope():
 
     properties = {
         'activate': BoolP(name='activate', default=True), 
-        'n_id': bpy.props.StringProperty(default='')
+        'n_id': StringP(default='')
     }
 
     def start(self):
         self.data = []
 
+    @property
+    def xy_offset(self):
+        a = self.location[:]
+        b = self.width[:]
+        b[0] += 20
+        return int(a[0] + b[0]), int(a[1] + b[1])
+
     def stop(self):
         n_id = node_id(self)
         bgl_callback.callback_disable(n_id)
         if self.activate:
-
-            a = self.location[:]
-            b = self.width[:]
-            b[0] += 20
-            x, y = int(a[0] + b[0]), int(a[1] + b[1])
             
             draw_data = {
                 'tree_name': self.id_data.name[:],
                 'custom_function': simple_grid_xy,
-                'loc': (x, y),
+                'loc': self.xy_offset,
                 'args': (None, None)
             }
             bgl_callback.callback_enable(n_id, draw_data)
