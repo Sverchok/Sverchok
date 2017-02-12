@@ -40,6 +40,9 @@ class SvRxStethoscope():
         'n_id': StringP(default='')
     }
 
+    def __init__(self, node=None):
+        self.start()
+
     def start(self):
         self.data = []
 
