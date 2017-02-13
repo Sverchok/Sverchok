@@ -21,7 +21,9 @@ import collections
 from itertools import chain
 import time
 
+import io
 
+import bpy
 
 timings = []
 
@@ -45,8 +47,7 @@ def time_func(func):
     return inner
 
 def show_timings():
-    import bpy
-    import io
+
     text = bpy.data.texts.get("SVRX_Timings")
     if not text:
         text = bpy.data.texts.new("SVRX_Timings")
@@ -72,7 +73,7 @@ def show_timings():
     print("Total exec time: ", ng_name, '%.3e' % (ng_stop-ng_start), file=output)
     print("DAG build time: ", '%.3e' % (stop - start), '{:.1%}'.format((stop-start)/total), file=output)
     sum_node_calls = 0.0
-    print("Nodes:")
+    print("Nodes:", file=output)
     for key in nodes[::2]:
         ts = res[key]
         if key.startswith("SvRx"):
@@ -85,7 +86,7 @@ def show_timings():
             print('',file=output)
     print("Node call time total: " '%.3e' % sum_node_calls, '{:.1%}'.format(sum_node_calls/total), file=output)
     sum_func_calls = 0.0
-    print("Functions:")
+    print("Functions:", file=output)
     for key, ts in sorted(res.items(), key=lambda x: x[0]):
         if not key.startswith("SvRx"):
             t = sum(ts[1::2]) - sum(ts[0::2])
