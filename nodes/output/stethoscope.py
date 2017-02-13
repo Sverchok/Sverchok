@@ -35,34 +35,31 @@ class SvRxStethoscope():
     bl_idname = "SvRxStethoscope"
     label = "Stethoscope"
 
-    n_id = StringP(default='')
-
     properties = {
-        'activate': BoolP(name='activate', default=True), 
+        'activate': BoolP(name='activate', default=True),
+        'n_id': StringP(default='callback stuff') #  until something like n_id is implemented
     }
 
     def __init__(self, node=None):
-        self.start()
-
-    def start(self):
-        self.data = []
+        if node is not None:
+            self.node = node
+            self.activate = node.activate
+            self.n_id = node.n_id
 
     @property
     def xy_offset(self):
-        a = self.location[:]
-        b = self.width[:]
+        a = self.node.location[:]
+        b = int(self.node.width)
         b[0] += 20
         return int(a[0] + b[0]), int(a[1] + b[1])
 
     def stop(self):
-        print(dir(self))
-        print(dir(self.data))
-        n_id = node_id(self)
+        n_id = node_id(self.node)
         bgl_callback.callback_disable(n_id)
-        if self.properties['activate']:
+        if self.activate:
             
             draw_data = {
-                'tree_name': self.id_data.name[:],
+                'tree_name': self.node.id_data.name[:],
                 'custom_function': simple_grid_xy,
                 'loc': self.xy_offset,
                 'args': (None, None)
@@ -71,7 +68,7 @@ class SvRxStethoscope():
 
 
     def __call__(self, data: Anytype = Required):
-        self.data.append(data)
+        pass
 
 
 
