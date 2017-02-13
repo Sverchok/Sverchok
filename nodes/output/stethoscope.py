@@ -1,3 +1,6 @@
+import bgl
+import blf
+
 import bpy
 import bmesh
 import time
@@ -5,6 +8,8 @@ from svrx.nodes.node_base import stateful
 from svrx.typing import Required, StringP, Anytype, BoolP
 from svrx.util import bgl_callback 
 # pylint: disable=C0326
+
+
 
 
 def node_id(self):
@@ -49,9 +54,8 @@ class SvRxStethoscope():
     @property
     def xy_offset(self):
         a = self.node.location[:]
-        b = int(self.node.width)
-        b[0] += 20
-        return int(a[0] + b[0]), int(a[1] + b[1])
+        b = int(self.node.width) + 20
+        return int(a[0] + b), int(a[1])
 
     def stop(self):
         n_id = node_id(self.node)
