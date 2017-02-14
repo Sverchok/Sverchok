@@ -282,7 +282,9 @@ def exec_node_group(node_group):
         add_time(node.bl_idname +": " + node.name)
 
         if isinstance(func, Stateful):
+            add_time(func.label)
             func.start()
+            add_time(func.label)
 
         out_trees = []
         in_trees = []
@@ -318,12 +320,13 @@ def exec_node_group(node_group):
             recurse_levels(func, in_levels , out_levels, in_trees, out_trees)
 
         if isinstance(func, Stateful):
+            add_time(func.label)
             func.stop()
-        #print("finished with node", node.name)
+            add_time(func.label)
+
         for ot in out_trees:
             if ot:
                 ot.set_level()
-                #ot.print()
         add_time(node.bl_idname +": " + node.name)
     add_time(node_group.name)
 
