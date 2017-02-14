@@ -267,7 +267,7 @@ def exec_node_group(node_group):
     data_trees.clean(node_group)
     nodes = {}
     socket_links = {}
-    do_timings = timings.timings is not None
+    do_timings = node_group.do_timings_text or node_group.do_timings_graphics
     if do_timings:
         timings.start_timing()
 
@@ -328,4 +328,4 @@ def exec_node_group(node_group):
     add_time(node_group.name)
 
     if do_timings:
-        show_timings()
+        show_timings(node_group)

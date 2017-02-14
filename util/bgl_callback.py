@@ -22,7 +22,6 @@ import bgl
 
 from bpy.types import SpaceNodeEditor
 
-from svrx.core import tree
 
 callback_dict = {}
 point_dict = {}
@@ -43,7 +42,7 @@ def tag_redraw_all_nodeviews():
                 for region in area.regions:
                     if region.type == 'WINDOW':
                         region.tag_redraw()
-   
+
 
 def callback_enable(*args):
     n_id = args[0]
@@ -77,12 +76,12 @@ def callback_disable_all():
 def restore_opengl_defaults():
     bgl.glLineWidth(1)
     bgl.glDisable(bgl.GL_BLEND)
-    bgl.glColor4f(0.0, 0.0, 0.0, 1.0)        
+    bgl.glColor4f(0.0, 0.0, 0.0, 1.0)
 
 
 def draw_callback_px(n_id, data):
     space = bpy.context.space_data
-  
+
     ng_view = space.edit_tree
     if not ng_view:
         return
@@ -90,7 +89,7 @@ def draw_callback_px(n_id, data):
     ng_name = space.edit_tree.name
     if not (data['tree_name'] == ng_name):
         return
-    if not isinstance(ng_view, tree.SverchokReduxTree):
+    if not ng_view.bl_idname == "SvRxTree":
         return
 
     drawing_func = data.get('custom_function')
@@ -98,7 +97,7 @@ def draw_callback_px(n_id, data):
     args = data.get('args', (None,))
     drawing_func(x, y, args)
     restore_opengl_defaults()
-       
-        
+
+
 def unregister():
     callback_disable_all()
