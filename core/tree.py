@@ -23,7 +23,7 @@ import bpy
 from bpy.props import BoolProperty
 
 from svrx.core.execution import exec_node_group, DAG
-from svrx.ui import bgl_callback
+from svrx.util import bgl_callback
 
 
 class SverchokReduxTree(bpy.types.NodeTree):
@@ -40,7 +40,6 @@ class SverchokReduxTree(bpy.types.NodeTree):
     has_changed = BoolProperty(default=False)
     do_timings_text = BoolProperty(default=False)
     do_timings_graphics = BoolProperty(default=False, update=turn_graphics_off)
-
 
 
     def update(self):
