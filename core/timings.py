@@ -135,7 +135,7 @@ def water_fall(x, y, args):
         y_offset -= n_y
     y_offset = 0
     for node, n_x, n_y, x_offset in func_boxes:
-        draw_rect(x + x_offset, y + y_offset - 2, n_x, max(n_y, 2.0), color=(0.9, .1, .1, 1.0))
+        draw_rect(x + x_offset, y + y_offset - 2, max(n_x, 1.0), n_y, color=(0.9, .1, .1, 1.0))
         y_offset -= (n_y + 4)
 
 
