@@ -35,7 +35,7 @@ class SverchokReduxTree(bpy.types.NodeTree):
     bl_icon = 'NODE'
 
     def turn_graphics_off(self, context):
-        bgl_callback.callback_disable("timings:" + ng.name)
+        bgl_callback.callback_disable("timings:" + self.name)
 
     has_changed = BoolProperty(default=False)
     do_timings_text = BoolProperty(default=False)
