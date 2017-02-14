@@ -112,9 +112,8 @@ def water_fall(x, y, args):
     else:
         return
 
-    def draw_rect(x=0, y=0, w=30, h=10, color=(0.0, 0.0, 0.0, 1.0)):
+    def draw_rect(x=0, y=0, w=30, h=10):
 
-        bgl.glColor4f(*color)
         bgl.glBegin(bgl.GL_POLYGON)
 
         for coord in [(x, y), (x+w, y), (w+x, y-h), (x, y-h)]:
@@ -127,15 +126,20 @@ def water_fall(x, y, args):
     for node, n_x, n_y, x_offset in node_boxes:
         y_offset -= n_y
     y_max = -y_offset
-    draw_rect(x, y, x_max , y_max , color = (.7, .7, .7, 1.0))
+    bgl.glColor4f(0.7, .7, .7, 1.0)
+
+    draw_rect(x, y, x_max , y_max)
 
     y_offset = 0
+    bgl.glColor4f(0.1, .7, .3, 1.0)
+
     for node, n_x, n_y, x_offset in node_boxes:
-        draw_rect(x + x_offset, y + y_offset,  max(n_x, 1.0), n_y, color=(0.1, .7, .3, 1.0))
+        draw_rect(x + x_offset, y + y_offset,  max(n_x, 1.0), n_y)
         y_offset -= n_y
     y_offset = 0
+    bgl.glColor4f(0.9, .1, .1, 1.0)
     for node, n_x, n_y, x_offset in func_boxes:
-        draw_rect(x + x_offset, y + y_offset - 2, max(n_x, 1.0), n_y, color=(0.9, .1, .1, 1.0))
+        draw_rect(x + x_offset, y + y_offset - 2, max(n_x, 1.0), n_y)
         y_offset -= (n_y + 4)
 
 
