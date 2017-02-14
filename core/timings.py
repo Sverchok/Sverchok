@@ -138,10 +138,11 @@ def water_fall(x, y, args):
         draw_rect(x + x_offset, y + y_offset - 2, n_x, max(n_y, 2.0), color=(0.9, .1, .1, 1.0))
         y_offset -= (n_y + 4)
 
+
 def show_timings_text(ng):
-    text = bpy.data.texts.get("SVRX_Timings")
+    text = bpy.data.texts.get("SVRX_Timings_{}".format(ng.name))
     if not text:
-        text = bpy.data.texts.new("SVRX_Timings")
+        text = bpy.data.texts.new("SVRX_Timings_{}".format(ng.name))
 
     t_iter = iter(timings)
     output = io.StringIO()
@@ -187,7 +188,6 @@ def show_timings_text(ng):
                 f = "{0: <{1}}"
                 output.write(f.format(n, c))
             print('',file=output)
-
 
     print("Functon call total time", '%.3e' % sum_func_calls, '{:.1%}'.format(sum_func_calls/total), file=output)
     text.from_string(output.getvalue())
