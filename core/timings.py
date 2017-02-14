@@ -92,7 +92,7 @@ def show_timings_graphics(ng):
             _, stop = func_data[i + 1]
             y_f = 6
             x_f = (stop - start) * 10000
-            func_boxes.append((func, x_f, y_f, (start - base_time) * 10000   ))
+            func_boxes.append((func, x_f, y_f, (start - base_time) * 10000))
 
     base_point = (max(n.location.x for n in ng.nodes) + 200, max(n.location.y for n in ng.nodes))
     draw_data = {
@@ -103,7 +103,6 @@ def show_timings_graphics(ng):
 
     }
     bgl_callback.callback_enable("timings:" + ng.name, draw_data)
-    water_fall(base_point, node_boxes, func_boxes)
 
 
 def water_fall(x, y, args):
