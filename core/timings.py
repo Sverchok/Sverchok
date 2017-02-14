@@ -193,5 +193,5 @@ def show_timings_text(ng):
                 output.write(f.format(n, c))
             print('',file=output)
 
-    print("Functon call total time",  "{0:.6f}".format(sum_node_calls), '{:.1%}'.format(sum_func_calls/total), file=output)
+    print("Functon call total time",  "{0:.6f}".format(sum_func_calls), '{:.1%}'.format(sum_func_calls/total), file=output)
     text.from_string(output.getvalue())

@@ -62,7 +62,7 @@ class MeshOut(Mesh_out_common):
         param = zip(range(self.max_mesh_count), self.verts, self.edges, self.faces, self.mats)
         for idx, verts, edges, faces, mat in param:
             obj_index = idx
-            bm = bmesh_from_pydata(verts[:, :3], edges, faces, normal_update=False)
+            bm = bmesh_from_pydata(verts[:, :3].tolist(), edges, faces, normal_update=False)
             obj = make_bmesh_geometry(bm,
                                       name=self.base_name,
                                       idx=idx,)
