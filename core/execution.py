@@ -25,6 +25,8 @@ from svrx.core.data_tree import SvDataTree
 from svrx.core.type_conversion import needs_conversion, get_conversion
 from svrx.nodes.node_base import Stateful
 
+import svrx.core.timings as timings
+from svrx.core.timings import add_time, time_func, start_timing, show_timings
 
 class SvTreeDB:
     """
@@ -58,7 +60,7 @@ class VirtualNode:
     """
     Used to represent node that don't have real conterpart in the layout
     """
-    bl_idname = "VirtualNode"
+    bl_idname = "SvRxVirtualNode"
 
     def __init__(self, func, ng):
         self.func = func
@@ -67,13 +69,13 @@ class VirtualNode:
         for _, name, default in func.inputs_template:
             self.inputs.append(VirtualSocket(self, name=name, default=default['default_value']))
         self.outputs = [VirtualSocket(self) for _ in func.returns]
-        self.name = "VirtualNode<{}>".format(func.label)
+        self.name = "VNode<{}>".format(func.label)
 
     def compile(self):
         return self.func
 
 class VirtualLink:
-    bl_idname = "VirtualLink"
+    bl_idname = "SvRxVirtualLink"
     def __init__(self, from_socket, to_socket):
         self.from_socket = from_socket
         self.from_node = from_socket.node
@@ -257,6 +259,7 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
                 else:
                     outs.append(None)
 
+
             recurse_levels(f, in_levels, out_levels, args, outs)
 
 
@@ -264,12 +267,24 @@ def exec_node_group(node_group):
     data_trees.clean(node_group)
     nodes = {}
     socket_links = {}
-    for node in DAG(node_group, nodes, socket_links):
-        #print("exec node", node.name)
+    do_timings = node_group.do_timings_text or node_group.do_timings_graphics
+    if do_timings:
+        timings.start_timing()
+
+    add_time(node_group.name)
+    add_time("DAG")
+    dag_list = DAG(node_group, nodes, socket_links)
+    add_time("DAG")
+    for node in dag_list:
+
         func = nodes[node]
-        #print(node.name)
+
+        add_time(node.bl_idname +": " + node.name)
+
         if isinstance(func, Stateful):
+            add_time(func.label)
             func.start()
+            add_time(func.label)
 
         out_trees = []
         in_trees = []
@@ -297,12 +312,23 @@ def exec_node_group(node_group):
                 out_trees.append(data_trees.get(socket))
             else:
                 out_trees.append(None)
+        out_levels =  [l for _, l in func.returns]
 
-        recurse_levels(func, in_levels , [l for _, l in func.returns], in_trees, out_trees)
+        if do_timings:
+            recurse_levels(time_func(func), in_levels , out_levels, in_trees, out_trees)
+        else:
+            recurse_levels(func, in_levels , out_levels, in_trees, out_trees)
+
         if isinstance(func, Stateful):
+            add_time(func.label)
             func.stop()
-        #print("finished with node", node.name)
+            add_time(func.label)
+
         for ot in out_trees:
             if ot:
                 ot.set_level()
-                #ot.print()
+        add_time(node.bl_idname +": " + node.name)
+    add_time(node_group.name)
+
+    if do_timings:
+        show_timings(node_group)

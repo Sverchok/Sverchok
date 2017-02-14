@@ -24,6 +24,7 @@ import numpy as np
 
 
 class SvDataTree:
+    __slots__ =  ('children', 'data', 'name', 'level', 'obj_count')
     def __init__(self, socket=None, node=None, prop=None):
         self.data = None
         self.children = []
