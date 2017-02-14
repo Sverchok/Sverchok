@@ -131,7 +131,7 @@ def water_fall(x, y, args):
 
     y_offset = 0
     for node, n_x, n_y, x_offset in node_boxes:
-        draw_rect(x + x_offset, y + y_offset, n_x, n_y, color=(0.1, .7, .3, 1.0))
+        draw_rect(x + x_offset, y + y_offset,  max(n_x, 1.0), n_y, color=(0.1, .7, .3, 1.0))
         y_offset -= n_y
     y_offset = 0
     for node, n_x, n_y, x_offset in func_boxes:
@@ -162,8 +162,8 @@ def show_timings_text(ng):
         res[name].append(t)
 
     total = ng_stop - ng_start
-    print("Total exec time: ", ng_name, '%.3e' % (ng_stop-ng_start), file=output)
-    print("DAG build time: ", '%.3e' % (stop - start), '{:.1%}'.format((stop-start)/total), file=output)
+    print("Total exec time: ", ng_name, "{0:.6f}".format(ng_stop-ng_start), file=output)
+    print("DAG build time: ",  "{0:.6f}".format(stop - start), '{:.1%}'.format((stop-start)/total), file=output)
     sum_node_calls = 0.0
     print("Nodes:", file=output)
     for key in nodes[::2]:
@@ -171,23 +171,23 @@ def show_timings_text(ng):
         if key.startswith("SvRx"):
             t = sum(ts[1::2]) - sum(ts[0::2])
             sum_node_calls +=  t
-            names = [(key, 40), ('%.3e' % t,12), ('{:.1%}'.format(t/total), 12 )]
+            names = [(key, 40), ("{0:.6f}".format(t),12), ('{:.1%}'.format(t/total), 12 )]
             for n, c in names:
-                f = "{0: <"+ str(c) + "}"
-                output.write(f.format(n[:c-1]))
+                f = "{0: <{1}}"
+                output.write(f.format(n, c))
             print('',file=output)
-    print("Node call time total: " '%.3e' % sum_node_calls, '{:.1%}'.format(sum_node_calls/total), file=output)
+    print("Node call time total: ", "{0:.6f}".format(sum_node_calls), '{:.1%}'.format(sum_node_calls/total), file=output)
     sum_func_calls = 0.0
     print("Functions:", file=output)
     for key, ts in sorted(res.items(), key=lambda x: x[0]):
         if not key.startswith("SvRx"):
             t = sum(ts[1::2]) - sum(ts[0::2])
             sum_func_calls += t
-            names = [(key, 30), (len(ts)//2, 10), ('%.3e' % t,12), ('{:.1%}'.format(t/total), 12 )]
+            names = [(key, 30), (len(ts)//2, 10), ( "{0:.6f}".format(t), 12), ('{:.1%}'.format(t/total), 12 )]
             for n, c in names:
                 f = "{0: <{1}}"
                 output.write(f.format(n, c))
             print('',file=output)
 
-    print("Functon call total time", '%.3e' % sum_func_calls, '{:.1%}'.format(sum_func_calls/total), file=output)
+    print("Functon call total time",  "{0:.6f}".format(sum_node_calls), '{:.1%}'.format(sum_func_calls/total), file=output)
     text.from_string(output.getvalue())
