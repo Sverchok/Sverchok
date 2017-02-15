@@ -114,10 +114,12 @@ def water_fall(x, y, args):
 
     def draw_rect(x=0, y=0, w=30, h=10):
 
-        bgl.glBegin(bgl.GL_POLYGON)
+        bgl.glBegin(bgl.GL_TRIANGLE_STRIP)
 
-        for coord in [(x, y), (x+w, y), (w+x, y-h), (x, y-h)]:
-            bgl.glVertex2f(*coord)
+        bgl.glVertex2f(x, y)
+        bgl.glVertex2f(x + w, y)
+        bgl.glVertex2f(x, y-h)
+        bgl.glVertex2f(w+x, y-h)
         bgl.glEnd()
 
     node, n_x, n_y, x_offset = node_boxes[-1]
