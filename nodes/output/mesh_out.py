@@ -14,19 +14,34 @@ class Mesh_out_common:
             self.max_mesh_count = node.max_mesh_count
         self.start()
 
-    def get_children(self, basename):
+
+    def get_children(self, basename, kind='MESH'):
+        """
+        This finds those objects that are associated with the basename provided by 
+        the node's interface. kind can be MESH / CURVE
+        """
         objects = bpy.data.objects
-        objs = [obj for obj in objects if obj.type == 'MESH']
+        objs = [obj for obj in objects if obj.type == kind]
         return [o for o in objs if o.get('basename') == basename]
 
 
-    def remove_non_updated_objects(self, obj_index):
-        objs = self.get_children(self.base_name)
+    def remove_non_updated_objects(self, obj_index, kind='MESH'):
+        """
+        This function removes those objects that the node no longer is asked to
+        update. This is necessary because a node can be asked to generate any 
+        number of objects, and that number can fluctuate on consecutive updates.
+
+        """
+        objs = self.get_children(self.base_name, kind)
         objs = [obj.name for obj in objs if obj['idx'] > obj_index]
         if not objs:
             return
 
-        meshes = bpy.data.meshes
+        if kind == 'MESH':
+            data_kind = bpy.data.meshes
+        elif kind == 'CURVE':
+            data_kind = bpy.data.curves
+
         objects = bpy.data.objects
         scene = bpy.context.scene
 
@@ -39,7 +54,7 @@ class Mesh_out_common:
 
         # delete associated meshes
         for object_name in objs:
-            meshes.remove(meshes[object_name])
+            data_kind.remove(data_kind[object_name])
 
 @stateful
 class MeshOut(Mesh_out_common):
