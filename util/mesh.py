@@ -118,7 +118,10 @@ def rxdata_to_mesh(mesh, rx, validate=True):
     mesh.edges.foreach_set("vertices", rx.edges.flatten().astype(dtype=np.uint32))
 
     vertex_indices = rx.faces.flatten().astype(dtype=np.uint32)
-    loop_starts = tuple(islice(chain([0], accumulate(face_lengths)), len(rx.faces)))
+
+    loop_starts = np.cumsum(face_lengths, axis=0, dtype=np.uint32)   (insert 0 )
+    np.roll(loop_starts, 1)
+    loop_starts[0] = 0
 
     mesh.polygons.foreach_set("loop_total", face_lengths)
     mesh.polygons.foreach_set("loop_start", loop_starts)
