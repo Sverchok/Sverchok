@@ -3,7 +3,7 @@ import bmesh
 
 from svrx.nodes.node_base import stateful
 from svrx.typing import Vertices, Required, Faces, Edges, StringP, IntP, Matrix, BMesh
-from svrx.util.mesh import bmesh_from_pydata
+from svrx.util.mesh import bmesh_from_pydata, rxdata_to_mesh
 
 # pylint: disable=C0326
 
@@ -85,8 +85,6 @@ class MeshOut(Mesh_out_common):
 
 
 
-
-
 @stateful
 class BMesh_out(Mesh_out_common):
     bl_idname = "SvRxNodeBmeshOut"
@@ -111,6 +109,50 @@ class BMesh_out(Mesh_out_common):
                 obj.matrix_world = mat.T
 
         self.remove_non_updated_objects(obj_index)
+
+
+@stateful
+class RxMeshOut(Mesh_out_common):
+
+    bl_idname = "SvRxNodeRxMeshOut"
+    label = "RxMesh out"
+
+    properties = {
+        'mesh_name': StringP(name='Mesh name', default="svrx_mesh"),
+        'max_mesh_count': IntP(name="Max count", default=100)
+    }
+
+    def start(self):
+        self.verts = []
+        self.edges = []
+        self.faces = []
+        self.mats = []
+
+    def stop(self):
+        obj_index = 0
+
+        #  using range to limit object number for now during testing
+        param = zip(range(self.max_mesh_count), self.verts, self.edges, self.faces, self.mats)
+        for idx, verts, edges, faces, mat in param:
+            
+            obj_index = idx
+            obj = update_mesh_geometry(rxdata, name=self.base_name, idx=idx)
+            if mat is not None:
+                obj.matrix_world = mat.T
+
+        # cleanup
+        self.remove_non_updated_objects(obj_index)
+
+
+    def __call__(self,
+                 verts: Vertices = Required,
+                 edges: Edges = None,
+                 faces: Faces = None,
+                 matrix: Matrix = None):
+        self.verts.append(verts)
+        self.edges.append(edges)
+        self.faces.append(faces)
+        self.mats.append(matrix)
 
 
 def make_bmesh_geometry(bm, name="svrx_mesh", idx=0):
@@ -141,3 +183,33 @@ def make_bmesh_geometry(bm, name="svrx_mesh", idx=0):
     obj.update_tag(refresh={'OBJECT', 'DATA'})
     obj.hide_select = False
     return obj
+
+
+def update_mesh_geometry(rxdata, name="svrx_mesh", idx=0):
+
+    scene = bpy.context.scene
+    meshes = bpy.data.meshes
+    objects = bpy.data.objects
+
+    rx_name = name + "." + str(idx).zfill(4)
+
+    if rx_name in objects:
+        obj = objects[rx_name]
+    else:
+        # this is only executed once, upon the first run.
+        mesh = meshes.new(rx_name)
+        obj = objects.new(rx_name, mesh)
+        scene.objects.link(obj)
+
+        obj['idx'] = idx
+        obj['basename'] = name
+
+    # at this point the mesh is always fresh and empty
+    rxdata_to_mesh(obj.data, rxdata, validate=True)
+
+    obj.update_tag(refresh={'OBJECT', 'DATA'})
+    obj.hide_select = False
+    return obj
+
+
+
