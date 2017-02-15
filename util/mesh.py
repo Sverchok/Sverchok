@@ -88,7 +88,7 @@ def rxdata_to_mesh(mesh, rx, validate=True):
     num_new_edges = len(rx.edges) - len(mesh.edges)
     num_new_faces = len(rx.faces) - len(mesh.polygons)
     face_lengths = tuple(map(len, rx.faces))
-    old_face_lengths = tuple(map(len, mesh.polygons))
+    old_face_lengths = tuple(map(len, (p.vertices for p in mesh.polygons)))
     num_new_face_lengths = sum(face_lengths) - sum(old_face_lengths)
 
     if any(n < 0 for n in [num_new_verts, num_new_edges, num_new_faces]):
