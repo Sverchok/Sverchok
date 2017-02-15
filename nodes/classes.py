@@ -85,6 +85,20 @@ class NodeStateful(NodeBase):
     def get_cls(bl_idname):
         return _node_classes[bl_idname]
 
+    def draw_buttons(self, context, layout):
+        props = self.get_cls(self.bl_idname).properties
+
+        for name in props.keys():
+            layout.prop(self, name)
+
+
+    def adjust_sockets(self):
+        func = self.get_cls(self.bl_idname)
+        if func is None:
+            return
+        self.adjust_inputs(func.inputs_template)
+        self.adjust_outputs(func.outputs_template)
+
     def compile(self):
         return NodeStateful.get_cls(self.bl_idname)(self)
 
