@@ -36,8 +36,8 @@ def cylinder(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     height = len(verts)
     vert_count = len(verts[0])
-    edges = np.array(cylinder_edges(height -2, vert_count), dtype=np.uint32)
-    faces = SvPolygon.from_pydata(cylinder_faces(height -2, vert_count, False))
+    edges = cyl_edges(height, vert_count)
+    faces = cyl_faces(height, vert_count, False)
     return vertices, edges, faces
 
 
@@ -83,32 +83,29 @@ def plane_faces(x, y):
     return polygons
 
 
-def cylinder_edges(Subd, Vertices):
-    listEdg = []
-    for i in range(Subd+2):
-        for j in range(Vertices-1):
-            listEdg.append([j+Vertices*i, j+1+Vertices*i])
-        listEdg.append([Vertices-1+Vertices*i, 0+Vertices*i])
-    for i in range(Subd+1):
-        for j in range(Vertices):
-            listEdg.append([j+Vertices*i, j+Vertices+Vertices*i])
+def cyl_edges(x, y):
+    edges = np.empty((2*x*y-y, 2), dtype=np.uint32)
+    edges[:x*y, 0] = np.arange(x * y)
+    edges[:x*y, 1] = np.arange(1, x * y + 1)
+    edges[range(y - 1, x * y, y), 1] -= y
+    edges[x * y:, 0] = np.arange(0, x * y - y)
+    edges[x * y:, 1] = np.arange(y, x * y)
+    return edges
 
-    return listEdg
-
-
-def cylinder_faces(Subd, Vertices, Cap):
-    listPlg = []
-    for i in range(Subd+1):
-        for j in range(Vertices-1):
-            listPlg.append([j+Vertices*i, j+1+Vertices*i, j+1+Vertices*i+Vertices, j+Vertices*i+Vertices])
-        listPlg.append([Vertices-1+Vertices*i, 0+Vertices*i, 0+Vertices*i+Vertices, Vertices-1+Vertices*i+Vertices])
-    if Cap:
-        capBot = []
-        capTop = []
-        for i in range(Vertices):
-            capBot.append(i)
-            capTop.append(Vertices*(Subd+1)+i)
-        capBot.reverse()
-        listPlg.append(capBot)
-        listPlg.append(capTop)
-    return listPlg
+def cyl_faces(x, y, cap=False):
+    """
+    caps not implemented yet
+    """
+    p = np.empty((x*y-y, 4), dtype=np.uint32)
+    skips = range(y - 1, x*y -y, y)
+    p[:, 0] = np.arange(0, x * y - y)
+    p[:, 1] = np.arange(1, x * y - y + 1)
+    p[skips, 1] -= y
+    p[:, 2] = np.arange(y + 1, x * y + 1)
+    p[skips, 2] -= y
+    p[:, 3] = np.arange(y, x * y)
+    l = np.empty((x * y - y, 2), dtype=np.uint32)
+    l[:, 0] = 4
+    l[:, 1] = np.arange(0, (x * y - y) * 4, 4)
+    p.shape = (x * y -y ) *4
+    return SvPolygon(l, p)
