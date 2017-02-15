@@ -119,7 +119,7 @@ def rxdata_to_mesh(mesh, rx, validate=True):
 
     vertex_indices = rx.faces.flatten().astype(dtype=np.uint32)
 
-    loop_starts = np.cumsum(face_lengths, axis=0, dtype=np.uint32)   (insert 0 )
+    loop_starts = np.cumsum(face_lengths, axis=0, dtype=np.uint32)
     np.roll(loop_starts, 1)
     loop_starts[0] = 0
 
