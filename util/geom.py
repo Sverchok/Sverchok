@@ -136,7 +136,7 @@ def circle(radius=1.0, phase=0, nverts=20):
     circ = np.array([np.cos(t + phase) * radius, np.sin(t + phase) * radius, np.zeros(nverts), np.ones(nverts)])
     verts = np.transpose(circ)
     edges = np.array([(i, i + 1) for i in range(nverts - 1)] + [(nverts - 1, 0)])
-    faces = SvPolygon.from_pydata([tuple(range(nverts))])
+    faces = SvPolygon(np.array([0], dtype=np.uint32), np.array([nverts], dtype=np.uint32), np.arange(0, nverts, dtype=np.uint32))
     return verts, edges, faces
 
 circles = vectorize(circle)
