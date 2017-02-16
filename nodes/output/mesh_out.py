@@ -120,7 +120,7 @@ class BMesh_out(Mesh_out_common):
         obj_index = 0
         for idx, bm, mat in zip(range(self.max_mesh_count), self.meshes, self.mats):
             obj_index = idx
-            obj = make_bmesh_geometry(bm, name=self.base_name, idx=idx)
+            obj = make_bmesh_geometry(bm, name=self.base_name, idx=idx, free=False)
             if mat is not None:
                 obj.matrix_world = mat.T
 
@@ -176,30 +176,13 @@ class RxMeshOut(Mesh_out_common):
         self.mats.append(matrix)
 
 
-def make_bmesh_geometry(bm, name="svrx_mesh", idx=0):
-
-    scene = bpy.context.scene
-    meshes = bpy.data.meshes
-    objects = bpy.data.objects
-
-    rx_name = name + "." + str(idx).zfill(4)
-
-    if rx_name in objects:
-        obj = objects[rx_name]
-    else:
-        # this is only executed once, upon the first run.
-        mesh = meshes.new(rx_name)
-        obj = objects.new(rx_name, mesh)
-        scene.objects.link(obj)
-
-        obj['idx'] = idx
-        obj['basename'] = name
-
-    # at this point the mesh is always fresh and empty
+def make_bmesh_geometry(bm, name="svrx_mesh", idx=0, free=True):
+    obj = get_obj_for(name, idx)
 
     ''' get bmesh, write bmesh to obj, free bmesh'''
     bm.to_mesh(obj.data)
-    bm.free()
+    if free:
+        bm.free()
 
     obj.update_tag(refresh={'OBJECT', 'DATA'})
     obj.hide_select = False
