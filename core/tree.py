@@ -18,6 +18,9 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import time
+import cProfile
+import pstats
+import io
 
 import bpy
 from bpy.props import BoolProperty
@@ -55,3 +58,24 @@ class SverchokReduxTree(bpy.types.NodeTree):
 
     def update_list(self):
         return DAG(self)
+
+    def profile_execute(self):
+        pr = cProfile.Profile()
+        pr.enable()
+        exec_node_group(self)
+        pr.disable()
+
+        s = io.StringIO()
+        sortby = 'cumulative'
+
+        ps = pstats.Stats(pr, stream=s)
+        ps.strip_dirs()
+        ps.sort_stats(sortby)
+        ps.print_stats()
+
+        text_name = self.name + " Profile"
+        if text_name in bpy.data.texts:
+            text = bpy.data.texts[text_name]
+        else:
+            text = bpy.data.texts.new(text_name)
+        text.from_string(s.getvalue())

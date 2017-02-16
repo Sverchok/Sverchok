@@ -16,6 +16,10 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
+# pylint: disable=W0141
+
+from itertools import chain, islice, accumulate
+
 import numpy as np
 
 import bmesh
