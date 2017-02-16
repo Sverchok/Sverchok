@@ -296,15 +296,15 @@ def write_to_mesh(obj, vertices, edges=None, faces=None):
         mesh.edges.foreach_set('vertices', edges)
 
     if faces is not None:
-        mesh.polygons.foreach_set("loop_total", faces.loop_info[:,0].copy())
-        mesh.polygons.foreach_set("loop_start", faces.loop_info[:,1].copy())
+        mesh.polygons.foreach_set("loop_total", faces.loop_total)
+        mesh.polygons.foreach_set("loop_start", faces.loop_start)
         mesh.loops.foreach_set("vertex_index", faces.vertex_indices)
 
     if faces is not None and edges is None:
         print("updating edges")
         mesh.update(calc_edges=True)
 
-    fail = mesh.validate(verbose=True)
+    fail = mesh.validate(verbose=False)
     if not fail:
         print("managed to update mesh for: ", obj.name)
     else:

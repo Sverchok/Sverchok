@@ -114,45 +114,69 @@ class SvEdges:
         return self.edges
 
 class SvPolygon:
+    """
+    Represent face-data using data structur compatible with blender
+    vertex_indices list of vertex index for all loops
+    loop_start offset of each face in vertex_indices
+    loop_total length of each face in vertex_indices
+
+    Example:
+    - 1 Triangle face:
+    vertex_indices = [0 1 2]
+    loop_start = [0]
+    loop_total = [3]
+
+    - 2 Triangle faces and polygon face
+    [0 1 2 0 1 4 3]
+    [0 3]
+    [3 4]
+    """
+
     @classmethod
     def from_pydata(cls, faces):
 
-        loop_info = np.zeros((len(faces), 2), dtype=np.uint32)
-        loop_info[:, 0] = tuple(map(len, faces))
-        loop_info[1:,1] = loop_info[:-1,0].cumsum()
+        loop_total = np.empty(len(faces), dtype=np.uint32)
+        loop_start = np.zeros(len(faces), dtype=np.uint32)
+        loop_total[:] = tuple(map(len, faces))
+        loop_start[1:] = loop_total[:-1].cumsum()
         vertex_indices = np.fromiter(chain.from_iterable(faces),
                                      dtype=np.uint32,
-                                     count=loop_info[:,0].sum())
-        return cls(loop_info, vertex_indices)
+                                     count=loop_start.sum())
+        return cls(loop_start, loop_total, vertex_indices)
 
-    def __init__(self, loop_info=None, vertex_indices=None):
-       self.loop_info = loop_info
+
+    def __init__(self, loop_start=None, loop_total=None, vertex_indices=None):
+       self.loop_start = loop_start
+       self.loop_total = loop_total
        self.vertex_indices = vertex_indices
 
     @classmethod
     def from_mesh(cls, mesh):
-        loop = np.zeros((len(mesh.polygons), 2), dtype=np.uint32)
-        mesh.polygons.foreach_get("loop_total", loop[:,0])
-        mesh.polygons.foreach_get("loop_start", loop[:,1])
+        loop_total = np.empty(len(mesh.polygons), dtype=np.uint32)
+        loop_start = np.empty(len(mesh.polygons), dtype=np.uint32)
+        mesh.polygons.foreach_get("loop_total", loop_total)
+        mesh.polygons.foreach_get("loop_start", loop_start)
         vertex_indices = np.empty(len(mesh.loops), dtype=np.uint32)
         mesh.loops.foreach_get("vertex_index", vertex_indices)
-        return cls(loop, vertex_indices)
+        return cls(loop_start, loop_total, vertex_indices)
 
 
     def __getitem__(self, key):
-        loop_start = self.loop_info[key, 1]
-        loop_stop = loop_start + self.loop_info[key, 0]
+        loop_start = self.loop_start[key]
+        loop_stop = loop_start + self.loop_total[key]
         return self.vertex_indices[loop_start: loop_stop]
 
     def __len__(self):
-        return self.loop_info.shape[0]
+        return len(self.loop_start)
 
     def as_pydata(self):
         return [tuple(face) for face in self]
 
+    """
     def join(self, poly):
         offset = len(poly.vertex_indices)
         face_count = len(self)
         self.loop_info = np.concatenate((self.loop_info, poly.loop_info))
         self.vertex_indices = np.concatenate((self.vertex_indices, poly.vertex_indices + offset))
         self.loop_info[face_count:,1] += offset
+    """

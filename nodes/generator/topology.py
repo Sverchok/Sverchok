@@ -104,8 +104,8 @@ def cyl_faces(x, y, cap=False):
     p[:, 2] = np.arange(y + 1, x * y + 1)
     p[skips, 2] -= y
     p[:, 3] = np.arange(y, x * y)
-    l = np.empty((x * y - y, 2), dtype=np.uint32)
-    l[:, 0] = 4
-    l[:, 1] = np.arange(0, (x * y - y) * 4, 4)
-    p.shape = (x * y -y ) *4
-    return SvPolygon(l, p)
+    l_total = np.empty(x * y - y, dtype=np.uint32)
+    l_total[:] = 4
+    l_start = np.arange(0, (x * y - y) * 4, 4, dtype=np.uint32)
+    p.shape = (x * y -y ) * 4
+    return SvPolygon(l_start, l_total, p)

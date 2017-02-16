@@ -9,7 +9,7 @@ from svrx.util.mesh import bmesh_from_pydata, rxdata_from_bm
 def bmesh_in(verts: Vertices = Required,
              edges: Edges = None,
              faces: Faces = None) -> BMesh:
-    return bmesh_from_pydata(verts[:,:3], edges, faces)
+    return bmesh_from_pydata(verts[:,:3].tolist(), edges, faces)
 
 @node_func(bl_idname="SvRxBMeshOut")
 def bmesh_out(bm: BMesh = Required) -> (Vertices, Edges, Faces):
