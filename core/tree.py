@@ -67,7 +67,10 @@ class SverchokReduxTree(bpy.types.NodeTree):
 
         s = io.StringIO()
         sortby = 'cumulative'
-        ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
+
+        ps = pstats.Stats(pr, stream=s)
+        ps.strip_dirs()
+        ps.sort_stats(sortby)
         ps.print_stats()
 
         text_name = self.name + " Profile"
