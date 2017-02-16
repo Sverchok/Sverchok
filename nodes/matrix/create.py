@@ -17,13 +17,13 @@ def create_matrix(location: Vector = (0.0, 0.0, 0.0, 1.0),
                   angle: Float = 0.0
                   ) -> [Matrix]:
 
-    t = translation_matrix(location)
+    #t = translation_matrix(location)
     s = np.identity(4)
     for i in range(3):
         s[i,i] = scale[i]
+        s[i, 3] = location[i]
     r = rotation_matrix(math.radians(angle), rotation)
-    mat = concatenate_matrices(t, s, r)
-    return mat
+    return s.dot(r)
 
 
 def rotation_matrix(theta, axis):
@@ -41,5 +41,5 @@ def rotation_matrix(theta, axis):
     bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
     return np.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac), 0],
                      [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab), 0],
-                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc, 0,],
+                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc, 0],
                      [0,         0,         0,           1]])
