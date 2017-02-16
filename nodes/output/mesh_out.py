@@ -5,7 +5,7 @@ import bmesh
 
 from svrx.nodes.node_base import stateful
 from svrx.typing import Vertices, Required, Faces, Edges, StringP, IntP, Matrix, BMesh
-from svrx.util.mesh import bmesh_from_pydata, rxdata_to_mesh
+from svrx.util.mesh import bmesh_from_pydata
 
 
 # pylint: disable=C0326
@@ -15,8 +15,6 @@ class Mesh_out_common:
         if node:
             self.base_name = node.mesh_name
             self.max_mesh_count = node.max_mesh_count
-        self.start()
-
 
     def get_children(self, basename, kind='MESH'):
         """
@@ -208,32 +206,6 @@ def make_bmesh_geometry(bm, name="svrx_mesh", idx=0):
     return obj
 
 
-def update_mesh_geometry(rxdata, name="svrx_mesh", idx=0):
-
-    scene = bpy.context.scene
-    meshes = bpy.data.meshes
-    objects = bpy.data.objects
-
-    rx_name = name + "." + str(idx).zfill(4)
-
-    if rx_name in objects:
-        obj = objects[rx_name]
-    else:
-        # this is only executed once, upon the first run.
-        mesh = meshes.new(rx_name)
-        obj = objects.new(rx_name, mesh)
-        scene.objects.link(obj)
-
-        obj['idx'] = idx
-        obj['basename'] = name
-
-    # at this point the mesh is always fresh and empty
-    rxdata_to_mesh(obj.data, rxdata, validate=True)
-
-    obj.update_tag(refresh={'OBJECT', 'DATA'})
-    obj.hide_select = False
-    return obj
-
 def get_obj_for(name="svrx", idx=0):
     scene = bpy.context.scene
     meshes = bpy.data.meshes
@@ -287,13 +259,15 @@ def write_to_mesh(obj, vertices, edges=None, faces=None):
         mesh.loops.add(loop_diff)
         mesh.polygons.add(face_diff)
 
-    vert_out = vertices[:,:3].astype(np.float32)
-    vert_out.shape = (3 * len(vert_out))
+    vert_out = vertices[:,:3].flatten()
+    #vert_out.shape = (3 * len(vert_out))
     mesh.vertices.foreach_set('co', vert_out)
 
     if edges is not None:
-        edges.shape = (2 * len(edges))
+        edges.shape = -1
         mesh.edges.foreach_set('vertices', edges)
+        # temporary falten
+        edges.shape = (-1, 2)
 
     if faces is not None:
         mesh.polygons.foreach_set("loop_total", faces.loop_total)

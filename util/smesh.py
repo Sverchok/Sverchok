@@ -127,6 +127,8 @@ class SvPolygon:
     loop_total = [3]
 
     - 2 Triangle faces and polygon face
+    [[0, 1, 2], [0, 1, 4 ,3]]
+
     [0 1 2 0 1 4 3]
     [0 3]
     [3 4]
