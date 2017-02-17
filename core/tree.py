@@ -59,11 +59,14 @@ class SverchokReduxTree(bpy.types.NodeTree):
     def update_list(self):
         return DAG(self)
 
-    def profile_execute(self):
+    def profile_execute(self, pstat_file=None):
         pr = cProfile.Profile()
         pr.enable()
         exec_node_group(self)
         pr.disable()
+
+        if pstat_file is not None:
+            pr.dump_stats(pstat_file)
 
         s = io.StringIO()
         sortby = 'cumulative'
