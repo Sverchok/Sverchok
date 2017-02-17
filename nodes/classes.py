@@ -72,6 +72,12 @@ class NodeBase:
             for bl_id, name in outputs_template[diff:]:
                 self.outputs.new(bl_id, name)
 
+    def as_json(self):
+        pass
+
+    def from_json(self, json):
+        pass
+
 
 _node_classes = {}
 
