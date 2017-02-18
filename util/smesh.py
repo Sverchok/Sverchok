@@ -174,6 +174,21 @@ class SvPolygon:
     def as_pydata(self):
         return [tuple(face) for face in self]
 
+    def __iadd__(self, other):
+        if isinstance(other, SvPolygon):
+            face_count = len(self)
+            offset = len(self.vertex_indices)
+            self.loop_start = np.concatenate((self.loop_start, other.loop_start + face_count))
+            self.loop_total = np.concatenate((self.loop_total, other.loop_total))
+            self.vertex_indices = np.concatenate((self.vertex_indices, other.vertex_indices + offset))
+        else:
+            if isinstance(other, np.ndarray):
+                if len(other.shape) == 1:
+                    self += SvPolygon(np.array([0], dtype=np.uint32),np.array(other.shape, dtype=np.uint32), other)
+                elif len(other.shape) == 2:
+                    #self += SvPolygon
+                    pass
+
     """
     def join(self, poly):
         offset = len(poly.vertex_indices)
