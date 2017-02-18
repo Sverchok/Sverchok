@@ -46,5 +46,4 @@ def cylinder(scale: Float(iterable=False) = 1.0,
     cylinder[:] = z[:, np.newaxis, :] + circle
     cylinder[:,:,:2] *= scale[:,np.newaxis,np.newaxis]
     cylinder.shape = (-1, 4)
-    print(rings, verts)
     return cylinder, cylinder_edges(rings, verts), cylinder_faces(rings, verts, caps)

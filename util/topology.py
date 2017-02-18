@@ -20,11 +20,16 @@ from svrx.util.smesh import SvPolygon
 
 
 def plane_edges(x, y):
-    edges = np.empty((x * (y - 1) + (x - 1) * y, 2 ), dtype=uint32)
-    edges[:(x - 1) * y:, 0] = (np.arange(0, x-1) + np.arange(0, x * y - y, x)[:, np.newaxis]).flatten()
-    edges[(x - 1) * y: 0] = (np.arange(0, x*(y-1), x) + np.arange(0, x)[:,np.newaxis]).flatten()
-    edges[:(x - 1) * y:, 1] = edges[:(x - 1) * y:, 0] + 1
-    edges[(x - 1) * y: 1] = edges[(x - 1) * y: 0] + x
+    edges = np.empty((x * (y - 1) + (x - 1) * y, 2 ), dtype=np.uint32)
+    u_dir = np.arange(0, x - 1) + np.arange(0, x * y, x)[:,np.newaxis]
+    v_dir = np.arange(0, x * (y - 1), x) + np.arange(0, x)[:,np.newaxis]
+    u_dir.shape = -1
+    v_dir.shape = -1
+    split = v_dir.shape[0]
+    edges[split:, 0] = u_dir
+    edges[:split, 0] = v_dir
+    edges[split:, 1] = u_dir + 1
+    edges[:split, 1] = v_dir + x
     return edges
 
 def plane_faces(x, y):
