@@ -59,7 +59,7 @@ def torus(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     height = len(verts)
     vert_count = len(verts[0])
     edges = torus_edges(height, vert_count)
-    faces = torus_faces(height, vert_count, False)
+    faces = torus_faces(height, vert_count)
     return vertices, edges, faces
 
 
