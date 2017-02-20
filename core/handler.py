@@ -50,12 +50,18 @@ def sv_file_load(scene):
                 node.adjust_sockets()
 
 
+@persistent
+def frame_change(scene):
+    for ng in svrx_trees():
+        ng.execute()
 
 def register():
     bpy.app.handlers.scene_update_pre.append(sv_main_handler)
     bpy.app.handlers.load_post.append(sv_file_load)
+    bpy.app.handlers.frame_change_pre.append(frame_change)
 
 
 def unregister():
     bpy.app.handlers.scene_update_pre.remove(sv_main_handler)
     bpy.app.handlers.load_post.append.remove(sv_file_load)
+    bpy.app.handlers.frame_change_pre.remove(frame_change)
