@@ -100,16 +100,15 @@ def tanh(x: Number = 0.0) -> Number:
 ## Constants times input n
 
 @node_func(bl_idname=local_name, id=60)
-@constant_times_n
 def pi(n: Number = 2.0) -> Number:
     return np.pi * n
 
 @node_func(bl_idname=local_name, id=61)
-@constant_times_n
 def tau(n: Number = 1.0) -> Number:
     return np.pi * n * 2
 
+PHI = ((1 + 5 ** 0.5) / 2)
+
 @node_func(bl_idname=local_name, id=62)
-@constant_times_n
 def phi(n: Number = 1.0) -> Number:
-    return np.empty((1 + 5 ** 0.5) / 2) * n
+    return PHI * n
