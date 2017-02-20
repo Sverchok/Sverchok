@@ -97,16 +97,18 @@ class MultiInputNode(NodeBase):
         self.adjust_outputs(func.outputs_template)
 
     def update(self):
-        print("update", self.name, len(self.inputs))
-        if len(self.inputs) < 2:
-            return
 
-        if self.inputs and self.inputs[-1].is_linked:
-            s_type = self.socket_type
-            s_name = self.socket_base_name
-            self.inputs.new(s_type, s_name)
-        elif not self.inputs[-1].is_linked and not self.inputs[-2].is_linked:
-            self.inputs.remove(self.inputs[-1])
+        min_count = max(1, self.min_count)
+
+        if not self.inputs:
+            return
+        if self.inputs[-1].is_linked:
+            length = start + len(self.inputs)
+            name = self.base_name.format(length)
+            node.inputs.new(node.socket_type, name)
+        else:
+            while len(self.inputs) > min_count and not self.inputs[-2].is_linked:
+                self.inputs.remove(self.inputs[-1])
 
 
 
