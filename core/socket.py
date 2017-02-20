@@ -272,6 +272,15 @@ class ColorSocket(bpy.types.NodeSocket, SocketVector):
         else:
             super().draw(context, layout, node, text)
 
+
+class StringSocket(bpy.types.NodeSocket, SocketBase):
+    bl_idname = 'SvRxStringSocket'
+    bl_label = 'String Socket'
+
+    default_value = StringProperty(update=exec_socket)
+    color = (.3, .3, .3, 1.0)
+
+
 class TopoSocket(bpy.types.NodeSocket, SocketBase):
     bl_idname = "SvRxTopoSocket"
     bl_label = "Topo Socket"
