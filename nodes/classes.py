@@ -1,4 +1,5 @@
 import os
+import time
 import bpy
 from bpy.props import EnumProperty, StringProperty
 
@@ -110,7 +111,14 @@ class MultiInputNode(NodeBase):
             while len(self.inputs) > min_count and not self.inputs[-2].is_linked:
                 self.inputs.remove(self.inputs[-1])
 
+class NodeID:
+    n_id = StringProperty()
 
+    @property
+    def node_id(self):
+        if not self.n_id:
+            self.n_id = str(hash(self) ^ hash(time.monotonic()))
+        return self.n_id
 
 _node_classes = {}
 
