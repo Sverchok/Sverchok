@@ -44,8 +44,8 @@ def compat(func):
         return func(*make_compatible(a, b))
     return inner
 
-def make_compatible(a, b):
-    if is_broadcastable(a, b):
+def make_compatible(a, b, broadcast=True):
+    if broadcast and is_broadcastable(a, b):
         return a, b
     shape = tuple(max(x, y) for x, y in zip(a.shape, b.shape))
     return array_as(a, shape), array_as(b, shape)
