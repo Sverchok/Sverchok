@@ -120,6 +120,9 @@ class NodeID:
             self.n_id = str(hash(self) ^ hash(time.monotonic()))
         return self.n_id
 
+    def copy(self, node):
+        self.n_id = ''
+
 _node_classes = {}
 
 class NodeStateful(NodeBase):
