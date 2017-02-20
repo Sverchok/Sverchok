@@ -79,6 +79,37 @@ class NodeBase:
         pass
 
 
+class MultiInputNode(NodeBase):
+
+
+    def compile(self):
+        count = max(len(self.inputs), 2)
+        func = super.compile()
+        func.copy()
+
+    def adjust_sockets(self):
+        func = self.compile()
+        if func is None:
+            return
+
+        print("adjust_sockets", self.name, count)
+        self.adjust_inputs(func.inputs_template * count)
+        self.adjust_outputs(func.outputs_template)
+
+    def update(self):
+        print("update", self.name, len(self.inputs))
+        if len(self.inputs) < 2:
+            return
+
+        if self.inputs and self.inputs[-1].is_linked:
+            s_type = self.socket_type
+            s_name = self.socket_base_name
+            self.inputs.new(s_type, s_name)
+        elif not self.inputs[-1].is_linked and not self.inputs[-2].is_linked:
+            self.inputs.remove(self.inputs[-1])
+
+
+
 _node_classes = {}
 
 class NodeStateful(NodeBase):
