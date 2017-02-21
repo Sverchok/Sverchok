@@ -46,7 +46,7 @@ def tag_redraw_all_3dviews():
 
 def callback_enable(*args):
     n_id = args[0]
-    global callback_dict
+    # global callback_dict
     if n_id in callback_dict:
         return
 
