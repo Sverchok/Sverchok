@@ -20,11 +20,7 @@
 import bpy
 from bpy.app.handlers import persistent
 
-
-def svrx_trees():
-    for ng in bpy.data.node_groups:
-        if ng.bl_idname == 'SvRxTree':
-            yield ng
+from svrx.core.tree import svrx_trees
 
 
 @persistent
@@ -53,7 +49,11 @@ def sv_file_load(scene):
 @persistent
 def frame_change(scene):
     for ng in svrx_trees():
-        ng.execute()
+        try:
+            ng.execute_animate()
+        except:
+            pass
+    scene.update()
 
 def register():
     bpy.app.handlers.scene_update_pre.append(sv_main_handler)

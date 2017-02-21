@@ -19,7 +19,7 @@
 
 
 import bpy
-
+from svrx.core.tree import svrx_trees
 
 class SvRxPanelDebug(bpy.types.Panel):
     bl_idname = "SvRxPanelDebug"
@@ -42,3 +42,27 @@ class SvRxPanelDebug(bpy.types.Panel):
         layout.label("Timings")
         layout.prop(ng, "do_timings_text")
         layout.prop(ng, "do_timings_graphics")
+
+
+class SvRxPanelControl(bpy.types.Panel):
+    bl_idname = "SvRxPanelControl"
+    bl_label = "SvRx Control"
+    bl_space_type = 'NODE_EDITOR'
+    bl_region_type = 'UI'
+    bl_category = 'Sverchok Redux'
+    use_pin = True
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return context.space_data.edit_tree.bl_idname == 'SvRxTree'
+        except:
+            return False
+
+    def draw(self, context):
+        layout = self.layout
+        current_ng = context.space_data.edit_tree
+        for ng in svrx_trees():
+            row = layout.row()
+            row.label(ng.name)
+            row.prop(ng, "rx_animate")

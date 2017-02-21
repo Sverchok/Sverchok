@@ -2,8 +2,27 @@ import numpy as np
 
 import bpy
 
-from svrx.typing import IntValue, FloatValue, PointValue, ColorValue, ObjectValue
-from svrx.nodes.node_base import stateful
+from svrx.typing import IntValue, FloatValue, PointValue, ColorValue, ObjectValue, Int
+from svrx.nodes.node_base import stateful, node_func
+from svrx.nodes.classes import NodeBase
+
+
+class NodeFrameInfo(NodeBase):
+
+    def draw_buttons(self, context, layout):
+        row = layout.row()
+        scene = context.scene
+        screen = context.screen
+        """
+        box = row.box()
+        box.prop(scene, "frame_start")
+        box.prop(scene, "frame_end")
+        """
+        row.prop(scene, "frame_current", text="")
+        if not screen.is_animation_playing:
+            row.operator("screen.animation_play", text="", icon='PLAY')
+        else:
+            row.operator("screen.animation_play", text="", icon='PAUSE')
 
 
 class ValueNodeCommon:
@@ -11,8 +30,15 @@ class ValueNodeCommon:
         if node and node.outputs:
             self.value = node.outputs[0].default_value
         else:
-            self.value = 0
+            self.value = None
 
+@node_func(bl_idname="SvRxNodeFrameChange", cls_bases=(NodeFrameInfo,))
+def frame_change() -> (Int("Current"), Int("Frame Start"), Int("Frame End")):
+    scene = bpy.context.scene
+    current = scene.frame_current
+    start = scene.frame_start
+    end = scene.frame_end
+    return np.atleast_1d(current), np.atleast_1d(start), np.atleast_1d(end)
 
 @stateful
 class IntNode(ValueNodeCommon):

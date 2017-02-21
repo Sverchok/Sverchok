@@ -29,6 +29,11 @@ from svrx.core.execution import exec_node_group, DAG
 from svrx.util import bgl_callback
 
 
+def svrx_trees():
+    for ng in bpy.data.node_groups:
+        if ng.bl_idname == 'SvRxTree':
+            yield ng
+
 class SverchokReduxTree(bpy.types.NodeTree):
     """
     Sverchok Redux visual programming language
@@ -44,6 +49,9 @@ class SverchokReduxTree(bpy.types.NodeTree):
     do_timings_text = BoolProperty(default=False)
     do_timings_graphics = BoolProperty(default=False, update=turn_graphics_off)
 
+    rx_animate = BoolProperty(default=True,
+                              name="Animate",
+                              description="Execute layout upon frame change")
 
     def update(self):
         self.has_changed = True
@@ -55,6 +63,9 @@ class SverchokReduxTree(bpy.types.NodeTree):
         self.has_changed = False
         stop = time.perf_counter()
         print(self.name, "{:f}".format(stop-start))
+
+    def execute_animate(self):
+        exec_node_group(self)
 
     def update_list(self):
         return DAG(self)
