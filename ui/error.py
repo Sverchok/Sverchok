@@ -20,6 +20,7 @@ import svrx.util.bgl_callback as bgl_callback
 import bgl
 import blf
 import traceback
+import bpy
 
 
 def draw_rect(x=0, y=0, w=30, h=10):
@@ -57,15 +58,22 @@ def draw_text(x, y, args):
 def show(node, err):
     if node.bl_idname == "SvRxVirtualNode":
         return  # for now
+    ng_name = node.id_data.name
+    text = bpy.data.texts.get(ng_name + "_Error")
+    if not text:
+        text = bpy.data.texts.new(ng_name + "_Error")
+    text.clear()
 
     msg = traceback.format_exc()
     print(msg)
+    text.from_string(msg)
+
     msg = msg.splitlines()[-3:]
 
     x = node.location.x + node.width + 20
     y = node.location.y
     draw_data = {
-        'tree_name': node.id_data.name,
+        'tree_name': ng_name,
         'custom_function': draw_text,
         'loc': (x, y),
         'args': (msg,)
