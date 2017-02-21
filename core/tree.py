@@ -53,6 +53,10 @@ class SverchokReduxTree(bpy.types.NodeTree):
                               name="Animate",
                               description="Execute layout upon frame change")
 
+    rx_real_nodes = BoolProperty(default=False,
+                                 name="Explict conversion",
+                                 description="Create type conversion nodes")
+
     def update(self):
         self.has_changed = True
 

@@ -28,12 +28,17 @@ from svrx.nodes.node_base import Stateful
 import svrx.core.timings as timings
 from svrx.core.timings import add_time, time_func, start_timing, show_timings
 
+
 class SvTreeDB:
     """
     Data storage loookup for sockets
     """
     def __init__(self):
         self.data_trees = {}
+        self.links = {}
+
+    def set_links(self, ng, links):
+        self.links[ng.name] = links
 
     def print(self, ng):
         for link in ng.links:
@@ -41,6 +46,11 @@ class SvTreeDB:
 
     def get(self, socket):
         ng_id = socket.id_data.name
+        if not socket.is_output:
+            if ng_id in self.links:
+                return self.get(self.links[ng_id][socket])
+            else:
+                return self.get(socket.other)
 
         if ng_id not in self.data_trees:
             self.data_trees[ng_id] = {}
@@ -52,6 +62,7 @@ class SvTreeDB:
     def clean(self, ng):
         ng_id = ng.name
         self.data_trees[ng_id] = {}
+
 
 data_trees = SvTreeDB()
 
@@ -67,20 +78,26 @@ class VirtualNode:
         self.id_data = ng
         self.inputs = []
         for _, name, default in func.inputs_template:
-            self.inputs.append(VirtualSocket(self, name=name, default=default['default_value']))
+            self.inputs.append(VirtualSocket(self,
+                                             name=name,
+                                             default=default['default_value'],
+                                             output=False))
         self.outputs = [VirtualSocket(self) for _ in func.returns]
         self.name = "VNode<{}>".format(func.label)
 
     def compile(self):
         return self.func
 
+
 class VirtualLink:
     bl_idname = "SvRxVirtualLink"
+
     def __init__(self, from_socket, to_socket):
         self.from_socket = from_socket
         self.from_node = from_socket.node
         self.to_node = to_socket.node
         self.to_socket = to_socket
+        self.id_data = self.from_node.id_data
 
         if isinstance(from_socket, VirtualSocket):
             from_socket.is_linked = True
@@ -89,14 +106,16 @@ class VirtualLink:
             to_socket.is_linked = True
             to_socket.other = from_socket
 
+
 class VirtualSocket:
-    def __init__(self, node, name=None, default=None):
+    def __init__(self, node, name=None, default=None, output=True):
         self.name = name or "VirtualSocket"
         self.node = node
         self.id_data = node.id_data
         self.default_value = default
         self.is_linked = False
         self.required = False
+        self.is_output = output
 
 def topo_sort(links, starts):
     """
@@ -131,14 +150,20 @@ def filter_reroute(ng):
     return links
 
 
+def compile_nodes(links, nodes):
+    for link in links:
+        if link.from_node not in nodes:
+            nodes[link.from_node] = link.from_node.compile()
+        if link.to_node not in nodes:
+            nodes[link.to_node] = link.to_node.compile()
+
+
 def verify_links(links, nodes, socket_links, real_nodes=False):
     skip = set()
+
     for i in range(len(links)):
         l = links[i]
-        if l.from_node not in nodes:
-             nodes[l.from_node] = l.from_node.compile()
-        if l.to_node not in nodes:
-             nodes[l.to_node] = l.to_node.compile()
+
         to_func = nodes[l.to_node]
         from_func = nodes[l.from_node]
         from_type = from_func.returns[l.from_socket.index][0]
@@ -168,7 +193,6 @@ def verify_links(links, nodes, socket_links, real_nodes=False):
                     links.append(VirtualLink(l.from_socket, node.inputs[idx]))
                 links.append(VirtualLink(node.outputs[from_index], l.to_socket))
 
-
     real_links = collections.defaultdict(list)
 
     for idx, l in enumerate(links):
@@ -193,8 +217,8 @@ def DAG(ng, nodes, socket_links):
     # 3. wifi node replacement
 
     links = filter_reroute(ng)
-
-    real_links = verify_links(links, nodes, socket_links)
+    compile_nodes(links, nodes)
+    real_links = verify_links(links, nodes, socket_links, real_nodes=ng.rx_real_nodes)
 
     from_nodes = set(node for node in chain(*real_links.values()))
     starts = {node for node in real_links.keys() if node not in from_nodes}
@@ -259,8 +283,28 @@ def recurse_levels(f, in_levels, out_levels, in_trees, out_trees):
                 else:
                     outs.append(None)
 
-
             recurse_levels(f, in_levels, out_levels, args, outs)
+
+
+def collect_inputs(func, node):
+    in_trees = []
+    in_levels = []
+    for param, level, data_type in func.parameters:
+        in_levels.append(level)
+        #  int refers to socket index, str to a property name on the node
+        if isinstance(param, int):
+            socket = node.inputs[param]
+            if socket.is_linked:
+                tree = data_trees.get(socket)
+            elif socket.required:
+                print("Warning Required socket not connected", node.name)
+                tree = SvDataTree(socket)
+            else:
+                tree = SvDataTree(socket)
+        else:  # prop parameter
+            tree = SvDataTree(node=node, prop=param)
+        in_trees.append(tree)
+    return in_trees, in_levels
 
 
 def exec_node_group(node_group):
@@ -274,50 +318,33 @@ def exec_node_group(node_group):
     add_time(node_group.name)
     add_time("DAG")
     dag_list = DAG(node_group, nodes, socket_links)
+    data_trees.set_links(node_group, socket_links)
     add_time("DAG")
     for node in dag_list:
 
         func = nodes[node]
-
-        add_time(node.bl_idname +": " + node.name)
+        add_time(node.bl_idname + ": " + node.name)
 
         if isinstance(func, Stateful):
             add_time(func.label)
             func.start()
             add_time(func.label)
 
+        in_trees, in_levels = collect_inputs(func, node)
+
         out_trees = []
-        in_trees = []
-        in_levels = []
-
-        for param, level, data_type in func.parameters:
-            in_levels.append(level)
-            #  int refers to socket index, str to a property name on the node
-            if isinstance(param, int):
-                socket = node.inputs[param]
-                if socket.is_linked:
-                    other = socket_links[socket]
-                    tree = data_trees.get(other)
-                elif socket.required:
-                    print("Warning Required socket not connected", node.name)
-                    tree = SvDataTree(socket)
-                else:
-                    tree = SvDataTree(socket)
-            else:  # prop parameter
-                tree = SvDataTree(node=node, prop=param)
-            in_trees.append(tree)
-
         for socket in node.outputs:
             if socket.is_linked:
                 out_trees.append(data_trees.get(socket))
             else:
                 out_trees.append(None)
-        out_levels =  [l for _, l in func.returns]
+
+        out_levels = [l for _, l in func.returns]
 
         if do_timings:
-            recurse_levels(time_func(func), in_levels , out_levels, in_trees, out_trees)
+            recurse_levels(time_func(func), in_levels, out_levels, in_trees, out_trees)
         else:
-            recurse_levels(func, in_levels , out_levels, in_trees, out_trees)
+            recurse_levels(func, in_levels, out_levels, in_trees, out_trees)
 
         if isinstance(func, Stateful):
             add_time(func.label)
@@ -327,7 +354,7 @@ def exec_node_group(node_group):
         for ot in out_trees:
             if ot:
                 ot.set_level()
-        add_time(node.bl_idname +": " + node.name)
+        add_time(node.bl_idname + ": " + node.name)
     add_time(node_group.name)
 
     if do_timings:

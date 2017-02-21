@@ -43,6 +43,8 @@ class SvRxPanelDebug(bpy.types.Panel):
         layout.label("Timings")
         layout.prop(ng, "do_timings_text")
         layout.prop(ng, "do_timings_graphics")
+        layout.label("Options")
+        layout.prop(ng, "rx_real_nodes")
 
 
 class SvRxPanelControl(bpy.types.Panel):
