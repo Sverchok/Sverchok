@@ -10,6 +10,7 @@ from svrx.nodes.classes import MultiInputNode
 
 from svrx.util.function import make_compatible
 
+
 @node_func(bl_idname="SvRxNodeListJoin")
 def join(data: [Anytype] = None) -> Anytype("Data"):
     return np.concatenate(data)
@@ -19,10 +20,10 @@ def join(data: [Anytype] = None) -> Anytype("Data"):
 class MergeNode(MultiInputNode):
     socket_type = bpy.props.StringProperty(default=Vertices.bl_idname)
     socket_base_name = bpy.props.StringProperty(default="Vert data {}")
-"""
-#@node_func(bl_idname="SvRxNodeListMerge", cls_bases = (MergeNode,))
-#def merge(*vert_data: Vertices) -> Vertices:
+@node_func(bl_idname="SvRxNodeListMerge", cls_bases = (MergeNode,))
+def merge(*vert_data: Vertices) -> Vertices:
 #    return np.concatenate(vert_data)
+"""
 
 
 @node_func(bl_idname="SvRxNodeListMerge")
@@ -40,7 +41,5 @@ def merge(a: Vertices = None,
         out[::2] = a
         out[1::2] = b
         return out
-
-
     else:
         return np.concatenate((a, b))

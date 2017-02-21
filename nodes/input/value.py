@@ -32,6 +32,7 @@ class ValueNodeCommon:
         else:
             self.value = None
 
+
 @node_func(bl_idname="SvRxNodeFrameChange", cls_bases=(NodeFrameInfo,))
 def frame_change() -> (Int("Current"), Int("Frame Start"), Int("Frame End")):
     scene = bpy.context.scene
@@ -39,6 +40,7 @@ def frame_change() -> (Int("Current"), Int("Frame Start"), Int("Frame End")):
     start = scene.frame_start
     end = scene.frame_end
     return np.atleast_1d(current), np.atleast_1d(start), np.atleast_1d(end)
+
 
 @stateful
 class IntNode(ValueNodeCommon):
@@ -48,6 +50,7 @@ class IntNode(ValueNodeCommon):
     def __call__(self) -> IntValue("i"):
         return np.array([self.value])
 
+
 @stateful
 class FloatNode(ValueNodeCommon):
     bl_idname = "SvRxNodeFloatValue"
@@ -56,13 +59,15 @@ class FloatNode(ValueNodeCommon):
     def __call__(self) -> FloatValue("f"):
         return np.array([self.value])
 
+
 @stateful
 class PointValue(ValueNodeCommon):
     bl_idname = "SvRxNodePointValue"
     label = "Point input"
 
     def __call__(self) -> PointValue("p"):
-        return np.array([self.value])
+        return np.array(self.value)
+
 
 @stateful
 class ColorValue(ValueNodeCommon):
@@ -70,7 +75,7 @@ class ColorValue(ValueNodeCommon):
     label = "Color input"
 
     def __call__(self) -> ColorValue("c"):
-        return np.array([self.value])
+        return np.array(self.value)
 
 
 @stateful

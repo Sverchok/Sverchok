@@ -21,6 +21,7 @@
 import bpy
 from svrx.core.tree import svrx_trees
 
+
 class SvRxPanelDebug(bpy.types.Panel):
     bl_idname = "SvRxPanelDebug"
     bl_label = "SvRx Debug"

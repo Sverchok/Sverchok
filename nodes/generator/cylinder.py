@@ -17,33 +17,34 @@ def cylinder(r_top: Float = 1.0,
              rings: Int = 10,
              caps: BoolP = False) -> ([Vertices], [Edges], [Faces]):
     z = np.zeros((rings, 4))
-    z[:,2] = np.linspace(0, h, rings)
+    z[:, 2] = np.linspace(0, h, rings)
     scale = np.linspace(r_bot, r_top, rings)
     t = np.linspace(0, np.pi * 2 * (verts - 1 / verts), verts)
     circle = np.array([np.cos(t), np.sin(t), np.zeros(verts), np.ones(verts)]).T
     cylinder = np.empty((rings, verts, 4))
     cylinder[:] = z[:, np.newaxis, :] + circle
-    cylinder[:,:,:2] *= scale[:,np.newaxis,np.newaxis]
+    cylinder[:, :, :2] *= scale[:, np.newaxis, np.newaxis]
     cylinder.shape = (-1, 4)
     return cylinder, cylinder_edges(rings, verts), cylinder_faces(rings, verts, caps)
 
+
 @node_func(id=1, label="Scale control")
 @generator
-def cylinder(scale: Float(iterable=False) = 1.0,
+def cylinder(xy_scale: Float(iterable=False) = 1.0,
              z_scale: Float(iterable=False) = 1.0,
              verts: Int = 20,
              rings: Int = 10,
              caps: BoolP = False) -> ([Vertices], [Edges], [Faces]):
     z = np.zeros((rings, 4))
     if len(z_scale) == 1:
-        z[:,2] = np.linspace(0, z_scale[0] * rings, rings)
+        z[:, 2] = np.linspace(0, z_scale[0] * rings, rings)
     else:
-        z[:,2] = array_as(z_scale, (rings,))
-    scale = array_as(scale, (rings,))
+        z[:, 2] = array_as(z_scale, (rings,))
+    xy_scale = array_as(xy_scale, (rings,))
     t = np.linspace(0, np.pi * 2 * (verts - 1 / verts), verts)
     circle = np.array([np.cos(t), np.sin(t), np.zeros(verts), np.ones(verts)]).T
     cylinder = np.empty((rings, verts, 4))
     cylinder[:] = z[:, np.newaxis, :] + circle
-    cylinder[:,:,:2] *= scale[:,np.newaxis,np.newaxis]
+    cylinder[:, :, :2] *= xy_scale[:, np.newaxis, np.newaxis]
     cylinder.shape = (-1, 4)
     return cylinder, cylinder_edges(rings, verts), cylinder_faces(rings, verts, caps)
