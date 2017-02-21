@@ -60,10 +60,10 @@ def show(node, err):
 
     msg = traceback.format_exc()
     print(msg)
-    msg = msg.splitlines()
+    msg = msg.splitlines()[-3:]
 
-    x = node.location.x + node.width
-    y = node.location.y + 100
+    x = node.location.x + node.width + 20
+    y = node.location.y
     draw_data = {
         'tree_name': node.id_data.name,
         'custom_function': draw_text,
