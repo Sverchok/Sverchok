@@ -27,6 +27,7 @@ from svrx.nodes.node_base import Stateful
 
 import svrx.core.timings as timings
 from svrx.core.timings import add_time, time_func, start_timing, show_timings
+import svrx.ui.error as error
 
 
 class SvTreeDB:
@@ -311,6 +312,7 @@ def collect_inputs(func, node):
 
 def exec_node_group(node_group):
     data_trees.clean(node_group)
+    error.clear(node_group)
     nodes = {}
     socket_links = {}
     do_timings = node_group.do_timings_text or node_group.do_timings_graphics
@@ -322,42 +324,45 @@ def exec_node_group(node_group):
     dag_list = DAG(node_group, nodes, socket_links)
     data_trees.set_links(node_group, socket_links)
     add_time("DAG")
-    for node in dag_list:
+    try:
+        for node in dag_list:
 
-        func = nodes[node]
-        add_time(node.bl_idname + ": " + node.name)
+            func = nodes[node]
+            add_time(node.bl_idname + ": " + node.name)
 
-        if isinstance(func, Stateful):
-            add_time(func.label)
-            func.start()
-            add_time(func.label)
+            if isinstance(func, Stateful):
+                add_time(func.label)
+                func.start()
+                add_time(func.label)
 
-        in_trees, in_levels = collect_inputs(func, node)
+            in_trees, in_levels = collect_inputs(func, node)
 
-        out_trees = []
-        for socket in node.outputs:
-            if socket.is_linked:
-                out_trees.append(data_trees.get(socket))
+            out_trees = []
+            for socket in node.outputs:
+                if socket.is_linked:
+                    out_trees.append(data_trees.get(socket))
+                else:
+                    out_trees.append(None)
+
+            out_levels = [l for _, l in func.returns]
+
+            if do_timings:
+                recurse_levels(time_func(func), in_levels, out_levels, in_trees, out_trees)
             else:
-                out_trees.append(None)
+                recurse_levels(func, in_levels, out_levels, in_trees, out_trees)
 
-        out_levels = [l for _, l in func.returns]
+            if isinstance(func, Stateful):
+                add_time(func.label)
+                func.stop()
+                add_time(func.label)
+
+            for ot in out_trees:
+                if ot:
+                    ot.set_level()
+            add_time(node.bl_idname + ": " + node.name)
+        add_time(node_group.name)
 
         if do_timings:
-            recurse_levels(time_func(func), in_levels, out_levels, in_trees, out_trees)
-        else:
-            recurse_levels(func, in_levels, out_levels, in_trees, out_trees)
-
-        if isinstance(func, Stateful):
-            add_time(func.label)
-            func.stop()
-            add_time(func.label)
-
-        for ot in out_trees:
-            if ot:
-                ot.set_level()
-        add_time(node.bl_idname + ": " + node.name)
-    add_time(node_group.name)
-
-    if do_timings:
-        show_timings(node_group)
+            show_timings(node_group)
+    except Exception as err:
+        error.show(node, err)

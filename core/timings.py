@@ -77,7 +77,7 @@ def show_timings_graphics(ng):
             nodes.append((name, node_start, t))
         else:
             res[current_node].append((name, t))
-        name, t  = next(t_iter)
+        name, t = next(t_iter)
     stop_time = t
 
     node_boxes = []
