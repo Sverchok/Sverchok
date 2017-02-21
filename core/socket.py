@@ -58,6 +58,7 @@ def get_other_socket(socket):
 class SocketBase:
     default_value = None
     color = (1, 0, 0, 1)  # red to show unset colors
+    error_color = (1, 0, 0, 1)
     required = BoolProperty(default=False)
 
     def draw(self, context, layout, node, text):
@@ -72,6 +73,8 @@ class SocketBase:
             layout.label(text)
 
     def draw_color(self, context, node):
+        if self.required and not self.is_linked:
+            return self.error_color
         return self.color
 
 

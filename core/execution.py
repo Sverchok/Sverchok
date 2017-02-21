@@ -117,6 +117,7 @@ class VirtualSocket:
         self.required = False
         self.is_output = output
 
+
 def topo_sort(links, starts):
     """
     links = {node: [node0, node1, ..., nodeN]}
@@ -298,7 +299,8 @@ def collect_inputs(func, node):
                 tree = data_trees.get(socket)
             elif socket.required:
                 print("Warning Required socket not connected", node.name)
-                tree = SvDataTree(socket)
+                msg = "Required socket not connected {}: {}".format(node.name, socket.name)
+                raise SyntaxError(msg)
             else:
                 tree = SvDataTree(socket)
         else:  # prop parameter
