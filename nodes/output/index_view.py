@@ -124,17 +124,15 @@ class SvRxIndexView():
     properties = {
         'activate': BoolP(name='activate', default=True),
         'draw_bg': BoolP(name='draw bg', default=False),
-        "vert_idx_color", 
-        "edge_idx_color", 
-        "face_idx_color",
-        "vert_bg_color", 
-        "edge_bg_color", 
-        "face_bg_color",
+        "vert_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., 1., 1., 1.), subtype='COLOR'),
+        "edge_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., 1., .1, 1.), subtype='COLOR'),
+        "face_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., .8, .8, 1.), subtype='COLOR'),
+        "vert_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "edge_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "face_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
         "display_vert_index": BoolP(name='show_verts', default=True), 
         "display_edge_index": BoolP(name='show_edges', default=True),
         "display_face_index": BoolP(name='show_faces', default=True)
-
-
     }
 
     def __init__(self, node=None):
@@ -149,7 +147,8 @@ class SvRxIndexView():
         params = [
            "vert_idx_color", "edge_idx_color", "face_idx_color",
            "vert_bg_color", "edge_bg_color", "face_bg_color",
-           "display_vert_index", "display_edge_index", "display_face_index"
+           "display_vert_index", "display_edge_index", "display_face_index",
+           "draw_bg"
         ]
 
         fx = namedtuple('fx', params)
