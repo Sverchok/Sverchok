@@ -81,7 +81,6 @@ def draw_index_viz(context, args):
     region_mid_width = region.width / 2.0
     region_mid_height = region.height / 2.0
 
-
     def draw_index(rgb, rgb2, index, vec):
 
         vec_4d = perspective_matrix * vec.to_4d()
@@ -127,19 +126,20 @@ def draw_index_viz(context, args):
             for idx, v in enumerate(final_verts):
                 draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
 
-        # if bm.edges and fx.display_edge_index:
-        #     for edge_index, (idx1, idx2) in enumerate(e.vertices for e in bm.edges):
-                
-        #          v1 = Vector(final_verts[idx1])
-        #          v2 = Vector(final_verts[idx2])
-        #          loc = v1 + ((v2 - v1) / 2)
-        #          draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
+        if bm.edges and fx.display_edge_index:
+            # some lookup could be avoided by testing if matrix, then e.verts[0 and 1].co
+            for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
+                v1 = final_verts[idx1].co
+                v2 = final_verts[idx2].co
+                loc = v1 + ((v2 - v1) / 2)
+                draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
-        # if bm.faces and fx.display_face_index:
-        #     for face_index, f in enumerate(data_faces[obj_index]):
-        #         verts = [Vector(final_verts[idx]) for idx in f]
-        #         median = calc_median(verts)
-        #         draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
+        if bm.faces and fx.display_face_index:
+            for face_index, f in enumerate(bm.faces):
+                # verts = [Vector(final_verts[idx]) for idx in f]
+                # median = calc_median(verts)
+                median = f.calc_center_median()
+                draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 
