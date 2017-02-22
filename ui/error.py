@@ -50,8 +50,8 @@ def draw_text(x, y, args):
     lines = args[0]
     w, h = args[1]
     max_len = args[2]
-
-    draw_frame(x - 5, y + 5, w + 10, h + 40, 10)
+    #  disable reed frame for now
+    #  draw_frame(x - 5, y + 5, w + 10, h + 40, 10)
     x, y = int(x), int(y)
     color = (0.9, 0.9, 0.9)
     font_id = 0
