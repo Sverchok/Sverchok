@@ -21,6 +21,7 @@ import bgl
 import blf
 import traceback
 import bpy
+import sys
 
 
 def draw_rect(x=0, y=0, w=30, h=10):
@@ -65,10 +66,21 @@ def show(node, err):
     text.clear()
 
     msg = traceback.format_exc()
-    print(msg)
+    print(msg, file=sys.stderr)
     text.from_string(msg)
+    print(err)
 
-    msg = msg.splitlines()[-3:]
+    msg = [str(err)]
+    frames = traceback.extract_tb(err.__traceback__)
+    for info in reversed(frames):
+        file = info[0].lower()
+        loc = file.find("svrx")
+        if loc == -1:
+            loc = file.find("bpy.data.texts")
+        if loc > -1:
+            msg.append("@ -> {}".format(info[3]))
+            msg.append("{}:{} in {}".format(file[loc:], *info[1:3]))
+            break
 
     x = node.location.x + node.width + 20
     y = node.location.y
