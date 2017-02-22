@@ -15,4 +15,4 @@ def range(start: Int = 0, step: Int = 1, stop: Int = 10) -> [Int]:
 
 @node_func(id=1)
 def count(start: Int = 0, step: Int = 1, count: Int = 10) -> [Int]:
-    return np.arange(start, step, count)
+    return np.arange(start, count*step, step)
