@@ -80,9 +80,9 @@ if reload_event:
     print("SvRx reloading")
     # modules that needs to be loaded in order
     # for changes in these modules restart
-    
+
     prio_list = ['svrx.nodes.classes', 'svrx.nodes.node_base', 'svrx.typing']
-    prio_list.extend([key for key in imported_modules.keys() if key.startswith("svrx.core")])
+    #prio_list.extend([key for key in imported_modules.keys() if key.startswith("svrx.core")])
 
     for key, im in imported_modules.items():
         if key in prio_list:
