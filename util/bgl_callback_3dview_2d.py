@@ -79,7 +79,7 @@ def restore_opengl_defaults():
 def draw_callback_px(n_id, data):
     context = bpy.context
     drawing_func = data.get('custom_function')   # must accept 'context' first
-    args = data.get('args', (None,))
+    args = data.get('args', (None,))             # args does not need to be a tuple.
     drawing_func(context, args)
     restore_opengl_defaults()
 
