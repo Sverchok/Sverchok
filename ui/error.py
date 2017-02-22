@@ -35,8 +35,23 @@ def draw_rect(x=0, y=0, w=30, h=10):
     bgl.glEnd()
 
 
+def draw_frame(x, y, w, h, t):
+    coord = [(x, y), (x - t, y + t), (x + w, y), (x + w + t, y + t),
+             (x + w, y - h), (x + w + t, y - t - h), (x, y - h), (x - t, y - h - t)]
+    bgl.glColor3f(1, 0, 0)
+
+    bgl.glBegin(bgl.GL_TRIANGLE_STRIP)
+    for i in range(10):
+        bgl.glVertex2f(*coord[i % 8])
+    bgl.glEnd()
+
+
 def draw_text(x, y, args):
     lines = args[0]
+    w, h = args[1]
+    max_len = args[2]
+    #  disable reed frame for now
+    #  draw_frame(x - 5, y + 5, w + 10, h + 40, 10)
     x, y = int(x), int(y)
     color = (0.9, 0.9, 0.9)
     font_id = 0
@@ -49,46 +64,64 @@ def draw_text(x, y, args):
     blf.size(font_id, int(text_height), 72)
     bgl.glColor3f(*color)
     ypos = y
-    h = 1.3 * line_height * len(lines)
+    xpos = x + w + 30
+    h = 1.3 * line_height * (len(lines) + 1)
+    bgl.glColor3f(0.2,  0.2, 0.2)
+    draw_rect(xpos, ypos + 1.5 * line_height, max_len * 8, h)
+    bgl.glColor3f(*color)
     for line in lines:
-        blf.position(0, x, ypos, 0)
+        blf.position(0, xpos, ypos, 0)
         blf.draw(font_id, line)
         ypos -= int(line_height * 1.3)
 
 
-def show(node, err):
+def show(node, err, script=False):
     if node.bl_idname == "SvRxVirtualNode":
         return  # for now
     ng_name = node.id_data.name
+    bgl_callback.callback_disable("error:" + ng_name)
+
     text = bpy.data.texts.get(ng_name + "_Error")
     if not text:
         text = bpy.data.texts.new(ng_name + "_Error")
     text.clear()
-
     msg = traceback.format_exc()
     print(msg, file=sys.stderr)
     text.from_string(msg)
-    print(err)
 
-    msg = [str(err)]
     frames = traceback.extract_tb(err.__traceback__)
-    for info in reversed(frames):
-        file = info[0].lower()
-        loc = file.find("svrx")
-        if loc == -1:
-            loc = file.find("bpy.data.texts")
-        if loc > -1:
-            msg.append("@ -> {}".format(info[3]))
-            msg.append("{}:{} in {}".format(file[loc:], *info[1:3]))
-            break
+    if isinstance(err, SyntaxError):
+        lines = ["SyntaxError"]
+        lines.append("@ -> {}".format(err.text))
+        lines.append("{}:{}".format(err.filename, err.lineno))
+    else:
+        lines = [str(type(err).__name__) + " " + str(err)]
 
-    x = node.location.x + node.width + 20
+        for info in reversed(frames):
+            print(info)
+            file = info[0].lower()
+
+            if not script:
+                loc = file.find("svrx")
+                if loc == -1:
+                    loc = file.find("bpy.data")
+            else:
+                loc = file.find("bpy.data")
+                print(loc, file, *info)
+
+            if loc > -1:
+                lines.append("@ -> {}".format(info[3]))
+                lines.append("{}:{} in {}".format(file[loc:], *info[1:3]))
+                break
+
+    x = node.location.x
     y = node.location.y
+    max_len = max(map(len, lines))
     draw_data = {
         'tree_name': ng_name,
         'custom_function': draw_text,
         'loc': (x, y),
-        'args': (msg,)
+        'args': (lines, (node.width, node.height), max_len)
     }
 
     bgl_callback.callback_enable("error:" + node.id_data.name, draw_data)

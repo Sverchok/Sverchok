@@ -25,8 +25,10 @@ class SvRxBaseType:
 # Types aren't actually concrete types, they are just for
 # auto generating nodes based on introspection
 
-Required = object()
+# specal value kept
 
+class Required:
+    pass
 
 class Anytype(SvRxBaseType):
     bl_idname = "SvRxAnySocket"

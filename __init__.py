@@ -65,7 +65,6 @@ def import_submodules(package, recursive=True):
         package = importlib.import_module(package)
     results = {}
     for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
-        #print(name)
         full_name = package.__name__ + '.' + name
         results[full_name] = importlib.import_module(full_name)
         if recursive and is_pkg:
@@ -77,9 +76,17 @@ imported_modules = import_submodules('svrx')
 
 reload_event = bool("bpy" in locals())
 
-if reload_event and False:
+if reload_event:
     print("SvRx reloading")
-    for im in imported_modules.values():
+    # modules that needs to be loaded in order
+    # for changes in these modules restart
+
+    prio_list = ['svrx.nodes.classes', 'svrx.nodes.node_base', 'svrx.typing']
+    #prio_list.extend([key for key in imported_modules.keys() if key.startswith("svrx.core")])
+
+    for key, im in imported_modules.items():
+        if key in prio_list:
+            continue
         importlib.reload(im)
 
 # this is used as a marker for reload

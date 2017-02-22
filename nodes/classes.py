@@ -3,8 +3,10 @@ import time
 import bpy
 from bpy.props import EnumProperty, StringProperty
 
+
 import importlib
 from svrx.util.importers import get_sn_template_path, text_remap
+from svrx.ui import error
 
 _node_funcs = {}
 
@@ -41,7 +43,6 @@ class NodeBase:
             return
         self.adjust_inputs(func.inputs_template)
         self.adjust_outputs(func.outputs_template)
-
 
     def adjust_inputs(self, template):
         inputs_template = template
@@ -81,7 +82,6 @@ class NodeBase:
 
 
 class MultiInputNode(NodeBase):
-
 
     def compile(self):
         count = max(len(self.inputs), 2)
@@ -155,6 +155,7 @@ class NodeStateful(NodeBase):
 
 _multi_storage = {}
 
+
 class NodeDynSignature(NodeBase):
 
     @staticmethod
@@ -167,9 +168,12 @@ class NodeDynSignature(NodeBase):
         NodeDynSignature.last_bl_idname = func.bl_idname
 
     @staticmethod
+    def get_last():
+        return NodeDynSignature.last_bl_idname
+
+    @staticmethod
     def get_multi(func):
         return _multi_storage[func.bl_idname]
-
 
     def compile(self):
         func_dict, _ = _multi_storage[self.bl_idname]
@@ -196,8 +200,9 @@ socket_types = [
 class NodeMathBase(NodeDynSignature):
 
     first_input = EnumProperty(items=socket_types,
-                              default="default",
-                              update=NodeDynSignature.update_mode)
+                               default="default",
+                               update=NodeDynSignature.update_mode)
+
     second_input = EnumProperty(items=socket_types,
                                 default="default",
                                 update=NodeDynSignature.update_mode)
@@ -294,11 +299,15 @@ class NodeScript(NodeBase):
                 self.text_file = ''
                 return
             text = text_remap(self.text_file)
-            mod = importlib.import_module("svrx.nodes.script.{}".format(text))
-            importlib.reload(mod)
-            self.adjust_sockets()
-            self.color = READY_COLOR
-            self.use_custom_color = True
+            try:
+                mod = importlib.import_module("svrx.nodes.script.{}".format(text))
+                importlib.reload(mod)
+            except Exception as err:
+                error.show(self, err, script=True)
+            else:
+                self.adjust_sockets()
+                self.color = READY_COLOR
+                self.use_custom_color = True
         else:
             pass #  fail
 
@@ -363,10 +372,15 @@ def register():
         bpy.utils.register_class(cls.node_cls)
 
 
-
 def unregister():
+
     for func in _node_funcs.values():
         bpy.utils.unregister_class(func.cls)
 
     for cls in _node_classes.values():
         bpy.utils.unregister_class(cls.node_cls)
+
+    _multi_storage.clear()
+    _node_funcs.clear()
+    _node_classes.clear()
+    _node_scripts.clear()

@@ -63,5 +63,5 @@ def register():
 
 def unregister():
     bpy.app.handlers.scene_update_pre.remove(sv_main_handler)
-    bpy.app.handlers.load_post.append.remove(sv_file_load)
+    bpy.app.handlers.load_post.remove(sv_file_load)
     bpy.app.handlers.frame_change_pre.remove(frame_change)
