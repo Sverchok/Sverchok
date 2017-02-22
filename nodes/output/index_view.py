@@ -10,11 +10,15 @@ from svrx.typing import Required, StringP, Anytype, BoolP, VectorP, BMesh, Matri
 from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 # pylint: disable=C0326
-
+# pylint: disable=C0330
 
 def draw_indexviz(context, args):
 
-    draw_verts, draw_edges, draw_faces, draw_matrix = args.data
+    fx = args.fx
+
+    args.data.bms
+    
+    draw_verts, draw_edges, draw_faces, draw_matrix = 
 
     # ensure data or empty lists.
     data_vector = Vector_generate(draw_verts) if draw_verts else []
@@ -26,7 +30,6 @@ def draw_indexviz(context, args):
     if (data_vector, data_matrix) == (0, 0):
         return
 
-    fx = args.fx
     region = context.region
     region3d = context.space_data.region_3d
 
@@ -169,6 +172,10 @@ class SvRxIndexView():
             self.activate = node.activate
             self.n_id = node.node_id
 
+    def start(self):
+        self.bms = []
+        self.mats = []
+
 
     @property
     def get_fx(self):
@@ -176,8 +183,7 @@ class SvRxIndexView():
            "vert_idx_color", "edge_idx_color", "face_idx_color",
            "vert_bg_color", "edge_bg_color", "face_bg_color",
            "display_vert_index", "display_edge_index", "display_face_index",
-           "draw_bg"
-        ]
+           "draw_bg"]
 
         fx = namedtuple('fx', params)
         for param_name in params:
@@ -191,7 +197,7 @@ class SvRxIndexView():
 
     @property
     def get_data(self):
-        return 
+        return self.bms, self.mats
 
 
     @property
@@ -206,12 +212,11 @@ class SvRxIndexView():
 
 
     def stop(self):
-        print(self.bm)
         bgl_callback.callback_disable(self.n_id)
         if self.activate:
             bgl_callback.callback_enable(self.n_id, self.current_draw_data)
 
 
     def __call__(self, bm: BMesh = Required, matrix: Matrix = None):
-        self.bm.append(bmx)
+        self.bms.append(bm)
         self.mats.append(matrix)
