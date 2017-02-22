@@ -124,12 +124,12 @@ class SvRxIndexView():
     properties = {
         'activate': BoolP(name='activate', default=True),
         'draw_bg': BoolP(name='draw bg', default=False),
-        "vert_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., 1., 1., 1.), subtype='COLOR'),
-        "edge_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., 1., .1, 1.), subtype='COLOR'),
-        "face_idx_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(1., .8, .8, 1.), subtype='COLOR'),
-        "vert_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
-        "edge_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
-        "face_bg_color": FloatVectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "vert_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., 1., 1., 1.), subtype='COLOR'),
+        "edge_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., 1., .1, 1.), subtype='COLOR'),
+        "face_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., .8, .8, 1.), subtype='COLOR'),
+        "vert_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "edge_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "face_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
         "display_vert_index": BoolP(name='show_verts', default=True), 
         "display_edge_index": BoolP(name='show_edges', default=True),
         "display_face_index": BoolP(name='show_faces', default=True)
@@ -178,10 +178,11 @@ class SvRxIndexView():
 
 
     def stop(self):
+        print(self.bm)
         bgl_callback.callback_disable(self.n_id)
         if self.activate:
             bgl_callback.callback_enable(self.n_id, self.current_draw_data)
 
 
-    def __call__(self, data: Anytype = Required):
+    def __call__(self, bm: BMesh = Required):
         pass
