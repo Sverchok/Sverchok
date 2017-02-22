@@ -1,3 +1,4 @@
+import math
 from collections import namedtuple
 
 import bgl
@@ -13,6 +14,56 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 # pylint: disable=C0326
 # pylint: disable=C0330
+
+point_dict = {}
+
+def adjust_list(in_list, x, y):
+    return [[old_x + x, old_y + y] for (old_x, old_y) in in_list]
+
+
+def generate_points(width, height):
+    amp = 5  # radius fillet
+
+    width += 2
+    height += 4
+    width = ((width/2) - amp) + 2
+    height -= (2*amp)
+
+    pos_list, final_list = [], []
+
+    n_points = 12
+    seg_angle = 2 * math.pi / n_points
+    for i in range(n_points + 1):
+        angle = i * seg_angle
+        x = math.cos(angle) * amp
+        y = math.sin(angle) * amp
+        pos_list.append([x, -y])
+
+    w_list, h_list = [1, -1, -1, 1], [-1, -1, 1, 1]
+    slice_list = [[i, i+4] for i in range(0, n_points, 3)]
+
+    for idx, (start, end) in enumerate(slice_list):
+        point_array = pos_list[start:end]
+        w = width * w_list[idx]
+        h = height * h_list[idx]
+        final_list += adjust_list(point_array, w, h)
+
+    return final_list
+
+
+def get_points(index):
+    '''
+    index:   string representation of the index number
+    returns: rounded rect point_list used for background.
+    the neat thing about this is if a width has been calculated once, it
+    is stored in a dict and used if another polygon is saught with that width.
+    '''
+    width, height = blf.dimensions(0, index)
+    if not (width in point_dict):
+        point_dict[width] = generate_points(width, height)
+
+    return point_dict[width]
+
 
 def draw_index_viz(context, args):
 
@@ -74,7 +125,7 @@ def draw_index_viz(context, args):
 
         if fx.display_vert_index:
             for idx, v in enumerate(final_verts):
-                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
+                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
 
         # if bm.edges and fx.display_edge_index:
         #     for edge_index, (idx1, idx2) in enumerate(e.vertices for e in bm.edges):
@@ -182,7 +233,10 @@ class SvRxIndexView():
 
     @property
     def get_data(self):
-        return self.bms, self.mats
+        d = lambda: None
+        d.bms = self.bms
+        d.mats = self.mats
+        return d
 
 
     @property
