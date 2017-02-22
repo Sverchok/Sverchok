@@ -109,7 +109,7 @@ def get_signature(func):
         if isinstance(annotation, SvRxBaseType):  # Socket type parameter
             if parameter.default is None:
                 socket_settings = None
-            elif parameter.default is Required:
+            elif isinstance(parameter.default, type) and issubclass(parameter.default, Required):
                 socket_settings = {'required': True}
             else:
                 socket_settings = {'default_value': parameter.default}
@@ -165,7 +165,6 @@ def parse_type(s_type, level=0):
         return s_type, 0
 
 
-
 class Stateful:
     cls_bases = (NodeStateful,)
 
@@ -174,6 +173,7 @@ class Stateful:
 
     def stop(self):
         pass
+
 
 def stateful(cls):
     """
@@ -223,7 +223,7 @@ def node_func(**values):
         if hasattr(func, 'id'):
             # has Dynamic Signature
             if not hasattr(func, 'bl_idname'):
-                func.bl_idname = NodeDynSignature.last_bl_idname
+                func.bl_idname = NodeDynSignature.get_last()
             NodeDynSignature.add_multi(func)
             func_ref = NodeBase.get_func(func.bl_idname)
             if func_ref:
@@ -231,6 +231,7 @@ def node_func(**values):
                 return func
             elif not hasattr(func, "cls_bases"):
                 func.cls_bases = (NodeDynSignature,)
+
         class_factory(func)
         NodeBase.add_func(func)
         module_name = func.__module__.split(".")[-2]
