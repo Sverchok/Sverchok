@@ -14,7 +14,7 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 # pylint: disable=C0326
 # pylint: disable=C0330
 
-def draw_indexviz(context, args):
+def draw_index_viz(context, args):
 
     fx = args.fx
     region = context.region
@@ -187,7 +187,7 @@ class SvRxIndexView():
 
     @property
     def current_draw_data(self):
-        args = lambda: None
+        args = namedtuple('args', ['fx', 'data'])
         args.fx = self.get_fx
         args.data = self.get_data
         return {
