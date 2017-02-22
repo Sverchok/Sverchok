@@ -122,7 +122,7 @@ def draw_index_viz(context, args):
         final_verts = bm.verts
 
         """
-        preprocessing the vertex coordinates incase a matrix is passed. This makes
+        preprocessing the vertex coordinates if a matrix is passed. This makes
         the following routine a bit duplicitous, but acceptable for now.
 
         """
