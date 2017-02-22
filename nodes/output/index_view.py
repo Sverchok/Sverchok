@@ -153,6 +153,7 @@ def draw_index_viz(context, args):
                     loc = v1 + ((v2 - v1) / 2)
                     draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
+        # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
         if bm.faces and fx.display_face_index:
             if matrix is None:
                 for face_index, f in enumerate(bm.faces):
