@@ -21,6 +21,7 @@ import bpy
 from bpy.app.handlers import persistent
 
 from svrx.core.tree import svrx_trees
+from svrx.util import bgl_callback, bgl_callback_3dview_2d
 
 
 @persistent
@@ -38,6 +39,10 @@ def sv_file_load(scene):
     To make sure nodes follow signature on node changes
     NOT READY TO BE USED DUE TO ADJUST SOCKETS BUGS
     """
+
+    bgl_callback.callback_disable_all()
+    bgl_callback_3dview_2d.callback_disable_all()
+
     for ng in svrx_trees():
         for node in ng.nodes:
             if node.bl_idname == "SvRxNodeScript":
