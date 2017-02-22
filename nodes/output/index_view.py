@@ -7,6 +7,9 @@ import blf
 import bpy
 import bmesh
 import time
+
+from mathutils import Matrix as bMatrix
+
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
 from svrx.typing import Required, StringP, Anytype, BoolP, VectorP, BMesh, Matrix
@@ -118,13 +121,14 @@ def draw_index_viz(context, args):
         final_verts = bm.verts
 
         # quickly apply matrix if necessary
-        if matrix:  # and not matrix_close_to_identity(matrix)
+        if not matrix is None:  # and not matrix_close_to_identity(matrix)
             # bmesh.ops.transform(bm, matrix, space, verts)   ??...but make copy first.. so bad idea
-            final_verts = [matrix * v.co for v in bm.verts]
+            bmat = bMatrix(matrix)
+            final_verts = [bmat * v.co for v in bm.verts]    
 
         if fx.display_vert_index:
             for idx, v in enumerate(final_verts):
-                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
+                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)   # will fail if matrix is supplied, because finalverts will be .co already
 
         if bm.edges and fx.display_edge_index:
             # some lookup could be avoided by testing if matrix, then e.verts[0 and 1].co
