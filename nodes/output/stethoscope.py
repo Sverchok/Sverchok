@@ -53,7 +53,6 @@ class SvRxStethoscope():
     }
 
     def __init__(self, node=None):
-        print('----')
         if node is not None:
             self.node = node
             self.activate = node.activate
