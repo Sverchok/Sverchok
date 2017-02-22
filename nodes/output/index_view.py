@@ -6,7 +6,7 @@ import bmesh
 import time
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.typing import Required, StringP, Anytype, BoolP
+from svrx.typing import Required, StringP, Anytype, BoolP, VectorP, BMesh, Matrix
 from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 # pylint: disable=C0326
@@ -24,9 +24,6 @@ def draw_indexviz(context, args):
 
 
     if (data_vector, data_matrix) == (0, 0):
-    #    callback_disable(n_id)
-    #   not sure that it is safe to disable the callback in callback
-    #   just return instead.
         return
 
     fx = args.fx
@@ -109,6 +106,37 @@ def draw_indexviz(context, args):
 
 class NodeIndexView(NodeID, NodeStateful):
 
+    def draw_buttons(self, context, layout):
+        view_icon = 'RESTRICT_VIEW_' + ('OFF' if self.activate else 'ON')
+
+        column_all = layout.column()
+
+        row = column_all.row(align=True)
+        split = row.split()
+        r = split.column()
+        r.prop(self, "activate", text="Show", toggle=True, icon=view_icon)
+        row.prop(self, "draw_bg", text="Background", toggle=True)
+
+        col = column_all.column(align=True)
+        row = col.row(align=True)
+        row.prop(self, "display_vert_index", toggle=True, icon='VERTEXSEL', text='')
+        row.prop(self, "vert_idx_color", text="")
+        if self.draw_bg:
+            row.prop(self, "vert_bg_color", text="")
+
+        row = col.row(align=True)
+        row.prop(self, "display_edge_index", toggle=True, icon='EDGESEL', text='')
+        row.prop(self, "edge_idx_color", text="")
+        if self.draw_bg:
+            row.prop(self, "edge_bg_color", text="")
+
+        row = col.row(align=True)
+        row.prop(self, "display_face_index", toggle=True, icon='FACESEL', text='')
+        row.prop(self, "face_idx_color", text="")
+        if self.draw_bg:
+            row.prop(self, "face_bg_color", text="")
+
+
     def free(self):
         bgl_callback.callback_disable(self.node_id)
 
@@ -184,5 +212,6 @@ class SvRxIndexView():
             bgl_callback.callback_enable(self.n_id, self.current_draw_data)
 
 
-    def __call__(self, bm: BMesh = Required):
-        pass
+    def __call__(self, bm: BMesh = Required, matrix: Matrix = None):
+        self.bm.append(bmx)
+        self.mats.append(matrix)
