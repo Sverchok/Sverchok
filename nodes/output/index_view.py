@@ -9,6 +9,7 @@ import bmesh
 import time
 
 from mathutils import Matrix as bMatrix
+from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
@@ -111,7 +112,7 @@ def draw_index_viz(context, args):
         blf.draw(0, index)
 
     def calc_median(vlist):
-        a = Vector((0, 0, 0))
+        a = bVector((0, 0, 0))
         for v in vlist:
             a += v
         return a / len(vlist)
@@ -120,31 +121,48 @@ def draw_index_viz(context, args):
 
         final_verts = bm.verts
 
-        # quickly apply matrix if necessary
+        """
+        preprocessing the vertex coordinates incase a matrix is passed. This makes
+        the following routine a bit duplicitous, but acceptable for now.
+
+        """
+
         if not matrix is None:  # and not matrix_close_to_identity(matrix)
-            # bmesh.ops.transform(bm, matrix, space, verts)   ??...but make copy first.. so bad idea
             bmat = bMatrix(matrix)
             final_verts = [bmat * v.co for v in bm.verts]    
 
         if fx.display_vert_index:
-            for idx, v in enumerate(final_verts):
-                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)   # will fail if matrix is supplied, because finalverts will be .co already
+            if matrix is None:
+                for idx, v in enumerate(final_verts):
+                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
+            else:
+                for idx, v in enumerate(final_verts):
+                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
 
         if bm.edges and fx.display_edge_index:
-            # some lookup could be avoided by testing if matrix, then e.verts[0 and 1].co
-            for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
-                v1 = final_verts[idx1].co
-                v2 = final_verts[idx2].co
-                loc = v1 + ((v2 - v1) / 2)
-                draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
+            if matrix is None:
+                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
+                    v1 = final_verts[idx1].co
+                    v2 = final_verts[idx2].co
+                    loc = v1 + ((v2 - v1) / 2)
+                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
+            else:
+                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
+                    v1 = final_verts[idx1]
+                    v2 = final_verts[idx2]
+                    loc = v1 + ((v2 - v1) / 2)
+                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
         if bm.faces and fx.display_face_index:
-            for face_index, f in enumerate(bm.faces):
-                # verts = [Vector(final_verts[idx]) for idx in f]
-                # median = calc_median(verts)
-                median = f.calc_center_median()
-                draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
-
+            if matrix is None:
+                for face_index, f in enumerate(bm.faces):
+                    median = f.calc_center_median()
+                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
+            else:
+                for face_index, f in enumerate(bm.faces):
+                    verts = [final_verts[v.index] for v in f.verts]
+                    median = calc_median(verts)
+                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 class NodeIndexView(NodeID, NodeStateful):
