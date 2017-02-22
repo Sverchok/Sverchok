@@ -14,6 +14,8 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 def draw_indexviz(context, args):
 
+    draw_verts, draw_edges, draw_faces, draw_matrix = args.data
+
     # ensure data or empty lists.
     data_vector = Vector_generate(draw_verts) if draw_verts else []
     data_edges = draw_edges
@@ -34,17 +36,6 @@ def draw_indexviz(context, args):
     # vars for projection
     perspective_matrix = region3d.perspective_matrix.copy()
 
-
-    fx.vert_idx_color
-    fx.edge_idx_color
-    fx.face_idx_color
-    fx.vert_bg_color
-    fx.edge_bg_color
-    fx.face_bg_color
-    fx.display_vert_index
-    fx.display_edge_index
-    fx.display_face_index
-
     font_id = 0
     text_height = 13
     blf.size(font_id, text_height, 72)  # should check prefs.dpi
@@ -63,7 +54,7 @@ def draw_indexviz(context, args):
         y = region_mid_height + region_mid_height * (vec_4d.y / vec_4d.w)
         index = str(index)
 
-        if draw_bg:
+        if fx.draw_bg:
             polyline = get_points(index)
 
             ''' draw polygon '''
@@ -95,11 +86,11 @@ def draw_indexviz(context, args):
             matrix = data_matrix[obj_index]
             final_verts = [matrix * v for v in verts]
 
-        if display_vert_index:
+        if fx.display_vert_index:
             for idx, v in enumerate(final_verts):
                 draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
 
-        if data_edges and display_edge_index:
+        if data_edges and fx.display_edge_index:
             for edge_index, (idx1, idx2) in enumerate(data_edges[obj_index]):
                 
                 v1 = Vector(final_verts[idx1])
@@ -107,7 +98,7 @@ def draw_indexviz(context, args):
                 loc = v1 + ((v2 - v1) / 2)
                 draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
-        if data_faces and display_face_index:
+        if data_faces and fx.display_face_index:
             for face_index, f in enumerate(data_faces[obj_index]):
                 verts = [Vector(final_verts[idx]) for idx in f]
                 median = calc_median(verts)
@@ -123,7 +114,6 @@ class NodeIndexView(NodeID, NodeStateful):
 
 
 
-
 @stateful
 class SvRxIndexView():
 
@@ -133,6 +123,7 @@ class SvRxIndexView():
 
     properties = {
         'activate': BoolP(name='activate', default=True),
+        'draw_bg': BoolP(name='draw bg', default=False),
         "vert_idx_color", 
         "edge_idx_color", 
         "face_idx_color",
@@ -155,7 +146,7 @@ class SvRxIndexView():
 
     @property
     def get_fx(self):
-       params = [
+        params = [
            "vert_idx_color", "edge_idx_color", "face_idx_color",
            "vert_bg_color", "edge_bg_color", "face_bg_color",
            "display_vert_index", "display_edge_index", "display_face_index"
@@ -163,18 +154,29 @@ class SvRxIndexView():
 
         fx = namedtuple('fx', params)
         for param_name in params:
-            # some more delicate copying might be needed here.. if at all needed.
-            setattr(fx, param_name, getattr(self.param_name)[:])
+            if param_name.endswith('index'):
+                param_value = getattr(self.param_name)
+            else:
+                param_value = getattr(self.param_name)[:]
+            setattr(fx, param_name, param_value)
         return fx
+
+
+    @property
+    def get_data(self):
+        return 
+
 
     @property
     def current_draw_data(self):
         args.fx = self.get_fx
+        args.data = self.get_data
         return {
             'tree_name': self.node.id_data.name[:],
             'custom_function': draw_index_viz,
             'args': args
         }
+
 
     def stop(self):
         bgl_callback.callback_disable(self.n_id)
