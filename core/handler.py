@@ -40,8 +40,8 @@ def sv_file_load(scene):
     NOT READY TO BE USED DUE TO ADJUST SOCKETS BUGS
     """
 
-    bgl_callback.callback_disable_all()
-    bgl_callback_3dview_2d.callback_disable_all()
+    for callback in (bgl_callback, bgl_callback_3dview_2d):
+        callback.callback_disable_all()
 
     for ng in svrx_trees():
         for node in ng.nodes:
