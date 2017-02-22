@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 import bgl
 import blf
 
@@ -15,21 +17,6 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 def draw_indexviz(context, args):
 
     fx = args.fx
-
-    args.data.bms
-    
-    draw_verts, draw_edges, draw_faces, draw_matrix = 
-
-    # ensure data or empty lists.
-    data_vector = Vector_generate(draw_verts) if draw_verts else []
-    data_edges = draw_edges
-    data_faces = draw_faces
-    data_matrix = Matrix_generate(draw_matrix) if draw_matrix else []
-
-
-    if (data_vector, data_matrix) == (0, 0):
-        return
-
     region = context.region
     region3d = context.space_data.region_3d
 
@@ -54,10 +41,10 @@ def draw_indexviz(context, args):
         y = region_mid_height + region_mid_height * (vec_4d.y / vec_4d.w)
         index = str(index)
 
+        ''' draw polygon if requested'''
         if fx.draw_bg:
             polyline = get_points(index)
 
-            ''' draw polygon '''
             bgl.glColor4f(*rgb2)
             bgl.glBegin(bgl.GL_POLYGON)
             for pointx, pointy in polyline:
@@ -70,40 +57,38 @@ def draw_indexviz(context, args):
         blf.position(0, x - (txt_width / 2), y - (txt_height / 2), 0)
         blf.draw(0, index)
 
-    ########
-    # points
     def calc_median(vlist):
         a = Vector((0, 0, 0))
         for v in vlist:
             a += v
         return a / len(vlist)
 
-    for obj_index, verts in enumerate(data_vector):
-        final_verts = verts
+    for obj_index, (bm, matrix) in enumerate(zip(args.data.bms, args.data.mats)):
 
-        # quickly apply matrix if necessary
-        if draw_matrix:
-            matrix = data_matrix[obj_index]
-            final_verts = [matrix * v for v in verts]
+        final_verts = bm.verts
+
+        # # quickly apply matrix if necessary
+        # if matrix:  # and is not identity matrix.
+        #     # matrix = data_matrix[obj_index]
+        #     final_verts = [matrix * v for v in verts]
 
         if fx.display_vert_index:
             for idx, v in enumerate(final_verts):
                 draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
 
-        if data_edges and fx.display_edge_index:
-            for edge_index, (idx1, idx2) in enumerate(data_edges[obj_index]):
+        # if bm.edges and fx.display_edge_index:
+        #     for edge_index, (idx1, idx2) in enumerate(e.vertices for e in bm.edges):
                 
-                v1 = Vector(final_verts[idx1])
-                v2 = Vector(final_verts[idx2])
-                loc = v1 + ((v2 - v1) / 2)
-                draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
+        #          v1 = Vector(final_verts[idx1])
+        #          v2 = Vector(final_verts[idx2])
+        #          loc = v1 + ((v2 - v1) / 2)
+        #          draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
-        if data_faces and fx.display_face_index:
-            for face_index, f in enumerate(data_faces[obj_index]):
-                verts = [Vector(final_verts[idx]) for idx in f]
-                median = calc_median(verts)
-                draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
-
+        # if bm.faces and fx.display_face_index:
+        #     for face_index, f in enumerate(data_faces[obj_index]):
+        #         verts = [Vector(final_verts[idx]) for idx in f]
+        #         median = calc_median(verts)
+        #         draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 
@@ -188,9 +173,9 @@ class SvRxIndexView():
         fx = namedtuple('fx', params)
         for param_name in params:
             if param_name.endswith('index'):
-                param_value = getattr(self.param_name)
+                param_value = getattr(self, param_name)
             else:
-                param_value = getattr(self.param_name)[:]
+                param_value = getattr(self, param_name)[:]
             setattr(fx, param_name, param_value)
         return fx
 
