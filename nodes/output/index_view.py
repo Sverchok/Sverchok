@@ -7,12 +7,12 @@ import time
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
 from svrx.typing import Required, StringP, Anytype, BoolP
-from svrx.util import bgl_callback
+from svrx.util import bgl_callback_3dview_2d as bgl_callback
+
 # pylint: disable=C0326
 
 
-
-class NodeStethoscope(NodeID, NodeStateful):
+class NodeIndexView(NodeID, NodeStateful):
 
     def free(self):
         bgl_callback.callback_disable(self.node_id)
@@ -38,9 +38,9 @@ def simple_grid_xy(x, y, args):
 @stateful
 class SvRxStethoscope():
 
-    bl_idname = "SvRxStethoscope"
-    label = "Stethoscope"
-    cls_bases = (NodeStethoscope,)
+    bl_idname = "SvRxIndexView"
+    label = "Index View"
+    cls_bases = (NodeIndexView,)
 
     properties = {
         'activate': BoolP(name='activate', default=True),
@@ -51,12 +51,6 @@ class SvRxStethoscope():
             self.node = node
             self.activate = node.activate
             self.n_id = node.node_id
-
-    @property
-    def xy_offset(self):
-        a = self.node.location[:]
-        b = int(self.node.width) + 20
-        return int(a[0] + b), int(a[1])
 
     def stop(self):
         bgl_callback.callback_disable(self.n_id)
