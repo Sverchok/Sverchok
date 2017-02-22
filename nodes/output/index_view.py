@@ -172,10 +172,10 @@ class SvRxIndexView():
 
         fx = namedtuple('fx', params)
         for param_name in params:
-            if param_name.endswith('index'):
-                param_value = getattr(self, param_name)
+            if param_name.endswith(('index', 'bg')):
+                param_value = getattr(self.node, param_name)
             else:
-                param_value = getattr(self, param_name)[:]
+                param_value = getattr(self.node, param_name)[:]
             setattr(fx, param_name, param_value)
         return fx
 
@@ -187,6 +187,7 @@ class SvRxIndexView():
 
     @property
     def current_draw_data(self):
+        args = lambda: None
         args.fx = self.get_fx
         args.data = self.get_data
         return {
