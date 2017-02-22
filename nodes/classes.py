@@ -3,8 +3,10 @@ import time
 import bpy
 from bpy.props import EnumProperty, StringProperty
 
+
 import importlib
 from svrx.util.importers import get_sn_template_path, text_remap
+from svrx.ui import error
 
 _node_funcs = {}
 
@@ -294,11 +296,15 @@ class NodeScript(NodeBase):
                 self.text_file = ''
                 return
             text = text_remap(self.text_file)
-            mod = importlib.import_module("svrx.nodes.script.{}".format(text))
-            importlib.reload(mod)
-            self.adjust_sockets()
-            self.color = READY_COLOR
-            self.use_custom_color = True
+            try:
+                mod = importlib.import_module("svrx.nodes.script.{}".format(text))
+                importlib.reload(mod)
+            except Exception as err:
+                error.show(self, err, script=True)
+            else:
+                self.adjust_sockets()
+                self.color = READY_COLOR
+                self.use_custom_color = True
         else:
             pass #  fail
 
