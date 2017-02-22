@@ -351,14 +351,15 @@ def exec_node_group(node_group):
             else:
                 recurse_levels(func, in_levels, out_levels, in_trees, out_trees)
 
+            for ot in out_trees:
+                if ot:
+                    ot.set_level()
+
             if isinstance(func, Stateful):
                 add_time(func.label)
                 func.stop()
                 add_time(func.label)
 
-            for ot in out_trees:
-                if ot:
-                    ot.set_level()
             add_time(node.bl_idname + ": " + node.name)
         add_time(node_group.name)
 
