@@ -117,10 +117,10 @@ def draw_index_viz(context, args):
 
         final_verts = bm.verts
 
-        # # quickly apply matrix if necessary
-        # if matrix:  # and is not identity matrix.
-        #     # matrix = data_matrix[obj_index]
-        #     final_verts = [matrix * v for v in verts]
+        # quickly apply matrix if necessary
+        if matrix:  # and not matrix_close_to_identity(matrix)
+            # bmesh.ops.transform(bm, matrix, space, verts)   ??...but make copy first.. so bad idea
+            final_verts = [matrix * v.co for v in bm.verts]
 
         if fx.display_vert_index:
             for idx, v in enumerate(final_verts):
