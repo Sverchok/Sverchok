@@ -56,11 +56,6 @@ class NodeBase:
                 self.inputs.remove(self.inputs[-1])
         elif diff < 0:
             for bl_id, name, settings in inputs_template[diff:]:
-                print(bl_id)
-                try:
-                    print(getattr(bpy.types, bl_id))
-                except:
-                    print("failed")
                 s = self.inputs.new(bl_id, name)
                 s.setup(settings)
 
