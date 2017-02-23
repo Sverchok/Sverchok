@@ -21,7 +21,7 @@ import numpy as np
 from functools import wraps
 
 from svrx.util.smesh import SvPolygon
-from svrx.util.functions import match_long_repeat
+from svrx.util.function import match_long_repeat
 
 
 def vectorize(func):

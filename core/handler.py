@@ -33,6 +33,7 @@ def sv_main_handler(scene):
         if ng.has_changed:
             ng.execute()
 
+
 @persistent
 def sv_file_load(scene):
     """
@@ -59,6 +60,7 @@ def frame_change(scene):
         except:
             pass
     scene.update()
+
 
 def register():
     bpy.app.handlers.scene_update_pre.append(sv_main_handler)

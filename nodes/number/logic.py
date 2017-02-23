@@ -1,6 +1,6 @@
 import numpy as np
 
-from svrx.util.function import constant, draw_label
+from svrx.util.function import constant
 
 from svrx.nodes.node_base import node_func
 from svrx.nodes.classes import NodeMathBase
@@ -25,7 +25,7 @@ def not_equal(x: Number = 0, y: Number = 0) -> Bool:
 
 @node_func(bl_idname='SvRxNodeLogic', id=4)
 def less_than(x: Number = 0, y: Number = 0) -> Bool:
-    return x < y2
+    return x < y
 
 
 @node_func(bl_idname='SvRxNodeLogic', id=5)

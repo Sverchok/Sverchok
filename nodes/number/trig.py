@@ -6,8 +6,6 @@ from svrx.typing import Number, Float
 
 
 # pylint: disable=C0326
-
-
 '''
 -  SINE     / COSINE     / SIN(x), COS(x)
 -  DEGREES  / RADIANS    / TANGENT
@@ -19,6 +17,7 @@ from svrx.typing import Number, Float
 -  PHI * N
 -  TAU * N
 '''
+
 
 @node_func(bl_idname="SvRxNodeTrig",
            multi_label="Trigonometey",

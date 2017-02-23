@@ -1,10 +1,13 @@
 import numpy as np
 
-from bpy.props import BoolProperty, EnumProperty ,FloatProperty, IntProperty, StringProperty, FloatVectorProperty
+from bpy.props import (BoolProperty, EnumProperty,
+                       FloatProperty, IntProperty,
+                       StringProperty, FloatVectorProperty)
 
 
 class SvRxBaseType:
     iterable = False
+
     def __init__(self, name=None, iterable=None):
         if name is None:
             self.default_name = type(self).__name__
@@ -29,6 +32,7 @@ class SvRxBaseType:
 
 class Required:
     pass
+
 
 class Anytype(SvRxBaseType):
     bl_idname = "SvRxAnySocket"
@@ -60,8 +64,10 @@ class Int(Number):
         else:
             return "SvRxIntSocket"
 
+
 class Bool(Int):
     pass
+
 
 class Float(Number):
     @property
@@ -75,18 +81,21 @@ class Float(Number):
 class Number4f(SvRxBaseType):
     iterable = True
 
+
 class Color(Number4f):
     bl_idname = "SvRxColorSocket"
+
 
 class Vertices(Number4f):
     bl_idname = "SvRxVertexSocket"
 
+
 class Vector(Number4f):
     bl_idname = "SvRxVectorSocket"
 
+
 class Point(Number4f):
     bl_idname = "SvRxPointSocket"
-
 
 
 class Edges(SvRxBaseType):
@@ -120,17 +129,19 @@ class Mesh(SvRxBaseType):
     bl_idname = "SvRxMeshSocket"
     iterable = False
 
+
 class BMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
     iterable = False
+
 
 class SMesh(Mesh):
     bl_idname = "SvRxMeshSocket"
     iterable = False
 
 
-
 # Property types
+
 
 def exec_node(self, context):
     self.id_data.update()
@@ -141,7 +152,6 @@ class SvRxBaseTypeP:
         self.kwargs = {}
         self.kwargs['update'] = exec_node
         self.kwargs.update(kwargs)
-
 
     def add(self, key, value):
         self.kwargs[key] = value
@@ -200,14 +210,15 @@ class ObjectValue(Object):
     bl_idname = "SvRxValueObjectSocket"
 
 
-
-bases = [Number, Number4f, Mesh, Object, String, Matrix, Anytype]
+bases = [Number, Number4f, Mesh, Object, String, Matrix, Anytype, Faces, Edges]
 _lookup = {}
+
 
 def get_classes(cls):
     for sub_cls in cls.__subclasses__():
         yield sub_cls
         yield from get_classes(sub_cls)
+
 
 for base in bases:
     _lookup[base] = base
