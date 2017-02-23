@@ -142,8 +142,8 @@ class SvPolygon:
         loop_total[:] = tuple(map(len, faces))
         loop_start[1:] = loop_total[:-1].cumsum()
         vertex_indices = np.fromiter(chain.from_iterable(faces),
-                                     dtype=np.uint32,
-                                     count=loop_start.sum())
+                                     dtype=np.uint32,)
+                                     #count=loop_start.sum())
         return cls(loop_start, loop_total, vertex_indices)
 
 
