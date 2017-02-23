@@ -1,7 +1,7 @@
 import os
 import time
 import bpy
-from bpy.props import EnumProperty, StringProperty
+from bpy.props import EnumProperty, StringProperty, BoolProperty
 
 
 import importlib
@@ -123,7 +123,9 @@ class NodeID:
     def copy(self, node):
         self.n_id = ''
 
+
 _node_classes = {}
+
 
 class NodeStateful(NodeBase):
 
@@ -141,7 +143,6 @@ class NodeStateful(NodeBase):
         for name in props.keys():
             layout.prop(self, name)
 
-
     def adjust_sockets(self):
         func = self.get_cls(self.bl_idname)
         if func is None:
@@ -157,6 +158,13 @@ _multi_storage = {}
 
 
 class NodeDynSignature(NodeBase):
+
+    expand_modes = BoolProperty()
+
+    def init(self, context):
+        func_dict, func_list = _multi_storage[self.bl_idname]
+        self.expand_modes = 4 > len(func_list)
+        super().init(context)
 
     @staticmethod
     def add_multi(func):
@@ -184,7 +192,7 @@ class NodeDynSignature(NodeBase):
         self.id_data.update()
 
     def draw_buttons(self, context, layout):
-        layout.prop(self, 'mode')
+        layout.prop(self, 'mode', expand=self.expand_modes)
         super().draw_buttons(context, layout)
 
 
