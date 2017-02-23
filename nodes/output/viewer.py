@@ -123,14 +123,16 @@ class BMViewNode():
         color = self.node.face_color[:]
         tess_faces = bm.calc_tessface()
         vert_index = [l.vert.index for l in itertools.chain(*bm.calc_tessface())]
-        if mat is None:
+        bm.normal_update()
+        if mat is not None:
+            matrix = mu.Matrix(mat)
+            verts = [matrix  * v.co for v in bm.verts]
+            mat33 = matrix.to_3x3()
+            normals = [mat33 * f.normal for f in bm.faces]
+        else:
             verts = [v.co for v in bm.verts]
             normals = [f.normal for f in bm.faces]
-        else:
-            matrix = mu.Matrix(mat)
-            verts = [matrix * v.co for v in bm.verts]
-            normals = [matrix * f.normal for f in bm.faces]
-        bm.normal_update()
+
         face_index = [t_f[0].face.index for t_f in tess_faces]
         edges_index = [(e.verts[0].index, e.verts[1].index) for e in bm.edges]
         colors = []
