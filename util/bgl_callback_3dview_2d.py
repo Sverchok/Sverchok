@@ -49,7 +49,7 @@ def callback_enable(*args):
     if n_id in callback_dict:
         return
 
-    handle_pixel = SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_PIXEL')
+    handle_pixel = SpaceView3D.draw_handler_add(draw_callback_px, args, 'WINDOW', 'POST_VIEW')
     callback_dict[n_id] = handle_pixel
     tag_redraw_all_3dviews()
 
