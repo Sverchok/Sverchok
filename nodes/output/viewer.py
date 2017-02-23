@@ -12,7 +12,7 @@ from svrx.nodes.classes import NodeID, NodeStateful
 from svrx.typing import (Required, StringP,
                          Anytype, BoolP, ColorP, FVectorP,
                          BMesh, Matrix, Vertices, Faces)
-from svrx.util import bgl_callback_3dview_2d as bgl_callback
+from svrx.util import bgl_callback_3dview as bgl_callback
 import itertools
 import mathutils as mu
 
@@ -116,7 +116,7 @@ class BMViewNode():
     def stop(self):
         bgl_callback.callback_disable(self.n_id)
         if self.activate:
-            bgl_callback.callback_enable(self.n_id, self.current_draw_data)
+            bgl_callback.callback_enable(self.n_id, self.current_draw_data, overlay="POST_VIEW")
 
     def __call__(self, bm: BMesh = Required,
                  mat: Matrix = None):
@@ -126,7 +126,7 @@ class BMViewNode():
         bm.normal_update()
         if mat is not None:
             matrix = mu.Matrix(mat)
-            verts = [matrix  * v.co for v in bm.verts]
+            verts = [matrix * v.co for v in bm.verts]
             mat33 = matrix.to_3x3()
             normals = [mat33 * f.normal for f in bm.faces]
         else:
@@ -138,7 +138,7 @@ class BMViewNode():
         colors = []
         for idx in face_index:
             normal = normals[idx]
-            normal_nu = normal.angle((0,0,1), 0) / 3.14
+            normal_nu = normal.angle((0, 0, 1), 0) / 3.14
             r = (normal_nu * color[0]) - 0.1
             g = (normal_nu * color[1]) - 0.1
             b = (normal_nu * color[2]) - 0.1
