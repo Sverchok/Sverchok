@@ -1,14 +1,12 @@
-from functools import wraps
 import numpy as np
 
 from svrx.nodes.node_base import node_func
 from svrx.nodes.classes import NodeMathBase
-from svrx.typing import Number, Float, Int
+from svrx.typing import Number, Float
 
 
 # pylint: disable=C0326
 
-local_name = 'SvRxNodeTrig'
 
 '''
 -  SINE     / COSINE     / SIN(x), COS(x)
@@ -22,93 +20,99 @@ local_name = 'SvRxNodeTrig'
 -  TAU * N
 '''
 
-#  Constants wrapper
-def constant(func):
-    @wraps(func)
-    def inner():
-        return np.array([func()])
-    return inner
-
-#  Constants wrapper
-def constant_times_n(func):
-    @wraps(func)
-    def inner(*args):
-        return np.array([func(*args)])
-    return inner
-
-
-@node_func(bl_idname=local_name, multi_label="Trig", id=0, cls_bases=(NodeMathBase,))
+@node_func(bl_idname="SvRxNodeTrig",
+           multi_label="Trigonometey",
+           id=0, cls_bases=(NodeMathBase,))
 def sine(x: Number = 0.0) -> Number:
     return np.sin(x)
 
-@node_func(bl_idname=local_name, id=1)
+
+@node_func(id=1)
 def cosine(x: Number = 0.0) -> Number:
     return np.cos(x)
 
-@node_func(bl_idname=local_name, id=2)
+
+@node_func(id=2)
 def sincos(x: Number = 0.0) -> (Number("sin"), Number("cos")):
     return np.sin(x), np.cos(x)
 
-@node_func(bl_idname=local_name, id=3)
+
+@node_func(id=3)
 def degrees(x: Number = 0.0) -> Number:
     return np.degrees(x)
 
-@node_func(bl_idname=local_name, id=4)
+
+@node_func(id=4)
 def radians(x: Number = 0.0) -> Number:
     return np.radians(x)
 
-@node_func(bl_idname=local_name, id=20)
+
+@node_func(id=20)
 def tangent(x: Number = 0.0) -> Number:
     return np.tan(x)
 
-@node_func(bl_idname=local_name, id=30)
+
+@node_func(id=30)
 def arcsine(x: Number = 0.0) -> Number:
     return np.asin(x)
 
-@node_func(bl_idname=local_name, id=31)
+
+@node_func(id=31)
 def arcosine(x: Number = 0.0) -> Number:
     return np.acos(x)
 
-@node_func(bl_idname=local_name, id=32)
+
+@node_func(id=32)
 def arctangent(x: Number = 0.0) -> Number:
     return np.atan(x)
 
-@node_func(bl_idname=local_name, id=40)
+
+@node_func(id=40)
 def asinh(x: Number = 0.0) -> Number:
     return np.asinh(x)
 
-@node_func(bl_idname=local_name, id=41)
+
+@node_func(id=41)
 def acosh(x: Number = 0.0) -> Number:
     return np.acosh(x)
 
-@node_func(bl_idname=local_name, id=42)
+
+@node_func(id=42)
 def atanh(x: Number = 0.0) -> Number:
     return np.atanh(x)
 
-@node_func(bl_idname=local_name, id=50)
+
+@node_func(id=50)
 def sinh(x: Number = 0.0) -> Number:
     return np.sinh(x)
 
-@node_func(bl_idname=local_name, id=51)
+
+@node_func(id=51)
 def cosh(x: Number = 0.0) -> Number:
     return np.cosh(x)
 
-@node_func(bl_idname=local_name, id=52)
+
+@node_func(id=52)
 def tanh(x: Number = 0.0) -> Number:
     return np.tanh(x)
 
-## Constants times input n
 
-@node_func(bl_idname=local_name, id=60)
+#  Constants times input n
+
+
+@node_func(id=60)
 def pi(n: Number = 2.0) -> Number:
     return np.pi * n
 
-@node_func(bl_idname=local_name, id=61)
+
+@node_func(id=61)
 def tau(n: Number = 1.0) -> Number:
     return np.pi * n * 2
 
+
 PHI = ((1 + 5 ** 0.5) / 2)
 
-@node_func(bl_idname=local_name, id=62)
+
+@node_func(id=62)
 def phi(n: Number = 1.0) -> Number:
     return PHI * n
