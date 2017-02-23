@@ -36,8 +36,8 @@ def sv_main_handler(scene):
 @persistent
 def sv_file_load(scene):
     """
-    To make sure nodes follow signature on node changes
-    NOT READY TO BE USED DUE TO ADJUST SOCKETS BUGS
+    To make sure nodes follow signature on node changes on startup
+    clean up callbacks
     """
 
     for callback in (bgl_callback, bgl_callback_3dview_2d):
