@@ -24,7 +24,7 @@ class NodeView(NodeID, NodeStateful):
 
     def draw_buttons(self, context, layout):
         view_icon = 'RESTRICT_VIEW_' + ('OFF' if self.activate else 'ON')
-
+        layout.prop(self, "activate", text="Show", toggle=True, icon=view_icon)
         col = layout.column()
         row = col.row()
         row.prop(self, "display_vert", toggle=True, icon='VERTEXSEL', text='')
@@ -52,30 +52,31 @@ def draw_bmesh(context, args):
     for verts, vert_index, colors, edges in zip(obj_list, face_list, col_list, edg_list):
 
         try:
-            bgl.glBegin(bgl.GL_TRIANGLES)
-            for idx in range(0, len(vert_index), 3):
-                p0 = verts[vert_index[idx]]
-                p1 = verts[vert_index[idx + 1]]
-                p2 = verts[vert_index[idx + 2]]
-                bgl.glColor3f(*colors[idx//3])
-                bgl.glVertex3f(*p0)
-                bgl.glVertex3f(*p1)
-                bgl.glVertex3f(*p2)
-            bgl.glEnd()
+            if vert_index:
+                bgl.glBegin(bgl.GL_TRIANGLES)
+                for idx in range(0, len(vert_index), 3):
+                    p0 = verts[vert_index[idx]]
+                    p1 = verts[vert_index[idx + 1]]
+                    p2 = verts[vert_index[idx + 2]]
+                    bgl.glColor3f(*colors[idx//3])
+                    bgl.glVertex3f(*p0)
+                    bgl.glVertex3f(*p1)
+                    bgl.glVertex3f(*p2)
+                bgl.glEnd()
 
-            bgl.glBegin(bgl.GL_POINTS)
-
-            bgl.glColor3f(*vert_col)
-            for vert in verts:
-                bgl.glVertex3f(*vert)
-            bgl.glEnd()
-
-            bgl.glBegin(bgl.GL_LINES)
-            bgl.glColor3f(*edge_col)
-            for x, y in edges:
-                bgl.glVertex3f(*verts[x])
-                bgl.glVertex3f(*verts[y])
-            bgl.glEnd()
+            if vert_col:
+                bgl.glBegin(bgl.GL_POINTS)
+                bgl.glColor3f(*vert_col)
+                for vert in verts:
+                    bgl.glVertex3f(*vert)
+                bgl.glEnd()
+            if edge_col:
+                bgl.glBegin(bgl.GL_LINES)
+                bgl.glColor3f(*edge_col)
+                for x, y in edges:
+                    bgl.glVertex3f(*verts[x])
+                    bgl.glVertex3f(*verts[y])
+                bgl.glEnd()
         except Exception as err:
             bgl.glEnd()
             print("failure", err)
@@ -113,7 +114,8 @@ class BMViewNode():
     @property
     def current_draw_data(self):
         args = (self.vertices, self.faces, self.colors, self.edges,
-                (self.node.edge_color, self.node.vert_color))
+                (self.node.edge_color if self.node.display_edge else None,
+                 self.node.vert_color if self.node.display_vert else None))
         return {
             'tree_name': self.node.id_data.name[:],
             'custom_function': draw_bmesh,
@@ -145,6 +147,6 @@ class BMViewNode():
             colors.append((r, g, b))
 
         self.vertices.append(verts)
-        self.faces.append(vert_index)
+        self.faces.append(vert_index if self.node.display_face else [])
         self.colors.append(colors)
         self.edges.append(edges_index)
