@@ -1,7 +1,7 @@
 import numpy as np
 
 from svrx.nodes.node_base import node_func
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.typing import Int
 
 # pylint: disable=C0326
@@ -26,4 +26,3 @@ def count(start: Int = 0, step: Int = 1, count: Int(min=0) = 10) -> [Int]:
         return []
     stop = (count*step) + start
     return np.arange(start, stop, step)
-
