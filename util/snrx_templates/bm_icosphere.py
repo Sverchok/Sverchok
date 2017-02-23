@@ -1,5 +1,5 @@
 import bmesh
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.mesh import rxdata_from_bm
 
 def make_icosphere(subdiv, diam):

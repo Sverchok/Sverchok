@@ -20,7 +20,7 @@ import numpy as np
 from svrx.typing import Float, Int, Vertices, BoolP
 from svrx.nodes.node_base import node_func
 
-from svrx.util.geom import generator
+from svrx.util.function import generator
 
 
 def gen_rand_vecs(dims, number):

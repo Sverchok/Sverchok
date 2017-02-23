@@ -16,71 +16,13 @@
 #
 # ##### END GPL LICENSE BLOCK #####
 
-'''
-None of this file is in a working condition. skip this file.
 
-Eventual purpose of this file is to store the convenience functions which
-can be used for regular nodes or as part of recipes for script nodes. These
-functions will initially be sub optimal quick implementations, then optimized
-only for speed, never for aesthetics or line count or cleverness.
-
-'''
-
-import math
 import numpy as np
 from functools import wraps
-import itertools
-
-import bmesh
-import mathutils
-
-import inspect
 
 from svrx.util.smesh import SvPolygon
+from svrx.util.functions import match_long_repeat
 
-
-def match_long_repeat(*parameters, limit=None, mask=None):
-    if mask is None:
-        counts = [len(p) for p in parameters]
-    else:
-        counts = [1 if m else len(p) for m, p in zip(mask, parameters)]
-    if limit is not None:
-        max_len = counts[limit]
-    else:
-        max_len = max(counts)
-    if mask is None:
-        for i in range(max_len):
-            args = []
-            for c, parameter in zip(counts, parameters):
-                args.append(parameter[min(c - 1, i)])
-            yield args
-    else:
-        for i in range(max_len):
-            args = []
-            for c, m, parameter in zip(counts, mask, parameters):
-                if m:
-                    args.append(parameter)
-                else:
-                    args.append(parameter[min(c - 1, i)])
-            yield args
-
-def match_long_cycle(*parameters, limit=None, mask=None):
-    counts = [len(p) for p in parameters]
-    if limit is not None:
-        max_len = counts[limit]
-    else:
-        max_len = max(counts)
-    args = []
-    for c, p in zip(counts, parameters):
-        if c < max_len:
-            args.append(itertools.cycle(p))
-        else:
-            args.append(p)
-    yield from zip(*args)
-
-
-def match_short(*parameters, limit=None, mask=None):
-    yield from zip(*parameters)
 
 def vectorize(func):
     '''
@@ -98,46 +40,20 @@ def vectorize(func):
             yield func(*param[:split], **kw_args)
     return inner
 
-def generator(func=None, match=None, limit=None):
-    '''
-    Will create a yeilding vectorized generator of the
-    function it is applied to.
-    '''
-    def wrapper(func):
-        sig = inspect.signature(func)
-        func.mask = []
-        for name, parameter in sig.parameters.items():
-            m = getattr(parameter.annotation, "iterable", False)
-            func.mask.append(not m)
-
-        @wraps(func)
-        def inner(*args, match=match):
-            if match is None:
-                match = match_long_repeat
-            mask = func.mask
-            if mask is None:
-                parameters = [np.atleast_1d(arg) for arg in args]
-            else:
-                parameters = [arg if m else np.atleast_1d(arg) for arg, m in zip(args, mask)]
-            out = []
-            for param in match(*parameters, limit=limit, mask=mask):
-                out.append(func(*param))
-            return out
-        return inner
-    if func:
-        return wrapper(func)
-    else:
-        return wrapper
-
-
 
 def circle(radius=1.0, phase=0, nverts=20):
-    t = np.linspace(0, np.pi * 2 * (nverts - 1 / nverts), nverts)
-    circ = np.array([np.cos(t + phase) * radius, np.sin(t + phase) * radius, np.zeros(nverts), np.ones(nverts)])
+    t = np.linspace(0, np.pi * 2, nverts, endpoint=False)
+    circ = np.array([np.cos(t + phase) * radius,
+                    np.sin(t + phase) * radius,
+                    np.zeros(nverts),
+                    np.ones(nverts)])
     verts = np.transpose(circ)
     edges = np.array([(i, i + 1) for i in range(nverts - 1)] + [(nverts - 1, 0)])
-    faces = SvPolygon(np.array([0], dtype=np.uint32), np.array([nverts], dtype=np.uint32), np.arange(0, nverts, dtype=np.uint32))
+    faces = SvPolygon(np.array([0], dtype=np.uint32),
+                      np.array([nverts], dtype=np.uint32),
+                      np.arange(0, nverts, dtype=np.uint32))
     return verts, edges, faces
+
 
 circles = vectorize(circle)
 

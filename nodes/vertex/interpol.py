@@ -2,7 +2,8 @@ import numpy as np
 
 from svrx.typing import Vertices, Float, Int, Required, FloatP
 
-from svrx.util.geom import CubicSpline, LinearSpline, generator
+from svrx.util.geom import CubicSpline, LinearSpline
+from svrx.util.function import generator
 from svrx.nodes.node_base import node_func
 
 
@@ -10,8 +11,8 @@ from svrx.nodes.node_base import node_func
 def cubic_spline(verts: Vertices = Required,
                  t: Float = 0.5,
                  h: FloatP = 0.001,
-                ) -> (Vertices, Vertices("Tanget")):
-    spl = CubicSpline(verts[:,:3])
+                 ) -> (Vertices, Vertices("Tanget")):
+    spl = CubicSpline(verts[:, :3])
     points_out = np.ones((len(t), 4), dtype=np.float64)
     tangents_out = np.zeros((len(t), 4), dtype=np.float64)
     points_out[:, :3] = spl.eval(t)
@@ -27,11 +28,12 @@ def cubic_spline_count(verts: Vertices(iterable=False) = Required,
                        ) -> ([Vertices], [Vertices("Tanget")]):
     return cubic_spline(verts, np.linspace(0.0, 1.0, count), h)
 
+
 @node_func(bl_idname='SvRxVertexInterpol', id=1)
 def linear_spline(verts: Vertices = Required,
                   t: Float = 0.5,
-                 ) -> Vertices:
-    spl = LinearSpline(verts[:,:3])
+                  ) -> Vertices:
+    spl = LinearSpline(verts[:, :3])
     points_out = np.ones((len(t), 4), dtype=np.float64)
     points_out[:, :3] = spl.eval(t)
     return points_out

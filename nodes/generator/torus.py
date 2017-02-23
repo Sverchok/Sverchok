@@ -2,7 +2,7 @@ from svrx.nodes.node_base import node_func
 from svrx.typing import Float, Int, Vertices, Edges, Faces
 
 import numpy as np
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.smesh import SvPolygon
 from svrx.util.topology import torus_edges, torus_faces
 

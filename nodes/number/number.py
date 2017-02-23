@@ -2,7 +2,7 @@ import numpy as np
 
 from svrx.nodes.node_base import node_func
 from svrx.typing import Float, Int
-from svrx.util.geom import generator
+from svrx.util.function import generator
 
 
 @node_func(bl_idname="SvRxNumberLinspace")

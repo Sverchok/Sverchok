@@ -4,7 +4,7 @@ import bmesh
 
 from svrx.typing import Float, Int, Vector, BMesh, Required, Vertices
 from svrx.nodes.node_base import node_func
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.function import std_wrap
 
 

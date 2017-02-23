@@ -2,7 +2,7 @@ from svrx.nodes.node_base import node_func
 from svrx.typing import Float, Int, Vertices, Edges, Faces, BoolP
 
 import numpy as np
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.smesh import SvPolygon
 from svrx.util.topology import cylinder_edges, cylinder_faces
 from svrx.util.function import array_as

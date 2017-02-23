@@ -3,7 +3,7 @@ import numpy as np
 import mathutils
 from svrx.nodes.node_base import node_func
 from svrx.util.transforms import translation_matrix, concatenate_matrices, scale_matrix
-from svrx.util.geom import generator
+from svrx.util.function import generator
 
 
 from svrx.typing import Vector, Float, Matrix

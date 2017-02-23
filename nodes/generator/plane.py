@@ -2,7 +2,7 @@ from svrx.nodes.node_base import node_func
 from svrx.typing import Float, Int, Vertices, Edges, Faces
 
 import numpy as np
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.topology import plane_edges, plane_faces
 
 def plane_verts(t_x, t_y):

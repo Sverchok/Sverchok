@@ -1,6 +1,6 @@
 from sverchok.nodes.generator.torus import torus_verts, torus_edges, torus_polygons
 
-from svrx.util.geom import generator
+from svrx.util.function import generator
 from svrx.util.smesh import SMesh
 
 def make_torus(R, r, N1, N2, rPhase, sPhase):
