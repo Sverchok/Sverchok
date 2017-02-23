@@ -17,21 +17,12 @@
 # ##### END GPL LICENSE BLOCK #####
 
 import bpy
-import blf
 import bgl
 
 
 SpaceView3D = bpy.types.SpaceView3D
 
 callback_dict = {}
-point_dict = {}
-
-
-def adjust_list(in_list, x, y):
-    return [[old_x + x, old_y + y] for (old_x, old_y) in in_list]
-
-
-## end of util functions
 
 
 def tag_redraw_all_3dviews():
