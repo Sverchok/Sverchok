@@ -164,44 +164,44 @@ def verify_links(links, nodes, socket_links, real_nodes=False):
     skip = set()
 
     for i in range(len(links)):
-        l = links[i]
+        link = links[i]
 
-        to_func = nodes[l.to_node]
-        from_func = nodes[l.from_node]
-        from_type = from_func.returns[l.from_socket.index][0]
+        to_func = nodes[link.to_node]
+        from_func = nodes[link.from_node]
+        from_type = from_func.returns[link.from_socket.index][0]
 
         to_type = None
-        socket_index = l.to_socket.index
+        socket_index = link.to_socket.index
         for index, _, s_type in to_func.parameters:
             if index == socket_index:
                 to_type = s_type
         if needs_conversion(from_type, to_type):
             skip.add(i)
             func, to_index, from_index = get_conversion(from_type, to_type)
-            ng = l.id_data
+            ng = link.id_data
             if real_nodes:
                 node = ng.nodes.new(func.bl_idname)
                 node.hide = True
                 node.select = False
                 nodes[node] = node.compile()
-                node.location = (l.from_node.location + l.to_node.location) * .5
+                node.location = (link.from_node.location + link.to_node.location) * .5
                 for idx in to_index:
-                    links.append(ng.links.new(l.from_socket, node.inputs[idx]))
-                links.append(ng.links.new(node.outputs[from_index], l.to_socket))
+                    links.append(ng.links.new(link.from_socket, node.inputs[idx]))
+                links.append(ng.links.new(node.outputs[from_index], link.to_socket))
             else:
                 node = VirtualNode(func, ng)
                 nodes[node] = func
                 for idx in to_index:
-                    links.append(VirtualLink(l.from_socket, node.inputs[idx]))
-                links.append(VirtualLink(node.outputs[from_index], l.to_socket))
+                    links.append(VirtualLink(link.from_socket, node.inputs[idx]))
+                links.append(VirtualLink(node.outputs[from_index], link.to_socket))
 
     real_links = collections.defaultdict(list)
 
-    for idx, l in enumerate(links):
+    for idx, link in enumerate(links):
         if idx in skip:
             continue
-        real_links[l.to_node].append(l.from_node)
-        socket_links[l.to_socket] = l.from_socket
+        real_links[link.to_node].append(link.from_node)
+        socket_links[link.to_socket] = link.from_socket
 
     return real_links
 
