@@ -2,7 +2,8 @@ import numpy as np
 
 from bpy.props import (BoolProperty, EnumProperty,
                        FloatProperty, IntProperty,
-                       StringProperty, FloatVectorProperty)
+                       StringProperty, FloatVectorProperty,
+                       IntVectorProperty, BoolVectorProperty)
 
 
 class SvRxBaseType:
@@ -168,8 +169,31 @@ class IntP(SvRxBaseTypeP):
     prop_func = IntProperty
 
 
-class VectorP(SvRxBaseTypeP):
+class BVectorP(SvRxBaseTypeP):
+    prop_func = BoolVectorProperty
+
+
+class IVectorP(SvRxBaseTypeP):
+    prop_func = IntVectorProperty
+
+
+class FVectorP(SvRxBaseTypeP):
     prop_func = FloatVectorProperty
+
+
+class ColorP(FVectorP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.kwargs['size'] = 3
+        self.kwargs['min'] = 0.0
+        self.kwargs['max'] = 1.0
+        self.kwargs['subtype'] = 'COLOR'
+
+
+class ColorAP(ColorP):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.kwargs['size'] = 4
 
 
 class StringP(SvRxBaseTypeP):

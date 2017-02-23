@@ -13,7 +13,9 @@ from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.typing import Required, StringP, Anytype, BoolP, VectorP, BMesh, Matrix
+from svrx.typing import (Required, StringP,
+                         Anytype, BoolP, ColorAP, FVectorP,
+                         BMesh, Matrix)
 from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 # pylint: disable=C0326
@@ -214,12 +216,12 @@ class SvRxIndexView():
     properties = {
         'activate': BoolP(name='activate', default=True),
         'draw_bg': BoolP(name='draw bg', default=False),
-        "vert_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., 1., 1., 1.), subtype='COLOR'),
-        "edge_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., 1., .1, 1.), subtype='COLOR'),
-        "face_idx_color": VectorP(size=4, min=0.0, max=1.0, default=(1., .8, .8, 1.), subtype='COLOR'),
-        "vert_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
-        "edge_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
-        "face_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
+        "vert_idx_color": ColorAP(default=(1., 1., 1., 1.)),
+        "edge_idx_color": ColorAP(default=(1., 1., .1, 1.)),
+        "face_idx_color": ColorAP(default=(1., .8, .8, 1.)),
+        "vert_bg_color": ColorAP(default=(.2, .2, .2, 1.)),
+        "edge_bg_color": ColorAP(default=(.2, .2, .2, 1.)),
+        "face_bg_color": ColorAP(default=(.2, .2, .2, 1.)),
         "display_vert_index": BoolP(name='show_verts', default=True),
         "display_edge_index": BoolP(name='show_edges', default=True),
         "display_face_index": BoolP(name='show_faces', default=True)
