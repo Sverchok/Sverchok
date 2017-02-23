@@ -8,7 +8,8 @@ from svrx.typing import Int
 # pylint: disable=W0622
 # pylint: disable=W0621
 
-@node_func(bl_idname='SvRxNumberRangeInt', multi_label="Range Int", id=0)
+
+@node_func(bl_idname='SvRxNodeNumberRangeInt', multi_label="Range Int", id=0)
 @generator
 def range(start: Int = 0, step: Int = 1, stop: Int = 10) -> [Int]:
     if start == stop:
@@ -17,6 +18,7 @@ def range(start: Int = 0, step: Int = 1, stop: Int = 10) -> [Int]:
     if stop < start:
         step *= -1
     return np.arange(start, stop, step)
+
 
 @node_func(id=1)
 @generator

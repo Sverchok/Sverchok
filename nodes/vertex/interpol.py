@@ -7,7 +7,7 @@ from svrx.util.function import generator
 from svrx.nodes.node_base import node_func
 
 
-@node_func(bl_idname="SvRxVertexInterpol", multi_label="Interpolation", id=0)
+@node_func(bl_idname="SvRxNodeVertexInterpol", multi_label="Interpolation", id=0)
 def cubic_spline(verts: Vertices = Required,
                  t: Float = 0.5,
                  h: FloatP = 0.001,
@@ -29,7 +29,7 @@ def cubic_spline_count(verts: Vertices(iterable=False) = Required,
     return cubic_spline(verts, np.linspace(0.0, 1.0, count), h)
 
 
-@node_func(bl_idname='SvRxVertexInterpol', id=1)
+@node_func(id=10)
 def linear_spline(verts: Vertices = Required,
                   t: Float = 0.5,
                   ) -> Vertices:

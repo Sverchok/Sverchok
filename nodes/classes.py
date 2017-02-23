@@ -56,6 +56,11 @@ class NodeBase:
                 self.inputs.remove(self.inputs[-1])
         elif diff < 0:
             for bl_id, name, settings in inputs_template[diff:]:
+                print(bl_id)
+                try:
+                    print(getattr(bpy.types, bl_id))
+                except:
+                    print("failed")
                 s = self.inputs.new(bl_id, name)
                 s.setup(settings)
 
@@ -264,7 +269,7 @@ snrx_template_path = get_sn_template_path()
 
 class SvRxScriptNodePyMenu(bpy.types.Menu):
     bl_label = "svrx sn templates"
-    bl_idname = "SvRxScriptNodePyMenu"
+    bl_idname = "SvRxMenuScriptNodePy"
 
     def draw(self, context):
         if context.active_node:
@@ -354,7 +359,7 @@ class NodeScript(NodeBase):
         row = layout.row()
         row.prop(self, 'selected_mode', expand=True)
         col = layout.column()
-        col.menu(SvRxScriptNodePyMenu.bl_idname)
+        col.menu(SvRxMenuScriptNodePy.bl_idname)
         self.draw_buttons(context, layout)
 
 

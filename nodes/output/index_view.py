@@ -129,7 +129,7 @@ def draw_index_viz(context, args):
 
         if not matrix is None:  # and not matrix_close_to_identity(matrix)
             bmat = bMatrix(matrix)
-            final_verts = [bmat * v.co for v in bm.verts]    
+            final_verts = [bmat * v.co for v in bm.verts]
 
         if fx.display_vert_index:
             if matrix is None:
@@ -207,7 +207,7 @@ class NodeIndexView(NodeID, NodeStateful):
 @stateful
 class SvRxIndexView():
 
-    bl_idname = "SvRxIndexView"
+    bl_idname = "SvRxNodeIndexView"
     label = "Index View"
     cls_bases = (NodeIndexView,)
 
@@ -220,7 +220,7 @@ class SvRxIndexView():
         "vert_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
         "edge_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
         "face_bg_color": VectorP(size=4, min=0.0, max=1.0, default=(.2, .2, .2, 1.), subtype='COLOR'),
-        "display_vert_index": BoolP(name='show_verts', default=True), 
+        "display_vert_index": BoolP(name='show_verts', default=True),
         "display_edge_index": BoolP(name='show_edges', default=True),
         "display_face_index": BoolP(name='show_faces', default=True)
     }

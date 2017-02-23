@@ -46,6 +46,7 @@ def make_node_cats():
         nodes += [cls.node_cls for cls in node_classes.values() if cls.category == cat]
         node_cat = sorted([(node.bl_idname, node.bl_label) for node in nodes],
                           key=lambda x: x[1])
+
         node_cats[cat.title()] = node_cat
 
     return node_cats
@@ -93,6 +94,7 @@ def script_nodes(context):
 
 def draw_script(self, layout, context):
     pass
+
 
 def reload_menu():
     menu, node_count = make_categories()

@@ -43,7 +43,7 @@ def simple_grid_xy(x, y, args):
 @stateful
 class SvRxStethoscope():
 
-    bl_idname = "SvRxStethoscope"
+    bl_idname = "SvRxNodeStethoscope"
     label = "Stethoscope"
     cls_bases = (NodeStethoscope,)
 

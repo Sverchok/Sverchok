@@ -67,7 +67,7 @@ class SocketBase:
     def draw(self, context, layout, node, text):
 
         if self.is_output and self.is_linked:
-            layout.label(text + " : "  + self.count)
+            layout.label(text + " : " + self.count)
         elif self.is_linked:
             layout.label(text)
         elif not self.is_output and self.default_value is not None:
@@ -80,10 +80,8 @@ class SocketBase:
             return self.error_color
         return self.color
 
-
     def replace_socket(self, bl_idname=None, name=None, settings=None):
         replace_socket(self, new_type=bl_idname, new_name=name, settings=settings)
-
 
     @property
     def depth(self):
@@ -178,7 +176,7 @@ class SocketNumber(SocketBase):
 
 
 class IntSocket(bpy.types.NodeSocket, SocketNumber):
-    bl_idname = "SvRxIntSocket"
+    bl_idname = "SvRxSocketInt"
     bl_label = "Int Socket"
 
     default_value = IntProperty(update=exec_socket)
@@ -190,11 +188,13 @@ def get_value(self):
     value = self.get('default_value', 0)
     return max(min(value, self.default_value_high), self.default_value_low)
 
+
 def set_value(self, value):
     self['default_value'] = max(min(value, self.default_value_high), self.default_value_low)
 
+
 class IntLimitSocket(bpy.types.NodeSocket, SocketNumber):
-    bl_idname = "SvRxIntLimitSocket"
+    bl_idname = "SvRxSocketIntLimit"
     bl_label = "Int Socket"
 
     default_value_low = IntProperty(default=-100)
@@ -203,14 +203,14 @@ class IntLimitSocket(bpy.types.NodeSocket, SocketNumber):
 
 
 class FloatSocket(bpy.types.NodeSocket, SocketNumber):
-    bl_idname = "SvRxFloatSocket"
+    bl_idname = "SvRxSocketFloat"
     bl_label = "Float Socket"
 
     default_value = FloatProperty(update=exec_socket)
 
 
 class FloatLimitSocket(bpy.types.NodeSocket, SocketNumber):
-    bl_idname = "SvRxFloatLimitSocket"
+    bl_idname = "SvRxSocketFloatLimit"
     bl_label = "Float Socket"
 
     default_value_low = FloatProperty(default=-100)
@@ -219,25 +219,24 @@ class FloatLimitSocket(bpy.types.NodeSocket, SocketNumber):
     default_value = FloatProperty(update=exec_socket, set=set_value, get=get_value)
 
 
-
 class SocketVector(SocketBase):
     color = (0.9, 0.6, 0.2, 1.0)
 
 
 class VertexSocket(bpy.types.NodeSocket, SocketVector):
-    bl_idname = "SvRxVertexSocket"
+    bl_idname = "SvRxSocketVertex"
     bl_label = "Vertex Socket"
 
 
 class MatrixSocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = "SvRxMatrixSocket"
+    bl_idname = "SvRxSocketMatrix"
     bl_label = "Matrix Socket"
 
     color = (.2, .8, .8, 1.0)
 
 
 class VectorSocket(bpy.types.NodeSocket, SocketVector):
-    bl_idname = "SvRxVectorSocket"
+    bl_idname = "SvRxSocketVector"
     bl_label = "Vector Socket"
 
     default_value = FloatVectorProperty(size=4, update=exec_socket, default=(0, 0, 0, 1))
@@ -250,7 +249,7 @@ class VectorSocket(bpy.types.NodeSocket, SocketVector):
 
 
 class PointSocket(bpy.types.NodeSocket, SocketVector):
-    bl_idname = "SvRxPointSocket"
+    bl_idname = "SvRxSocketPoint"
     bl_label = "Point Socket"
 
     default_value = FloatVectorProperty(size=4, update=exec_socket, default=(0, 0, 0, 1))
@@ -263,7 +262,7 @@ class PointSocket(bpy.types.NodeSocket, SocketVector):
 
 
 class ColorSocket(bpy.types.NodeSocket, SocketVector):
-    bl_idname = 'SvRxColorSocket'
+    bl_idname = 'SvRxSocketColor'
     bl_label = 'Color Socket'
 
     default_value = FloatVectorProperty(size=4,
@@ -280,7 +279,7 @@ class ColorSocket(bpy.types.NodeSocket, SocketVector):
 
 
 class StringSocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = 'SvRxStringSocket'
+    bl_idname = 'SvRxSocketString'
     bl_label = 'String Socket'
 
     default_value = StringProperty(update=exec_socket)
@@ -288,28 +287,28 @@ class StringSocket(bpy.types.NodeSocket, SocketBase):
 
 
 class TopoSocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = "SvRxTopoSocket"
+    bl_idname = "SvRxSocketTopo"
     bl_label = "Topo Socket"
 
     color = (.1, .1, .1, 1)
 
 
 class AnySocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = "SvRxAnySocket"
+    bl_idname = "SvRxSocketAny"
     bl_label = "Any Socket"
 
     color = (.9, .9, .9, 1.0)
 
 
 class MeshSocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = "SvRxMeshSocket"
+    bl_idname = "SvRxSocketMesh"
     bl_label = "Any Socket"
 
     color = (.1, .1, .1, 1.0)
 
 
 class ObjectSocket(bpy.types.NodeSocket, SocketBase):
-    bl_idname = 'SvRxObjectSocket'
+    bl_idname = 'SvRxSocketObject'
     bl_label = 'Blender Objects'
 
     color = (.2, .2, .2, 1.0)
@@ -322,6 +321,7 @@ class ObjectSocket(bpy.types.NodeSocket, SocketBase):
         else:
             super().draw(context, layout, node, text)
 
+
 class ValueSocket:
     def draw(self, context, layout, node, text):
         if self.is_output:
@@ -329,23 +329,23 @@ class ValueSocket:
         else:
             pass
 
+
 class ValueIntSocket(bpy.types.NodeSocket, ValueSocket, SocketNumber):
-    bl_idname = "SvRxValueIntSocket"
+    bl_idname = "SvRxSocketValueInt"
     bl_label = "Value Int Socket"
 
     default_value = IntProperty(update=exec_socket)
 
 
-
 class ValueFloatSocket(bpy.types.NodeSocket, ValueSocket, SocketNumber):
-    bl_idname = "SvRxValueFloatSocket"
+    bl_idname = "SvRxSocketValueFloat"
     bl_label = "Value Float Socket"
 
     default_value = FloatProperty(update=exec_socket)
 
 
 class ValuePointSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
-    bl_idname = "SvRxValuePointSocket"
+    bl_idname = "SvRxSocketValuePoint"
     bl_label = "Value Point Socket"
 
     default_value = FloatVectorProperty(size=4, update=exec_socket)
@@ -359,7 +359,7 @@ class ValuePointSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
 
 
 class ValueColorSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
-    bl_idname = "SvRxValueColorSocket"
+    bl_idname = "SvRxSocketValueColor"
     bl_label = "Value Color Socket"
 
     default_value = FloatVectorProperty(size=4,
@@ -370,12 +370,11 @@ class ValueColorSocket(bpy.types.NodeSocket, ValueSocket, SocketVector):
 
 
 class ValueObjectSocket(bpy.types.NodeSocket, ValueSocket, SocketBase):
-    bl_idname = "SvRxValueObjectSocket"
+    bl_idname = "SvRxSocketValueObject"
     bl_label = "Value Object Socket"
 
     default_value = StringProperty(update=exec_socket)
     color = (.2, .2, .2, 1.0)
-
 
     def draw(self, context, layout, node, text):
         if self.is_output:

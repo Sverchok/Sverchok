@@ -29,7 +29,7 @@ def gen_rand_vecs(dims, number):
     return vecs / mags[..., np.newaxis]
 
 
-@node_func(bl_idname="SvRxVectorRandom")
+@node_func(bl_idname="SvRxNodeVectorRandom")
 @generator
 def random_unit_vector(size: Int =1,
                        seed: Int = 1,

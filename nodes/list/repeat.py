@@ -4,7 +4,8 @@ from svrx.nodes.node_base import node_func
 from svrx.typing import Number, Int
 from svrx.util.function import generator
 
-@node_func(bl_idname='SvRxListRepeat', multi_label="Repeat", id=0, cls_bases=(NodeMathBase,))
+
+@node_func(bl_idname='SvRxNodeListRepeat', multi_label="Repeat", id=0, cls_bases=(NodeMathBase,))
 @generator
 def np_repeat(Values: Number(iterable=False) = 0.0, Repeat: Int = 2) -> [Number]:
     return np.repeat(Values, Repeat)

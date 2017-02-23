@@ -16,68 +16,74 @@ ONES = (1, 1, 1, 1)
 - Project,
 - Reflect,
 - Componentwise-multiplication,
-
 """
-
 # pylint: disable=C0326
 # pylint: disable=W0622
 
-@node_func(bl_idname="SvRxVectorMathNode", multi_label="Vector Math", id=0)
-def add(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
+
+@node_func(bl_idname="SvRxNodeVectorMath", multi_label="Vector Math", id=0)
+def add(u: Vector = ZEROS, v: Vector = ZEROS) -> Vertices:
     u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
-    out[:,:3] = u[:,:3] + v[:,:3]
-    out[:, 3] = max(u[0,3], v[0,3])
+    out[:, :3] = u[:, :3] + v[:, :3]
+    out[:, 3] = max(u[0, 3], v[0, 3])
     return out
 
+
 @node_func(id=6)
-def sub(u: Vector = ZEROS, v: Vector = ZEROS ) -> Vertices:
+def sub(u: Vector = ZEROS, v: Vector = ZEROS) -> Vertices:
     # return add(u, opposite(v))
     u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
-    out[:,:3] = u[:,:3] - v[:,:3]
-    out[:, 3] = max(u[0,3], v[0,3])
+    out[:, :3] = u[:, :3] - v[:, :3]
+    out[:, 3] = max(u[0, 3], v[0, 3])
     return out
 
 @node_func(id=12)
-def cross(u: Vector = X_AXIS, v: Vector = Y_AXIS ) -> Vertices:
+def cross(u: Vector = X_AXIS, v: Vector = Y_AXIS) -> Vertices:
     u, v = make_compatible(u, v)
     max_len = max(u.shape[0], v.shape[0])
     out = np.zeros((max_len, 4))
-    out[:,:3] = np.cross(u[:,:3], v[:,:3])
+    out[:, :3] = np.cross(u[:, :3], v[:, :3])
     return out
 
+
 @node_func(id=18)
-def scale(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
+def scale(u: Vector = ZEROS, s: Float = 1.0) -> Vertices:
     u, s = make_compatible(u, s[:, np.newaxis])
     out = u.copy()
     out[:, :3] = u[:, :3] * s[:, :3]
     return out
 
+
 @node_func(id=22)
-def scale_reciprocal(u: Vector = ZEROS, s: Float = 1.0 ) -> Vertices:
+def scale_reciprocal(u: Vector = ZEROS, s: Float = 1.0) -> Vertices:
     return scale(u, 1 / s)
 
+
 @node_func(id=26)
-def length(u: Vector = ZEROS ) -> Float:
+def length(u: Vector = ZEROS) -> Float:
     tmp = u[:, :3]
     return np.sqrt((tmp * tmp).sum(axis=1))
 
+
 @node_func(id=32)
-def dot(u: Vector = ZEROS, v: Vector = ZEROS ) -> Float:
+def dot(u: Vector = ZEROS, v: Vector = ZEROS) -> Float:
     u, v = make_compatible(u, v)
     return np.sum(u[:, :3] * v[:, :3], axis=1)  # .. not sure
 
+
 @node_func(id=38)
-def opposite(u: Vector = ZEROS ) -> Vertices:
+def opposite(u: Vector = ZEROS) -> Vertices:
     out = u.copy()
     out[:, :3] = -u[:, :3]
     return out
 
+
 @node_func(id=44)
-def distance(u: Vector = ZEROS, v: Vector = ZEROS ) -> Float:
+def distance(u: Vector = ZEROS, v: Vector = ZEROS) -> Float:
     # speed!?  http://stackoverflow.com/a/9184560/1243487
     # return length(sub(u, v))
 
@@ -89,8 +95,9 @@ def distance(u: Vector = ZEROS, v: Vector = ZEROS ) -> Float:
 @node_func(id=48)
 def round(u: Vector = ZEROS, n: Int = 7) -> Vertices:
     out = u.copy()
-    out[:, :3] =  np.round(u[:, :3], n)
+    out[:, :3] = np.round(u[:, :3], n)
     return out
+
 
 @node_func(id=50)
 def normalize(u: Vector = ZEROS) -> Vertices:

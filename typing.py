@@ -35,11 +35,11 @@ class Required:
 
 
 class Anytype(SvRxBaseType):
-    bl_idname = "SvRxAnySocket"
+    bl_idname = "SvRxSocketAny"
 
 
 class Number(SvRxBaseType):
-    bl_idname = "SvRxFloatSocket"
+    bl_idname = "SvRxSocketFloat"
     iterable = True
 
     def __init__(self, name=None, iterable=None, min=None, max=None):
@@ -60,9 +60,9 @@ class Int(Number):
     @property
     def bl_idname(self):
         if self.max is not None or self.min is not None:
-            return "SvRxIntLimitSocket"
+            return "SvRxSocketIntLimit"
         else:
-            return "SvRxIntSocket"
+            return "SvRxSocketInt"
 
 
 class Bool(Int):
@@ -73,9 +73,9 @@ class Float(Number):
     @property
     def bl_idname(self):
         if self.max is not None or self.min is not None:
-            return "SvRxFloatLimitSocket"
+            return "SvRxSocketFloatLimit"
         else:
-            return "SvRxFloatSocket"
+            return "SvRxSocketFloat"
 
 
 class Number4f(SvRxBaseType):
@@ -83,60 +83,60 @@ class Number4f(SvRxBaseType):
 
 
 class Color(Number4f):
-    bl_idname = "SvRxColorSocket"
+    bl_idname = "SvRxSocketColor"
 
 
 class Vertices(Number4f):
-    bl_idname = "SvRxVertexSocket"
+    bl_idname = "SvRxSocketVertex"
 
 
 class Vector(Number4f):
-    bl_idname = "SvRxVectorSocket"
+    bl_idname = "SvRxSocketVector"
 
 
 class Point(Number4f):
-    bl_idname = "SvRxPointSocket"
+    bl_idname = "SvRxSocketPoint"
 
 
 class Edges(SvRxBaseType):
-    bl_idname = "SvRxTopoSocket"
+    bl_idname = "SvRxSocketTopo"
 
 
 class Faces(SvRxBaseType):
-    bl_idname = "SvRxTopoSocket"
+    bl_idname = "SvRxSocketTopo"
 
 
 class TopoData(Edges, Faces):
-    bl_idname = "SvRxTopoSocket"
+    bl_idname = "SvRxSocketTopo"
 
 
 class String(SvRxBaseType):
-    bl_idname = "SvRxStringSocket"
+    bl_idname = "SvRxSocketString"
 
 
 class Object(SvRxBaseType):
-    bl_idname = "SvRxObjectSocket"
+    bl_idname = "SvRxSocketObject"
     iterable = False
 
 
 class Matrix(SvRxBaseType):
-    bl_idname = "SvRxMatrixSocket"
+    bl_idname = "SvRxSocketMatrix"
     identity = np.identity(4)
     iterable = False
 
 
 class Mesh(SvRxBaseType):
-    bl_idname = "SvRxMeshSocket"
+    bl_idname = "SvRxSocketMesh"
     iterable = False
 
 
 class BMesh(Mesh):
-    bl_idname = "SvRxMeshSocket"
+    bl_idname = "SvRxSocketMesh"
     iterable = False
 
 
 class SMesh(Mesh):
-    bl_idname = "SvRxMeshSocket"
+    bl_idname = "SvRxSocketMesh"
     iterable = False
 
 
@@ -187,27 +187,27 @@ class BoolP(SvRxBaseTypeP):
 # Value Types, used for outputs
 
 class ValueBase:
-    bl_idname = "SvRxValueIntSocket"
+    bl_idname = "SvRxSocketValueInt"
 
 
 class IntValue(Int):
-    bl_idname = "SvRxValueIntSocket"
+    bl_idname = "SvRxSocketValueInt"
 
 
 class FloatValue(Float):
-    bl_idname = "SvRxValueFloatSocket"
+    bl_idname = "SvRxSocketValueFloat"
 
 
 class PointValue(Number4f):
-    bl_idname = "SvRxValuePointSocket"
+    bl_idname = "SvRxSocketValuePoint"
 
 
 class ColorValue(Number4f):
-    bl_idname = "SvRxValueColorSocket"
+    bl_idname = "SvRxSocketValueColor"
 
 
 class ObjectValue(Object):
-    bl_idname = "SvRxValueObjectSocket"
+    bl_idname = "SvRxSocketValueObject"
 
 
 bases = [Number, Number4f, Mesh, Object, String, Matrix, Anytype, Faces, Edges]

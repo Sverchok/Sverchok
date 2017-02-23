@@ -37,9 +37,9 @@ class SvDataTree:
             if not socket.is_linked:
                 if socket.default_value is not None:
                     if isinstance(socket.default_value, str):
-                        if socket.bl_idname == "SvRxStringSocket":
+                        if socket.bl_idname == "SvRxSocketString":
                             self.data = socket.default_value
-                        elif socket.bl_idname == "SvRxObjectSocket":
+                        elif socket.bl_idname == "SvRxSocketObject":
                             self.data = bpy.data.objects.get(socket.default_value)
                     else:
                         self.data = np.array([socket.default_value])

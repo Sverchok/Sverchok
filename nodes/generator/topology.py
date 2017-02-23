@@ -3,9 +3,12 @@ import numpy as np
 from svrx.typing import Vertices, Edges, Faces, Required
 from svrx.nodes.node_base import node_func
 from svrx.util.smesh import SvPolygon
-from svrx.util.topology import plane_edges, plane_faces, cylinder_edges, cylinder_faces, torus_edges, torus_faces
+from svrx.util.topology import (plane_edges, plane_faces,
+                                cylinder_edges, cylinder_faces,
+                                torus_edges, torus_faces)
 
-@node_func(bl_idname="SvRxGeneratorTopology", multi_label="Topology", id=0)
+
+@node_func(bl_idname="SvRxNodeGeneratorTopology", multi_label="Topology", id=0)
 def line(verts: Vertices = Required) -> (Vertices, Edges, Faces):
     count = len(verts)
     edges = np.array([np.arange(0, count - 1), np.arange(1, count)]).T
@@ -17,8 +20,8 @@ def cirle(verts: Vertices = Required) -> (Vertices, Edges, Faces):
     count = len(verts)
     edges = np.array([np.arange(0, count), np.arange(1, count + 1) % count], dtype=np.uint32).T
     faces = SvPolygon(np.array([0], dtype=np.uint32),
-                      np.array([nverts], dtype=np.uint32),
-                      np.arange(0, nverts, dtype=np.uint32))
+                      np.array([verts], dtype=np.uint32),
+                      np.arange(0, verts, dtype=np.uint32))
     return verts, edges, faces
 
 
@@ -43,7 +46,7 @@ def cylinder(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
 
 
 @node_func(id=4)
-def line_connect(verts : [Vertices] = Required) -> (Vertices, Edges, Faces):
+def line_connect(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     count = len(verts[0])
     obj_count = len(verts)
@@ -53,7 +56,7 @@ def line_connect(verts : [Vertices] = Required) -> (Vertices, Edges, Faces):
     return vertices, edges, None
 
 
-@node_func( id=5)
+@node_func(id=5)
 def torus(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     vertices = np.concatenate(verts)
     height = len(verts)
@@ -61,6 +64,3 @@ def torus(verts: [Vertices] = Required) -> (Vertices, Edges, Faces):
     edges = torus_edges(height, vert_count)
     faces = torus_faces(height, vert_count)
     return vertices, edges, faces
-
-
-# helper from sverchok, should be rewritten into numpy form.
