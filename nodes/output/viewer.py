@@ -1,4 +1,3 @@
-import math
 
 import bgl
 import blf
@@ -7,8 +6,6 @@ import bpy
 import bmesh
 import time
 
-from mathutils import Matrix as bMatrix
-from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
@@ -26,7 +23,7 @@ class NodeView(NodeID, NodeStateful):
         view_icon = 'RESTRICT_VIEW_' + ('OFF' if self.activate else 'ON')
         layout.prop(self, "activate", text="Show", toggle=True, icon=view_icon)
         col = layout.column()
-        row = col.row()
+        row = col.row(align=True)
         row.prop(self, "display_vert", toggle=True, icon='VERTEXSEL', text='')
         row.prop(self, "vert_color", text="")
 
@@ -50,37 +47,31 @@ def draw_bmesh(context, args):
     edge_col, vert_col = args[4]
 
     for verts, vert_index, colors, edges in zip(obj_list, face_list, col_list, edg_list):
-
-        try:
-            if vert_index:
-                bgl.glBegin(bgl.GL_TRIANGLES)
-                for idx in range(0, len(vert_index), 3):
-                    p0 = verts[vert_index[idx]]
-                    p1 = verts[vert_index[idx + 1]]
-                    p2 = verts[vert_index[idx + 2]]
-                    bgl.glColor3f(*colors[idx//3])
-                    bgl.glVertex3f(*p0)
-                    bgl.glVertex3f(*p1)
-                    bgl.glVertex3f(*p2)
-                bgl.glEnd()
-
-            if vert_col:
-                bgl.glBegin(bgl.GL_POINTS)
-                bgl.glColor3f(*vert_col)
-                for vert in verts:
-                    bgl.glVertex3f(*vert)
-                bgl.glEnd()
-            if edge_col:
-                bgl.glBegin(bgl.GL_LINES)
-                bgl.glColor3f(*edge_col)
-                for x, y in edges:
-                    bgl.glVertex3f(*verts[x])
-                    bgl.glVertex3f(*verts[y])
-                bgl.glEnd()
-        except Exception as err:
+        if vert_index:
+            bgl.glBegin(bgl.GL_TRIANGLES)
+            for idx in range(0, len(vert_index), 3):
+                p0 = verts[vert_index[idx]]
+                p1 = verts[vert_index[idx + 1]]
+                p2 = verts[vert_index[idx + 2]]
+                bgl.glColor3f(*colors[idx//3])
+                bgl.glVertex3f(*p0)
+                bgl.glVertex3f(*p1)
+                bgl.glVertex3f(*p2)
             bgl.glEnd()
-            print("failure", err)
-            return
+        if vert_col:
+            bgl.glBegin(bgl.GL_POINTS)
+            bgl.glColor3f(*vert_col)
+            for vert in verts:
+                bgl.glVertex3f(*vert)
+            bgl.glEnd()
+        if edge_col:
+            bgl.glBegin(bgl.GL_LINES)
+            bgl.glColor3f(*edge_col)
+            for x, y in edges:
+                bgl.glVertex3f(*verts[x])
+                bgl.glVertex3f(*verts[y])
+            bgl.glEnd()
+
 
 @stateful
 class BMViewNode():
@@ -132,9 +123,14 @@ class BMViewNode():
         color = self.node.face_color[:]
         tess_faces = bm.calc_tessface()
         vert_index = [l.vert.index for l in itertools.chain(*bm.calc_tessface())]
-        verts = [v.co for v in bm.verts]
+        if mat is None:
+            verts = [v.co for v in bm.verts]
+            normals = [f.normal for f in bm.faces]
+        else:
+            matrix = mu.Matrix(mat)
+            verts = [matrix * v.co for v in bm.verts]
+            normals = [matrix * f.normal for f in bm.faces]
         bm.normal_update()
-        normals = [f.normal for f in bm.faces]
         face_index = [t_f[0].face.index for t_f in tess_faces]
         edges_index = [(e.verts[0].index, e.verts[1].index) for e in bm.edges]
         colors = []
