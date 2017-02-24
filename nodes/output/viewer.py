@@ -11,11 +11,11 @@ from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
 from svrx.typing import (Required, StringP,
                          Anytype, BoolP, ColorP, FVectorP,
-                         BMesh, Matrix, Vertices, Faces)
+                         BMesh, Matrix, Vertices, Faces, Edges)
 from svrx.util import bgl_callback_3dview as bgl_callback
 import itertools
 import mathutils as mu
-
+from svrx.util.mesh import bmesh_from_pydata
 
 class NodeView(NodeID, NodeStateful):
 
@@ -105,8 +105,8 @@ class BMViewNode():
     @property
     def current_draw_data(self):
         args = (self.vertices, self.faces, self.colors, self.edges,
-                (self.node.edge_color if self.node.display_edge else None,
-                 self.node.vert_color if self.node.display_vert else None))
+                (self.node.edge_color[:] if self.node.display_edge else None,
+                 self.node.vert_color[:] if self.node.display_vert else None))
         return {
             'tree_name': self.node.id_data.name[:],
             'custom_function': draw_bmesh,
@@ -148,3 +148,18 @@ class BMViewNode():
         self.faces.append(vert_index if self.node.display_face else [])
         self.colors.append(colors)
         self.edges.append(edges_index)
+
+
+
+@stateful
+class ViewNode(BMViewNode):
+    bl_idname = "SvRxNodeRxViewGL"
+    label = "Viewer Rx GL"
+
+    def __call__(self,
+                verts: Vertices = Required,
+                edges: Edges = None,
+                faces: Faces = None,
+                mat: Matrix = None):
+
+        super().__call__(bmesh_from_pydata(verts[:,:3].tolist(), edges, faces), mat)
