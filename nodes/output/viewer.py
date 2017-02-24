@@ -161,5 +161,5 @@ class ViewNode(BMViewNode):
                 edges: Edges = None,
                 faces: Faces = None,
                 mat: Matrix = None):
-
-        super().__call__(bmesh_from_pydata(verts[:,:3].tolist(), edges, faces), mat)
+        bm = bmesh_from_pydata(verts[:,:3].tolist(), edges, faces)
+        super().__call__(bm, mat)
