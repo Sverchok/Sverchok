@@ -8,7 +8,9 @@ from svrx.typing import (Required, BoolP, ColorP,
 from svrx.util import bgl_callback_3dview as bgl_callback
 import itertools
 import mathutils as mu
+import bmesh
 import numpy as np
+
 from svrx.util.mesh import bmesh_from_pydata
 
 
@@ -18,6 +20,7 @@ _callback_cache = {}
 class NodeView(NodeID, NodeStateful):
 
     def draw_buttons(self, context, layout):
+        layout.prop(self, "use_ops_trans")
         view_icon = 'RESTRICT_VIEW_' + ('OFF' if self.activate else 'ON')
         layout.prop(self, "activate", text="Show", toggle=True, icon=view_icon)
         col = layout.column()
@@ -32,6 +35,8 @@ class NodeView(NodeID, NodeStateful):
         row = col.row(align=True)
         row.prop(self, "display_face", toggle=True, icon='FACESEL', text='')
         row.prop(self, "face_color", text="")
+
+
 
     def free(self):
         bgl_callback.callback_disable(self.node_id)
@@ -90,7 +95,8 @@ class BMViewNode():
         "face_color": ColorP(default=(1., .8, .8)),
         "display_vert": BoolP(name='show_verts', default=True),
         "display_edge": BoolP(name='show_edges', default=True),
-        "display_face": BoolP(name='show_faces', default=True)
+        "display_face": BoolP(name='show_faces', default=True),
+        "use_ops_trans": BoolP(default=False)
     }
 
     def __init__(self, node=None):
@@ -127,17 +133,27 @@ class BMViewNode():
     def __call__(self, bm: BMesh = Required,
                  mat: Matrix = None):
         color = self.node.face_color[:]
-        tess_faces = bm.calc_tessface()
-        vert_index = [l.vert.index for l in itertools.chain(*bm.calc_tessface())]
-        bm.normal_update()
         if mat is not None:
-            matrix = mu.Matrix(mat)
-            verts = [matrix * v.co for v in bm.verts]
-            mat33 = matrix.to_3x3()
-            normals = [mat33 * f.normal for f in bm.faces]
+            if self.node.use_ops_trans:
+                bm = bm.copy()
+                matrix = mu.Matrix(mat)
+                bmesh.ops.transform(bm, matrix=matrix, verts=bm.verts)
+                verts = [v.co[:] for v in bm.verts]
+                bm.normal_update()
+                normals = [f.normal[:] for f in bm.faces]
+            else:
+                matrix = mu.Matrix(mat)
+                verts = [matrix * v.co for v in bm.verts]
+                bm.normal_update()
+                mat33 = matrix.to_3x3()
+                normals = [(mat33 * f.normal)[:] for f in bm.faces]
         else:
             verts = [v.co[:] for v in bm.verts]
+            bm.normal_update()
             normals = [f.normal[:] for f in bm.faces]
+
+        tess_faces = bm.calc_tessface()
+        vert_index = [l.vert.index for l in itertools.chain(*bm.calc_tessface())]
 
         face_index = [t_f[0].face.index for t_f in tess_faces]
         edges_index = [(e.verts[0].index, e.verts[1].index) for e in bm.edges]
