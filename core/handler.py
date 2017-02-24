@@ -22,15 +22,17 @@ from bpy.app.handlers import persistent
 
 from svrx.core.tree import svrx_trees
 from svrx.util import bgl_callback, bgl_callback_3dview_2d
-
+import svrx
 
 @persistent
 def sv_main_handler(scene):
     """
     Main Sverchok handler for updating node tree upon editor changes
     """
+    reload_event = svrx.reload_event
+    svrx.reload_event = False
     for ng in svrx_trees():
-        if ng.has_changed:
+        if ng.has_changed or reload_event:
             ng.execute()
 
 
