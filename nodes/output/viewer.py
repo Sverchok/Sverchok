@@ -1,21 +1,19 @@
 
 import bgl
-import blf
-
-import bpy
-import bmesh
-import time
-
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.typing import (Required, StringP,
-                         Anytype, BoolP, ColorP, FVectorP,
+from svrx.typing import (Required, BoolP, ColorP,
                          BMesh, Matrix, Vertices, Faces, Edges)
 from svrx.util import bgl_callback_3dview as bgl_callback
 import itertools
 import mathutils as mu
+import numpy as np
 from svrx.util.mesh import bmesh_from_pydata
+
+
+_callback_cache = {}
+
 
 class NodeView(NodeID, NodeStateful):
 
@@ -40,6 +38,11 @@ class NodeView(NodeID, NodeStateful):
 
 
 def draw_bmesh(context, args):
+    """Draw mesh from formatted data
+
+    Better passing of arguments
+    Display list/vertex buffer
+    """
     obj_list = args[0]
     face_list = args[1]
     col_list = args[2]
@@ -115,8 +118,12 @@ class BMViewNode():
 
     def stop(self):
         bgl_callback.callback_disable(self.n_id)
+        _callback_cache.pop(self.n_id, None)
         if self.activate:
-            bgl_callback.callback_enable(self.n_id, self.current_draw_data, overlay="POST_VIEW")
+            draw_data = self.current_draw_data
+            _callback_cache[self.n_id] = draw_data
+            print(self.n_id, self.label)
+            bgl_callback.callback_enable(self.n_id, draw_data, overlay="POST_VIEW")
 
     def __call__(self, bm: BMesh = Required,
                  mat: Matrix = None):
@@ -130,18 +137,18 @@ class BMViewNode():
             mat33 = matrix.to_3x3()
             normals = [mat33 * f.normal for f in bm.faces]
         else:
-            verts = [v.co for v in bm.verts]
-            normals = [f.normal for f in bm.faces]
+            verts = [v.co[:] for v in bm.verts]
+            normals = [f.normal[:] for f in bm.faces]
 
         face_index = [t_f[0].face.index for t_f in tess_faces]
         edges_index = [(e.verts[0].index, e.verts[1].index) for e in bm.edges]
         colors = []
         for idx in face_index:
-            normal = normals[idx]
-            normal_nu = normal.angle((0, 0, 1), 0) / 3.14
-            r = (normal_nu * color[0]) - 0.1
-            g = (normal_nu * color[1]) - 0.1
-            b = (normal_nu * color[2]) - 0.1
+            normal = mu.Vector(normals[idx])
+            normal_nu = normal.angle((0, 0, 1), 0) / np.pi
+            r = (normal_nu * color[0]) + 0.1
+            g = (normal_nu * color[1]) + 0.1
+            b = (normal_nu * color[2]) + 0.1
             colors.append((r, g, b))
 
         self.vertices.append(verts)
@@ -150,16 +157,15 @@ class BMViewNode():
         self.edges.append(edges_index)
 
 
-
 @stateful
 class ViewNode(BMViewNode):
     bl_idname = "SvRxNodeRxViewGL"
-    label = "Viewer Rx GL"
+    label = 'Viewer Rx GL'
 
     def __call__(self,
-                verts: Vertices = Required,
-                edges: Edges = None,
-                faces: Faces = None,
-                mat: Matrix = None):
-        bm = bmesh_from_pydata(verts[:,:3].tolist(), edges, faces)
+                 verts: Vertices = Required,
+                 edges: Edges = None,
+                 faces: Faces = None,
+                 mat: Matrix = None):
+        bm = bmesh_from_pydata(verts[:, :3].tolist(), edges, faces)
         super().__call__(bm, mat)
