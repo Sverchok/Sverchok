@@ -122,7 +122,6 @@ class BMViewNode():
         if self.activate:
             draw_data = self.current_draw_data
             _callback_cache[self.n_id] = draw_data
-            print(self.n_id, self.label)
             bgl_callback.callback_enable(self.n_id, draw_data, overlay="POST_VIEW")
 
     def __call__(self, bm: BMesh = Required,
