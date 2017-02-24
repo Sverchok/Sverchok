@@ -61,12 +61,9 @@ class SverchokReduxTree(bpy.types.NodeTree):
         self.has_changed = True
 
     def execute(self):
-        start = time.perf_counter()
         self.has_changed = False
         exec_node_group(self)
         self.has_changed = False
-        stop = time.perf_counter()
-        print(self.name, "{:f}".format(stop-start))
 
     def execute_animate(self):
         exec_node_group(self)
