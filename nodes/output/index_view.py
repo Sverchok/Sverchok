@@ -121,51 +121,38 @@ def draw_index_viz(context, args):
 
     for obj_index, (bm, matrix) in enumerate(zip(args.data.bms, args.data.mats)):
 
-        final_verts = bm.verts
+        # yes ultra lazy, but think of it like this.. we never use idx viewer to see tonnes of indices
+        # we should offer an index mask
 
-        """
-        preprocessing the vertex coordinates if a matrix is passed. This makes
-        the following routine a bit duplicitous, but acceptable for now.
-
-        """
-
-        if not matrix is None:  # and not matrix_close_to_identity(matrix)
+        if not matrix is None and matrix_is_epsilon_away_from_identity(matrix):
             bmat = bMatrix(matrix)
-            final_verts = [bmat * v.co for v in bm.verts]
+            bm2 = bmesh.ops.copy(bm)
+            bmesh.ops.transform(bm2, verts=bm.verts, matrix=bmat)
+            final_verts = bm2.verts
+            final_edges = bm2.edges
+            final_faces = bm2.faces
+        else:
+            final_verts = bm.verts
+            final_edges = bm.edges
+            final_faces = bm.faces
+
 
         if fx.display_vert_index:
-            if matrix is None:
-                for idx, v in enumerate(final_verts):
-                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
-            else:
-                for idx, v in enumerate(final_verts):
-                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
+            for idx, v in enumerate(final_verts):
+                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
 
         if bm.edges and fx.display_edge_index:
-            if matrix is None:
-                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
-                    v1 = final_verts[idx1].co
-                    v2 = final_verts[idx2].co
-                    loc = v1 + ((v2 - v1) / 2)
-                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
-            else:
-                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
-                    v1 = final_verts[idx1]
-                    v2 = final_verts[idx2]
-                    loc = v1 + ((v2 - v1) / 2)
-                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
+            for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
+                v1 = final_verts[idx1].co
+                v2 = final_verts[idx2].co
+                loc = v1 + ((v2 - v1) / 2)
+                draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
 
         # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
         if bm.faces and fx.display_face_index:
-            if matrix is None:
-                for face_index, f in enumerate(bm.faces):
-                    median = f.calc_center_median()
-                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
-            else:
-                for face_index, f in enumerate(bm.faces):
-                    verts = [final_verts[v.index] for v in f.verts]
-                    median = calc_median(verts)
-                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
+            for face_index, f in enumerate(final_faces):
+                median = f.calc_center_median()
+                draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 class NodeIndexView(NodeID, NodeStateful):
@@ -240,17 +227,12 @@ class SvRxIndexView():
 
     @property
     def get_fx(self):
-        params = [
-           "vert_idx_color", "edge_idx_color", "face_idx_color",
-           "vert_bg_color", "edge_bg_color", "face_bg_color",
-           "display_vert_index", "display_edge_index", "display_face_index",
-           "draw_bg"]
+        params = self.properties.keys()
 
         fx = namedtuple('fx', params)
         for param_name in params:
-            if param_name.endswith(('index', 'bg')):
-                param_value = getattr(self.node, param_name)
-            else:
+            param_value = getattr(self.node, param_name)
+            if not isinstance(param_value, (bool, )):
                 param_value = getattr(self.node, param_name)[:]
             setattr(fx, param_name, param_value)
         return fx
@@ -258,21 +240,14 @@ class SvRxIndexView():
 
     @property
     def get_data(self):
-        d = lambda: None
-        d.bms = self.bms
-        d.mats = self.mats
-        return d
-
+        return type('', (), {'bms': self.bms, 'mats': self.mats})
 
     @property
     def current_draw_data(self):
-        args = namedtuple('args', ['fx', 'data'])
-        args.fx = self.get_fx
-        args.data = self.get_data
         return {
             'tree_name': self.node.id_data.name[:],
             'custom_function': draw_index_viz,
-            'args': args
+            'args': type('', (), {'fx': self.get_fx, 'data': self.get_data})
         }
 
 
