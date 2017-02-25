@@ -23,6 +23,16 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 
 point_dict = {}
 
+
+def matrix_is_epsilon_away_from_identity(matrix):
+    #  reduces all values below threshold (+ or -) to 0.0, to avoid meaningless
+    #  wandering floats.
+    # coord_strip = lambda c: 0.0 if (-1.6e-5 <= c <= 1.6e-5) else c
+    # san = lambda v: Vector((coord_strip(c) for c in v[:]))
+    # return Matrix([san(v) for v in matrix]) == Matrix()
+    return True
+
+
 def adjust_list(in_list, x, y):
     return [[old_x + x, old_y + y] for (old_x, old_y) in in_list]
 
@@ -126,11 +136,12 @@ def draw_index_viz(context, args):
 
         if not matrix is None and matrix_is_epsilon_away_from_identity(matrix):
             bmat = bMatrix(matrix)
-            bm2 = bmesh.ops.copy(bm)
-            bmesh.ops.transform(bm2, verts=bm.verts, matrix=bmat)
+            bm2 = bm.copy()
+            bmesh.ops.transform(bm2, verts=bm2.verts, matrix=bmat)
             final_verts = bm2.verts
             final_edges = bm2.edges
             final_faces = bm2.faces
+            final_verts.ensure_lookup_table()
         else:
             final_verts = bm.verts
             final_edges = bm.edges
