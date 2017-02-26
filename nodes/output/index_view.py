@@ -13,7 +13,7 @@ from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.util import bgl_callback_3dview_2d as bgl_callback
+from svrx.util import bgl_callback_3dview as bgl_callback
 from svrx.typing import Required, BoolP, ColorAP, BMesh, Matrix
 
 
@@ -285,7 +285,7 @@ class SvRxIndexView():
     def stop(self):
         bgl_callback.callback_disable(self.n_id)
         if self.activate:
-            bgl_callback.callback_enable(self.n_id, self.current_draw_data)
+            bgl_callback.callback_enable(self.n_id, self.current_draw_data, overlay='POST_PIXEL')
 
 
     def __call__(self, bm: BMesh = Required, matrix: Matrix = None):
