@@ -264,7 +264,7 @@ snrx_template_path = get_sn_template_path()
 
 class SvRxScriptNodePyMenu(bpy.types.Menu):
     bl_label = "svrx sn templates"
-    bl_idname = "SvRxMenuScriptNodePy"
+    bl_idname = "SvRxScriptNodePyMenu"
 
     def draw(self, context):
         if context.active_node:
@@ -354,7 +354,7 @@ class NodeScript(NodeBase):
         row = layout.row()
         row.prop(self, 'selected_mode', expand=True)
         col = layout.column()
-        col.menu(SvRxMenuScriptNodePy.bl_idname)
+        col.menu(SvRxScriptNodePyMenu.bl_idname)
         self.draw_buttons(context, layout)
 
 
