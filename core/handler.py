@@ -21,7 +21,7 @@ import bpy
 from bpy.app.handlers import persistent
 
 from svrx.core.tree import svrx_trees
-from svrx.util import bgl_callback, bgl_callback_3dview_2d
+from svrx.util import bgl_callback, bgl_callback_3dview
 import svrx
 
 @persistent
@@ -43,7 +43,7 @@ def sv_file_load(scene):
     clean up callbacks
     """
 
-    for callback in (bgl_callback, bgl_callback_3dview_2d):
+    for callback in (bgl_callback, bgl_callback_3dview):
         callback.callback_disable_all()
 
     for ng in svrx_trees():
