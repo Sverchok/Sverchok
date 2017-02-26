@@ -13,10 +13,9 @@ from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.typing import (Required, StringP,
-                         Anytype, BoolP, ColorAP, FVectorP,
-                         BMesh, Matrix)
 from svrx.util import bgl_callback_3dview_2d as bgl_callback
+from svrx.typing import Required, BoolP, ColorAP, BMesh, Matrix
+
 
 # pylint: disable=C0326
 # pylint: disable=C0330
@@ -244,10 +243,12 @@ class SvRxIndexView():
                 final_edges = bm.edges
                 final_faces = bm.faces
 
+            VI = []
             if self.node.display_vert_index:
                 for idx, v in enumerate(final_verts):
                     vert_indices_add([idx, v.co])
 
+            EI = []
             if bm.edges and self.node.display_edge_index:
                 for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
                     v1 = final_verts[idx1].co
@@ -255,7 +256,7 @@ class SvRxIndexView():
                     loc = v1 + ((v2 - v1) / 2)
                     edge_indices_add([edge_index, loc])
 
-            # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
+            FI = []
             if bm.faces and self.node.display_face_index:
                 for face_index, f in enumerate(final_faces):
                     median = f.calc_center_median()
