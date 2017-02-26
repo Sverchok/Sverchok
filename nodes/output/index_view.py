@@ -123,13 +123,16 @@ def draw_index_viz(context, args):
         blf.draw(0, index)
 
     for instructions in args.data.vert_indices:
-        draw_index(fx.vert_idx_color, fx.vert_bg_color, *instructions)
+        for instruct in instructions:
+            draw_index(fx.vert_idx_color, fx.vert_bg_color, *instruct)
 
     for instructions in args.data.edge_indices:
-        draw_index(fx.edge_idx_color, fx.edge_bg_color, *instructions)
+        for instruct in instructions:
+            draw_index(fx.edge_idx_color, fx.edge_bg_color, *instruct)
 
-    for instructions in args.data.face_indices:        
-        draw_index(fx.face_idx_color, fx.face_bg_color, *instructions)
+    for instructions in args.data.face_indices:
+        for instruct in instructions:
+            draw_index(fx.face_idx_color, fx.face_bg_color, *instruct)
 
 
 
@@ -244,23 +247,29 @@ class SvRxIndexView():
                 final_faces = bm.faces
 
             VI = []
+            add_vert_instruct = VI.append
             if self.node.display_vert_index:
                 for idx, v in enumerate(final_verts):
-                    vert_indices_add([idx, v.co])
+                    add_vert_instruct([idx, v.co])
+                vert_indices_add(VI)
 
             EI = []
+            add_edge_instruct = EI.append
             if bm.edges and self.node.display_edge_index:
                 for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
                     v1 = final_verts[idx1].co
                     v2 = final_verts[idx2].co
                     loc = v1 + ((v2 - v1) / 2)
-                    edge_indices_add([edge_index, loc])
+                    add_edge_instruct([edge_index, loc])
+                edge_indices_add(EI)
 
             FI = []
+            add_face_instruct = FI.append
             if bm.faces and self.node.display_face_index:
                 for face_index, f in enumerate(final_faces):
                     median = f.calc_center_median()
-                    face_indices_add([face_index, median])
+                    add_face_instruct([face_index, median])
+                face_indices_add(FI)
 
         return type('', (), {'vert_indices': vert_indices, 'edge_indices': edge_indices, 'face_indices': face_indices})
 
