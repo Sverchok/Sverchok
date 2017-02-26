@@ -13,15 +13,24 @@ from mathutils import Vector as bVector
 
 from svrx.nodes.node_base import stateful
 from svrx.nodes.classes import NodeID, NodeStateful
-from svrx.typing import (Required, StringP,
-                         Anytype, BoolP, ColorAP, FVectorP,
-                         BMesh, Matrix)
 from svrx.util import bgl_callback_3dview_2d as bgl_callback
+from svrx.typing import Required, BoolP, ColorAP, BMesh, Matrix
+
 
 # pylint: disable=C0326
 # pylint: disable=C0330
 
 point_dict = {}
+
+
+def NOT_IMPLEMENTED_YET_identity_epsilon(matrix):
+    #  reduces all values below threshold (+ or -) to 0.0, to avoid meaningless
+    #  wandering floats.
+    # coord_strip = lambda c: 0.0 if (-1.6e-5 <= c <= 1.6e-5) else c
+    # san = lambda v: Vector((coord_strip(c) for c in v[:]))
+    # return Matrix([san(v) for v in matrix]) == Matrix()
+    return False
+
 
 def adjust_list(in_list, x, y):
     return [[old_x + x, old_y + y] for (old_x, old_y) in in_list]
@@ -113,59 +122,18 @@ def draw_index_viz(context, args):
         blf.position(0, x - (txt_width / 2), y - (txt_height / 2), 0)
         blf.draw(0, index)
 
-    def calc_median(vlist):
-        a = bVector((0, 0, 0))
-        for v in vlist:
-            a += v
-        return a / len(vlist)
+    for instructions in args.data.vert_indices:
+        for instruct in instructions:
+            draw_index(fx.vert_idx_color, fx.vert_bg_color, *instruct)
 
-    for obj_index, (bm, matrix) in enumerate(zip(args.data.bms, args.data.mats)):
+    for instructions in args.data.edge_indices:
+        for instruct in instructions:
+            draw_index(fx.edge_idx_color, fx.edge_bg_color, *instruct)
 
-        final_verts = bm.verts
+    for instructions in args.data.face_indices:
+        for instruct in instructions:
+            draw_index(fx.face_idx_color, fx.face_bg_color, *instruct)
 
-        """
-        preprocessing the vertex coordinates if a matrix is passed. This makes
-        the following routine a bit duplicitous, but acceptable for now.
-
-        """
-
-        if not matrix is None:  # and not matrix_close_to_identity(matrix)
-            bmat = bMatrix(matrix)
-            final_verts = [bmat * v.co for v in bm.verts]
-
-        if fx.display_vert_index:
-            if matrix is None:
-                for idx, v in enumerate(final_verts):
-                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
-            else:
-                for idx, v in enumerate(final_verts):
-                    draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v)
-
-        if bm.edges and fx.display_edge_index:
-            if matrix is None:
-                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
-                    v1 = final_verts[idx1].co
-                    v2 = final_verts[idx2].co
-                    loc = v1 + ((v2 - v1) / 2)
-                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
-            else:
-                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in bm.edges):
-                    v1 = final_verts[idx1]
-                    v2 = final_verts[idx2]
-                    loc = v1 + ((v2 - v1) / 2)
-                    draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
-
-        # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
-        if bm.faces and fx.display_face_index:
-            if matrix is None:
-                for face_index, f in enumerate(bm.faces):
-                    median = f.calc_center_median()
-                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
-            else:
-                for face_index, f in enumerate(bm.faces):
-                    verts = [final_verts[v.index] for v in f.verts]
-                    median = calc_median(verts)
-                    draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 class NodeIndexView(NodeID, NodeStateful):
@@ -240,17 +208,12 @@ class SvRxIndexView():
 
     @property
     def get_fx(self):
-        params = [
-           "vert_idx_color", "edge_idx_color", "face_idx_color",
-           "vert_bg_color", "edge_bg_color", "face_bg_color",
-           "display_vert_index", "display_edge_index", "display_face_index",
-           "draw_bg"]
+        params = self.properties.keys()
 
         fx = namedtuple('fx', params)
         for param_name in params:
-            if param_name.endswith(('index', 'bg')):
-                param_value = getattr(self.node, param_name)
-            else:
+            param_value = getattr(self.node, param_name)
+            if not isinstance(param_value, (bool, )):
                 param_value = getattr(self.node, param_name)[:]
             setattr(fx, param_name, param_value)
         return fx
@@ -258,21 +221,64 @@ class SvRxIndexView():
 
     @property
     def get_data(self):
-        d = lambda: None
-        d.bms = self.bms
-        d.mats = self.mats
-        return d
+        vert_indices = []
+        face_indices = []
+        edge_indices = []
+        vert_indices_add = vert_indices.append
+        face_indices_add = face_indices.append
+        edge_indices_add = edge_indices.append
 
+        for obj_index, (bm, matrix) in enumerate(zip(self.bms, self.mats)):
+
+            # yes ultra lazy, but think of it like this.. we never use idx viewer to see tonnes of indices
+            # we should offer an index mask
+
+            if not matrix is None and not NOT_IMPLEMENTED_YET_identity_epsilon(matrix):
+                bmat = bMatrix(matrix)
+                bm2 = bm.copy()
+                bmesh.ops.transform(bm2, verts=bm2.verts, matrix=bmat)
+                final_verts = bm2.verts
+                final_edges = bm2.edges
+                final_faces = bm2.faces
+                final_verts.ensure_lookup_table()
+            else:
+                final_verts = bm.verts
+                final_edges = bm.edges
+                final_faces = bm.faces
+
+            VI = []
+            add_vert_instruct = VI.append
+            if self.node.display_vert_index:
+                for idx, v in enumerate(final_verts):
+                    add_vert_instruct([idx, v.co])
+                vert_indices_add(VI)
+
+            EI = []
+            add_edge_instruct = EI.append
+            if bm.edges and self.node.display_edge_index:
+                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
+                    v1 = final_verts[idx1].co
+                    v2 = final_verts[idx2].co
+                    loc = v1 + ((v2 - v1) / 2)
+                    add_edge_instruct([edge_index, loc])
+                edge_indices_add(EI)
+
+            FI = []
+            add_face_instruct = FI.append
+            if bm.faces and self.node.display_face_index:
+                for face_index, f in enumerate(final_faces):
+                    median = f.calc_center_median()
+                    add_face_instruct([face_index, median])
+                face_indices_add(FI)
+
+        return type('', (), {'vert_indices': vert_indices, 'edge_indices': edge_indices, 'face_indices': face_indices})
 
     @property
     def current_draw_data(self):
-        args = namedtuple('args', ['fx', 'data'])
-        args.fx = self.get_fx
-        args.data = self.get_data
         return {
             'tree_name': self.node.id_data.name[:],
             'custom_function': draw_index_viz,
-            'args': args
+            'args': type('', (), {'fx': self.get_fx, 'data': self.get_data})
         }
 
 
