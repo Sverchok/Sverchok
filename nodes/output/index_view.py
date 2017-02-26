@@ -123,12 +123,6 @@ def draw_index_viz(context, args):
         blf.position(0, x - (txt_width / 2), y - (txt_height / 2), 0)
         blf.draw(0, index)
 
-    def calc_median(vlist):
-        a = bVector((0, 0, 0))
-        for v in vlist:
-            a += v
-        return a / len(vlist)
-
     for obj_index, (bm, matrix) in enumerate(zip(args.data.bms, args.data.mats)):
 
         # yes ultra lazy, but think of it like this.. we never use idx viewer to see tonnes of indices
