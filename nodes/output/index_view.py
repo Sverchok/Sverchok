@@ -24,13 +24,13 @@ from svrx.util import bgl_callback_3dview_2d as bgl_callback
 point_dict = {}
 
 
-def matrix_is_epsilon_away_from_identity(matrix):
+def NOT_IMPLEMENTED_YET_identity_epsilon(matrix):
     #  reduces all values below threshold (+ or -) to 0.0, to avoid meaningless
     #  wandering floats.
     # coord_strip = lambda c: 0.0 if (-1.6e-5 <= c <= 1.6e-5) else c
     # san = lambda v: Vector((coord_strip(c) for c in v[:]))
     # return Matrix([san(v) for v in matrix]) == Matrix()
-    return True
+    return False
 
 
 def adjust_list(in_list, x, y):
@@ -123,41 +123,15 @@ def draw_index_viz(context, args):
         blf.position(0, x - (txt_width / 2), y - (txt_height / 2), 0)
         blf.draw(0, index)
 
-    for obj_index, (bm, matrix) in enumerate(zip(args.data.bms, args.data.mats)):
+    for instructions in args.data.vert_indices:
+        draw_index(fx.vert_idx_color, fx.vert_bg_color, *instructions)
 
-        # yes ultra lazy, but think of it like this.. we never use idx viewer to see tonnes of indices
-        # we should offer an index mask
+    for instructions in args.data.edge_indices:
+        draw_index(fx.edge_idx_color, fx.edge_bg_color, *instructions)
 
-        if not matrix is None and matrix_is_epsilon_away_from_identity(matrix):
-            bmat = bMatrix(matrix)
-            bm2 = bm.copy()
-            bmesh.ops.transform(bm2, verts=bm2.verts, matrix=bmat)
-            final_verts = bm2.verts
-            final_edges = bm2.edges
-            final_faces = bm2.faces
-            final_verts.ensure_lookup_table()
-        else:
-            final_verts = bm.verts
-            final_edges = bm.edges
-            final_faces = bm.faces
+    for instructions in args.data.face_indices:        
+        draw_index(fx.face_idx_color, fx.face_bg_color, *instructions)
 
-
-        if fx.display_vert_index:
-            for idx, v in enumerate(final_verts):
-                draw_index(fx.vert_idx_color, fx.vert_bg_color, idx, v.co)
-
-        if bm.edges and fx.display_edge_index:
-            for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
-                v1 = final_verts[idx1].co
-                v2 = final_verts[idx2].co
-                loc = v1 + ((v2 - v1) / 2)
-                draw_index(fx.edge_idx_color, fx.edge_bg_color, edge_index, loc)
-
-        # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
-        if bm.faces and fx.display_face_index:
-            for face_index, f in enumerate(final_faces):
-                median = f.calc_center_median()
-                draw_index(fx.face_idx_color, fx.face_bg_color, face_index, median)
 
 
 class NodeIndexView(NodeID, NodeStateful):
@@ -245,7 +219,49 @@ class SvRxIndexView():
 
     @property
     def get_data(self):
-        return type('', (), {'bms': self.bms, 'mats': self.mats})
+        vert_indices = []
+        face_indices = []
+        edge_indices = []
+        vert_indices_add = vert_indices.append
+        face_indices_add = face_indices.append
+        edge_indices_add = edge_indices.append
+
+        for obj_index, (bm, matrix) in enumerate(zip(self.bms, self.mats)):
+
+            # yes ultra lazy, but think of it like this.. we never use idx viewer to see tonnes of indices
+            # we should offer an index mask
+
+            if not matrix is None and not NOT_IMPLEMENTED_YET_identity_epsilon(matrix):
+                bmat = bMatrix(matrix)
+                bm2 = bm.copy()
+                bmesh.ops.transform(bm2, verts=bm2.verts, matrix=bmat)
+                final_verts = bm2.verts
+                final_edges = bm2.edges
+                final_faces = bm2.faces
+                final_verts.ensure_lookup_table()
+            else:
+                final_verts = bm.verts
+                final_edges = bm.edges
+                final_faces = bm.faces
+
+            if self.node.display_vert_index:
+                for idx, v in enumerate(final_verts):
+                    vert_indices_add([idx, v.co])
+
+            if bm.edges and self.node.display_edge_index:
+                for edge_index, (idx1, idx2) in enumerate([e.verts[0].index, e.verts[1].index] for e in final_edges):
+                    v1 = final_verts[idx1].co
+                    v2 = final_verts[idx2].co
+                    loc = v1 + ((v2 - v1) / 2)
+                    edge_indices_add([edge_index, loc])
+
+            # if  dot(face_normal, camera_vector) > 0 : then backface... change hue/ hide index ?
+            if bm.faces and self.node.display_face_index:
+                for face_index, f in enumerate(final_faces):
+                    median = f.calc_center_median()
+                    face_indices_add([face_index, median])
+
+        return type('', (), {'vert_indices': vert_indices, 'edge_indices': edge_indices, 'face_indices': face_indices})
 
     @property
     def current_draw_data(self):
